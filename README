@@ -1,6 +1,14 @@
+Master thesis on peer discovery in federated overlays.
+
 ---------------------------------
-Kademlia for the Peersim Simulator
+Currently available: Node lookup in Kademlia (using Peersim Simulator)
 ---------------------------------
+
+Builds upon the work from:
+
+- Daniele Furlan (daniele.furlan@gmail.com)
+- Maurizio Bonani (maurizio.bonani@gmail.com)
+
 
 An example example.cfg configuration file can be found in the  main directory.
 
