@@ -293,7 +293,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 //		System.err.println("The operationID is : " + fop.operationId);
 //		System.err.println("Size of the findOP of node : " + this.nodeId +" is " + findOp.size());
 
-		// get the K closest node to srcNode and
+		// get the K closest node to search key
 		BigInteger[] neighbours = this.routingTable.getKClosestNeighbours(m.dest, this.nodeId);
 
 		// update the list of closest nodes and re-initialize available requests
@@ -471,7 +471,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 
 	/**
-	 * set the current NodeId
+	 * Set the current NodeId
 	 * 
 	 * @param tmp
 	 *            BigInteger
@@ -482,7 +482,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	}
 
 	/**
-	 * get the current NodeID
+	 * Get the current NodeID
 	 * @return nodeId
 	 */
 	public BigInteger getNodeId(){
@@ -490,7 +490,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	}
 
 	/**
-	 * get the current transport ID
+	 * Get the current transport ID
 	 * @return tid
 	 */
 	public int getTransportID(){
@@ -498,7 +498,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	}
 
 	/**
-	 * get the current kademlia protocol ID
+	 * Get the current kademlia protocol ID
 	 * @return kademliaid
 	 */
 	public int getKademliaProtocolID(){

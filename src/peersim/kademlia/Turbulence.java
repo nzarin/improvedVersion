@@ -1,5 +1,6 @@
 package peersim.kademlia;
 
+import java.math.BigInteger;
 import java.util.Comparator;
 
 import peersim.config.Configuration;
@@ -128,6 +129,7 @@ public class Turbulence implements Control {
 	 */
 	public boolean add() {
 
+
 		// Add Node
 		Node newNode = (Node) Network.prototype.clone();
 		for (int j = 0; j < inits.length; ++j)
@@ -139,7 +141,10 @@ public class Turbulence implements Control {
 
 		// set node Id
 		UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
-		((KademliaProtocol) (newNode.getProtocol(kademliaid))).setNodeId(urg.generate());
+		BigInteger nodeId = urg.generate();
+		((KademliaProtocol) (newNode.getProtocol(kademliaid))).setNodeId(nodeId);
+
+		System.err.println("New node is spawn with node id : " + nodeId);
 
 		// sort network
 		sortNet();
