@@ -171,16 +171,16 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 		if (fop != null) {
 
-			System.err.println("My old closest set is : " + fop.getClosestSet().toString());
+//			System.err.println("My old closest set is : " + fop.getClosestSet().toString());
 
 			// Step 1: update by saving received neighbour in the closest set of find operation
 			try {
 				fop.updateClosestSet((BigInteger[]) m.body);
-				System.err.println("My new (updated) closest set is : " + fop.getClosestSet().toString());
+//				System.err.println("My new (updated) closest set is : " + fop.getClosestSet().toString());
 
 			} catch (Exception ex) {
 				fop.available_requests++;
-				System.err.println("And I did not updated it.");
+//				System.err.println("And I did not updated it.");
 
 			}
 
@@ -193,8 +193,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				// if there is a node that still needs to be queried
 				if (neighbour != null) {
 
-					System.err.println("I found a neighbor that still needs to be queried: node " + neighbour);
-					System.err.println("So I am going to send it a ROUTE message");
+//					System.err.println("I found a neighbor that still needs to be queried: node " + neighbour);
+//					System.err.println("So I am going to send it a ROUTE message");
 
 					// create a new request to send to neighbour
 					Message request = new Message(Message.MSG_ROUTE);
@@ -209,17 +209,17 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 					sendMessage(request, neighbour, myPid);
 				} else if (fop.available_requests == KademliaCommonConfig.ALPHA) { // no new neighbour and no outstanding requests
 
-					System.err.println("I have no new valid neighbours and no outstanding requests");
-					System.err.println("My available fop request is " + fop.available_requests);
+//					System.err.println("I have no new valid neighbours and no outstanding requests");
+//					System.err.println("My available fop request is " + fop.available_requests);
 
 					// search operation finished
 					findOp.remove(fop.operationId);
 
-					System.err.println("The search operation "  + fop.operationId + " is finished!");
+//					System.err.println("The search operation "  + fop.operationId + " is finished!");
 
 					if (fop.body.equals("Automatically Generated Traffic") && fop.closestSet.containsKey(fop.destNode)) {
 
-						System.err.println("We were looking for " + fop.destNode + " and we found it!");
+//						System.err.println("We were looking for " + fop.destNode + " and we found it!");
 
 						// update statistics
 						long timeInterval = (CommonState.getTime()) - (fop.timestamp);
@@ -231,7 +231,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 					return;
 
 				} else {
-					System.err.println(" I have no neighbour available, but there exist outstanding requests. So I wait.");
+//					System.err.println(" I have no neighbour available, but there exist outstanding requests. So I wait.");
 					// no neighbour available but there exist outstanding requests that are waiting
 					return;
 				}
@@ -266,8 +266,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		response.src = this.nodeId;
 		response.ackId = m.id; // set ACK number
 
-		System.err.println();
-		System.err.println("Node " + this.nodeId + " is sending a RESPONSE message to node " + m.src + " with the following list of neighbors: " + Arrays.toString(betaNeighbours));
+//		System.err.println();
+//		System.err.println("Node " + this.nodeId + " is sending a RESPONSE message to node " + m.src + " with the following list of neighbors: " + Arrays.toString(betaNeighbours));
 
 		// send back the neighbours to the source of the message
 		sendMessage(response, m.src, senderPid);
@@ -314,7 +314,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			BigInteger nextNode = fop.getNeighbour();
 			if (nextNode != null) {
 
-				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
+//				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
 
 				sendMessage(m.copy(), nextNode, myPid);
 				fop.nrHops++;
@@ -384,8 +384,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	public void processEvent(Node myNode, int myPid, Object event) {
 
-		System.err.println("");
-		System.err.println("-----------------------------------------------------------------------------------------------------");
+//		System.err.println("");
+//		System.err.println("-----------------------------------------------------------------------------------------------------");
 
 		// Parse message content Activate the correct event manager for the particular event
 		this.kademliaid = myPid;
@@ -405,9 +405,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			case Message.MSG_FINDNODE:
 				m = (Message) event;
 
-				System.err.println("Node with protocol node ID " + this.nodeId +" received a FIND NODE message");
-				System.err.println("It should find node " + m.dest);
-				System.err.println("Its current routing table is as follows: " + this.routingTable.toString());
+//				System.err.println("Node with protocol node ID " + this.nodeId +" received a FIND NODE message");
+//				System.err.println("It should find node " + m.dest);
+//				System.err.println("Its current routing table is as follows: " + this.routingTable.toString());
 
 				find(m, myPid);
 				break;
@@ -416,10 +416,10 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			case Message.MSG_ROUTE:
 				m = (Message) event;
 
-				System.err.println("Node with protocol node ID " + this.nodeId +" has received a ROUTE message");
-				System.err.println("The src of this message is " + m.src);
-				System.err.println("It wants to find " + m.dest);
-				System.err.println("And its current routing table is as follows: " + this.routingTable.toString());
+//				System.err.println("Node with protocol node ID " + this.nodeId +" has received a ROUTE message");
+//				System.err.println("The src of this message is " + m.src);
+//				System.err.println("It wants to find " + m.dest);
+//				System.err.println("And its current routing table is as follows: " + this.routingTable.toString());
 
 
 				routeResponse(m, myPid);
@@ -428,9 +428,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			case Message.MSG_RESPONSE:
 				m = (Message) event;
 
-				System.err.println("Node with protocol node ID " + this.nodeId +" has received a RESPONSE message");
-				System.err.println("The src of this message is " + m.src);
-				System.err.println("We were looking for " + m.dest);
+//				System.err.println("Node with protocol node ID " + this.nodeId +" has received a RESPONSE message");
+//				System.err.println("The src of this message is " + m.src);
+//				System.err.println("We were looking for " + m.dest);
 
 				sentMsg.remove(m.ackId);
 				route(m, myPid);
@@ -439,9 +439,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			case Message.MSG_PING:
 				m = (Message) event;
 
-				System.err.println("Node with protocol node ID " + this.nodeId +" has received a PING message");
-				System.err.println("The src of this message is " + m.src);
-				System.err.println("It wants to find " + m.dest);
+//				System.err.println("Node with protocol node ID " + this.nodeId +" has received a PING message");
+//				System.err.println("The src of this message is " + m.src);
+//				System.err.println("It wants to find " + m.dest);
 
 				ping(m, myPid);
 				break;
@@ -449,10 +449,10 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			case Timeout.TIMEOUT: // timeout
 				Timeout t = (Timeout) event;
-				System.err.println("Node with protocol node ID " + this.nodeId +" has received a TIMEOUT message");
+//				System.err.println("Node with protocol node ID " + this.nodeId +" has received a TIMEOUT message");
 
 				if (sentMsg.containsKey(t.msgID)) { // the response msg isn't arrived
-					System.err.println("The response msg isn't arrived");
+//					System.err.println("The response msg isn't arrived");
 					// remove form sentMsg
 					sentMsg.remove(t.msgID);
 					// remove node from my routing table

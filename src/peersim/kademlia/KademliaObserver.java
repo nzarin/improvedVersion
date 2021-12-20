@@ -68,13 +68,14 @@ public class KademliaObserver implements Control {
 			if (!Network.get(i).isUp())
 				sz--;
 
-		String s = String.format("[time=%d]:[N=%d current nodes UP] [D=%f msg delivered] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%s nmr findops]", CommonState.getTime(), sz, msg_deliv.getSum(), hopStore.getMin(), hopStore.getAverage(), hopStore.getMax(), (int) timeStore.getMin(), (int) timeStore.getAverage(), (int) timeStore.getMax(), find_op.toString());
+		String s = String.format("[time=%d]:[N=%d current nodes UP] [D=%f msg delivered] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%s nmr findops]", CommonState.getTime(), sz, msg_deliv.getSum(), hopStore.getMin(), hopStore.getAverage(), hopStore.getMax(), (int) timeStore.getMin(), (int) timeStore.getAverage(), (int) timeStore.getMax(), find_op.getN());
 
 		//todo: write once at the end
 
 		// create hop file
 		try {
-			File f = new File("hopcountNEW.txt"); // " + sz + "
+			String fileName = "avgHops_" + Network.size() + ".txt";
+			File f = new File(fileName); // " + sz + "
 			f.createNewFile();
 			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
 			out.write(String.valueOf(hopStore.getAverage()).replace(".", ",") + ";\n");
@@ -83,7 +84,8 @@ public class KademliaObserver implements Control {
 		}
 		// create latency file
 		try {
-			File f = new File("latencyNEW.txt");
+			String fileName = "avgLatency_" + Network.size() + ".txt";
+			File f = new File(fileName);
 			f.createNewFile();
 			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
 			out.write(String.valueOf(timeStore.getAverage()).replace(".", ",") + ";\n");
@@ -91,7 +93,6 @@ public class KademliaObserver implements Control {
 		} catch (IOException e) {
 		}
 
-//		}
 
 		System.err.println(s);
 
