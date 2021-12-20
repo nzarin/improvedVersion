@@ -44,9 +44,14 @@ public class CustomDistribution implements peersim.core.Control {
         BigInteger tmp;
         for (int i = 0; i < Network.size(); ++i) {
             tmp = urg.generate();
-            System.err.println("Network node " + Network.get(i).getID() + " gets assigned Node ID : " + tmp + " for (kademlia) protocol with ID " + protocolID);
-            mapNIDoPID.put(Network.get(i).getID(), tmp);
-            ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNodeId(tmp);
+            if (!mapNIDoPID.containsValue(tmp)){
+                System.err.println("Network node " + Network.get(i).getID() + " gets assigned Node ID : " + tmp + " for (kademlia) protocol with ID " + protocolID);
+                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNodeId(tmp);
+                mapNIDoPID.put(Network.get(i).getID(), tmp);
+            } else{
+                // set i back with 1 to retry
+                i--;
+            }
         }
 
         System.err.println("");

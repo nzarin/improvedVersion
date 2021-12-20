@@ -195,7 +195,6 @@ public class Message extends SimpleEvent {
 			case MSG_FINDNODE:
 				return "MSG_FINDNODE";
 			case MSG_ROUTE:
-//				return "MSG_FINDVALUE";
 				return "MSG_ROUTE";
 			case MSG_RESPONSE:
 				return "MSG_RESPONSE";

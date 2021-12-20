@@ -68,7 +68,7 @@ public final class UniformRandomGenerator {
 
 	/**
 	 * Returns a unique x-bit random number. The number is also put into an internal store to check it will be never returned
-	 * again
+	 * again.
 	 * 
 	 * @return BigInteger
 	 */

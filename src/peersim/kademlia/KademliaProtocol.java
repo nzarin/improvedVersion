@@ -18,7 +18,6 @@ import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 import peersim.transport.UnreliableTransport;
 
-//__________________________________________________________________________________________________
 public class KademliaProtocol implements Cloneable, EDProtocol {
 
 	// VARIABLE PARAMETERS
@@ -322,6 +321,20 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 	}
 
+
+	/**
+	 * When a node receives a ping message it should reply or do nothing.
+	 * @param m
+	 * @param myPid
+	 */
+	private void ping(Message m, int myPid) {
+		// if I am online -> send a reply message
+//		if()
+
+		// if I am offline -> do nothing and wait until the ping message exceeds timeout deadline.
+
+	}
+
 	/**
 	 * Send a message with current transport layer and starting the timeout timer (which is an event) if the message is a request
 	 * 
@@ -393,7 +406,19 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				System.err.println("Node with protocol node ID " + this.nodeId +" received a FIND NODE message");
 				System.err.println("It should find node " + m.dest);
 				System.err.println("Its current routing table is as follows: " + this.routingTable.toString());
+
 				find(m, myPid);
+				break;
+
+
+			case Message.MSG_ROUTE:
+				m = (Message) event;
+
+				System.err.println("Node with protocol node ID " + this.nodeId +" has received a ROUTE message");
+				System.err.println("The src of this message is " + m.src);
+				System.err.println("It wants to find " + m.dest);
+
+				routeResponse(m, myPid);
 				break;
 
 			case Message.MSG_RESPONSE:
@@ -407,13 +432,14 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				route(m, myPid);
 				break;
 
-			case Message.MSG_ROUTE:
+			case Message.MSG_PING:
 				m = (Message) event;
 
-				System.err.println("Node with protocol node ID " + this.nodeId +" has received a ROUTE message");
+				System.err.println("Node with protocol node ID " + this.nodeId +" has received a PING message");
 				System.err.println("The src of this message is " + m.src);
 				System.err.println("It wants to find " + m.dest);
-				routeResponse(m, myPid);
+
+				ping(m, myPid);
 				break;
 
 
@@ -441,6 +467,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		}
 
 	}
+
+
 
 	/**
 	 * set the current NodeId
