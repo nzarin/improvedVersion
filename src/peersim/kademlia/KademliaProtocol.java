@@ -165,8 +165,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			routingTable.addNeighbour(m.src);
 		}
 
-//		System.err.println("Message operationId is " + m.operationId);
-//		System.err.println("Size of the findOP of node : " + this.nodeId +" is " + findOp.size());
 
 		// get corresponding find operation (using the message field operationId)
 		FindOperation fop = this.findOp.get(m.operationId);
@@ -188,8 +186,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			// Step 2: send new requests if necessary
 			while (fop.available_requests > 0) {
-
-				System.err.println("I still have " + fop.available_requests + " available requests");
 
 				// get an available neighbour
 				BigInteger neighbour = fop.getNeighbour();
@@ -235,6 +231,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 					return;
 
 				} else {
+					System.err.println(" I have no neighbour available, but there exist outstanding requests. So I wait.");
 					// no neighbour available but there exist outstanding requests that are waiting
 					return;
 				}
@@ -258,14 +255,19 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		// get the k closest nodes to target node
 		BigInteger[] neighbours = this.routingTable.getKClosestNeighbours(m.dest, m.src);
 
+		//get the BETA closest nodes from the neighbours
+		BigInteger[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
+
+
 		// create a response message containing the neighbours (with the same id as of the request)
-		Message response = new Message(Message.MSG_RESPONSE, neighbours);
+		Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
 		response.operationId = m.operationId;
 		response.dest = m.dest;
 		response.src = this.nodeId;
 		response.ackId = m.id; // set ACK number
 
-		System.err.println("Node " + this.nodeId + " is sending a RESPONSE message to node " + m.src + " with the following list of neighbors: " + Arrays.toString(neighbours));
+		System.err.println();
+		System.err.println("Node " + this.nodeId + " is sending a RESPONSE message to node " + m.src + " with the following list of neighbors: " + Arrays.toString(betaNeighbours));
 
 		// send back the neighbours to the source of the message
 		sendMessage(response, m.src, senderPid);
@@ -417,6 +419,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				System.err.println("Node with protocol node ID " + this.nodeId +" has received a ROUTE message");
 				System.err.println("The src of this message is " + m.src);
 				System.err.println("It wants to find " + m.dest);
+				System.err.println("And its current routing table is as follows: " + this.routingTable.toString());
+
 
 				routeResponse(m, myPid);
 				break;
@@ -426,7 +430,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 				System.err.println("Node with protocol node ID " + this.nodeId +" has received a RESPONSE message");
 				System.err.println("The src of this message is " + m.src);
-				System.err.println("It wants to find " + m.dest);
+				System.err.println("We were looking for " + m.dest);
 
 				sentMsg.remove(m.ackId);
 				route(m, myPid);
