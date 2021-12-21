@@ -347,7 +347,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @param myPid
 	 *            The sender Pid
 	 */
-	public void sendMessage(Message m, BigInteger destId, int myPid) {
+	private void sendMessage(Message m, BigInteger destId, int myPid) {
 		// add destination to routing table
 		this.routingTable.addNeighbour(destId);
 
@@ -368,8 +368,32 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			this.sentMsg.put(m.id, m.timestamp);
 			EDSimulator.add(delay, t, src, myPid);
 		}
+	}
 
-		//todo: else
+
+	/**
+	 * If the message is not arrived before timeout, try to resend it.
+	 * @param timeout
+	 * @param myPid
+	 */
+	private void handleTimeOut(Timeout timeout, int myPid) {
+
+		// the response msg isn't arrived
+		if (sentMsg.containsKey(timeout.msgID)) {
+
+			// remove form sentMsg
+			sentMsg.remove(timeout.msgID);
+			// remove node from my routing table
+			this.routingTable.removeNeighbour(timeout.node);
+			// remove from closestSet of find operation
+			this.findOp.get(timeout.opID).closestSet.remove(timeout.node);
+			// try another node
+			Message m1 = new Message();
+			m1.operationId = timeout.opID;
+			m1.src = nodeId;
+			m1.dest = this.findOp.get(timeout.opID).destNode;
+			this.route(m1, myPid);
+		}
 	}
 
 	/**
@@ -449,23 +473,10 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			case Timeout.TIMEOUT: // timeout
 				Timeout t = (Timeout) event;
+
 //				System.err.println("Node with protocol node ID " + this.nodeId +" has received a TIMEOUT message");
 
-				if (sentMsg.containsKey(t.msgID)) { // the response msg isn't arrived
-//					System.err.println("The response msg isn't arrived");
-					// remove form sentMsg
-					sentMsg.remove(t.msgID);
-					// remove node from my routing table
-					this.routingTable.removeNeighbour(t.node);
-					// remove from closestSet of find operation
-					this.findOp.get(t.opID).closestSet.remove(t.node);
-					// try another node
-					Message m1 = new Message();
-					m1.operationId = t.opID;
-					m1.src = nodeId;
-					m1.dest = this.findOp.get(t.opID).destNode;
-					this.route(m1, myPid);
-				}
+				handleTimeOut(t, myPid);
 				break;
 
 		}

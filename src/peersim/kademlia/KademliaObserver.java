@@ -36,6 +36,9 @@ public class KademliaObserver implements Control {
 	 */
 	public static IncrementalStats find_op = new IncrementalStats();
 
+
+	public static IncrementalStats failed_lookups = new IncrementalStats();
+
 	/** Parameter of the protocol we want to observe */
 	private static final String PAR_PROT = "protocol";
 
@@ -68,14 +71,16 @@ public class KademliaObserver implements Control {
 			if (!Network.get(i).isUp())
 				sz--;
 
-		String s = String.format("[time=%d]:[N=%d current nodes UP] [D=%f msg delivered] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%s nmr findops]", CommonState.getTime(), sz, msg_deliv.getSum(), hopStore.getMin(), hopStore.getAverage(), hopStore.getMax(), (int) timeStore.getMin(), (int) timeStore.getAverage(), (int) timeStore.getMax(), find_op.getN());
+		// calculate success ratio
+		double success_ratio = msg_deliv.getSum() /  find_op.getN();
 
-		//todo: write once at the end
+
+		String s = String.format("[time=%d]:[N=%d current nodes UP] [D=%f msg delivered] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%s nmr findops] [%f success lookups] [%d failed lookups]", CommonState.getTime(), sz, msg_deliv.getSum(), hopStore.getMin(), hopStore.getAverage(), hopStore.getMax(), (int) timeStore.getMin(), (int) timeStore.getAverage(), (int) timeStore.getMax(), find_op.getN(), success_ratio, failed_lookups.getN());
 
 		// create hop file
 		try {
-			String fileName = "avgHops_" + Network.size() + ".txt";
-			File f = new File(fileName); // " + sz + "
+			String fileName = "avgHops_" + Network.size() + "_noturbolence.txt";
+			File f = new File(fileName);
 			f.createNewFile();
 			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
 			out.write(String.valueOf(hopStore.getAverage()).replace(".", ",") + ";\n");
@@ -84,7 +89,7 @@ public class KademliaObserver implements Control {
 		}
 		// create latency file
 		try {
-			String fileName = "avgLatency_" + Network.size() + ".txt";
+			String fileName = "avgLatency_" + Network.size() + "_noturbolence.txt";
 			File f = new File(fileName);
 			f.createNewFile();
 			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
