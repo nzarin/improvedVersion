@@ -79,7 +79,7 @@ public class KademliaObserver implements Control {
 
 		// create hop file
 		try {
-			String fileName = "avgHops_" + Network.size() + "_noturbolence.txt";
+			String fileName = "results/avgHops_" + Network.size() + "_noturbolence.txt";
 			File f = new File(fileName);
 			f.createNewFile();
 			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
@@ -89,7 +89,7 @@ public class KademliaObserver implements Control {
 		}
 		// create latency file
 		try {
-			String fileName = "avgLatency_" + Network.size() + "_noturbolence.txt";
+			String fileName = "results/avgLatency_" + Network.size() + "_noturbolence.txt";
 			File f = new File(fileName);
 			f.createNewFile();
 			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
