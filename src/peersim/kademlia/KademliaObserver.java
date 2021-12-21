@@ -97,6 +97,18 @@ public class KademliaObserver implements Control {
 			out.close();
 		} catch (IOException e) {
 		}
+		// create success and failure file
+		try {
+			String fileName = "results/succes_ratio" + Network.size() + "_noturbolence.txt";
+			File f = new File(fileName);
+			f.createNewFile();
+			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
+			out.write(String.valueOf(failed_lookups.getN()) + ";\n");
+			out.close();
+		} catch (IOException e) {
+		}
+
+		
 
 
 		System.err.println(s);
