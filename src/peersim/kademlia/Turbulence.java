@@ -101,7 +101,7 @@ public class Turbulence implements Control {
 			System.err.println("Wrong event probability in Turbulence class: the sum of PAR_IDLE, PAR_ADD and PAR_REM must be 1");
 		}
 
-		System.err.println(String.format("Turbulence: [p_idle=%f] [p_add=%f] [(min,max)=(%d,%d)]", p_idle, p_add, maxsize, minsize));
+		System.err.println(String.format("Turbulence: [p_idle=%f] [p_add=%f] [p_remove=%f] [(min,max)=(%d,%d)]", p_idle, p_add, p_rem, minsize, maxsize));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -129,8 +129,7 @@ public class Turbulence implements Control {
 	 */
 	public boolean add() {
 
-
-		// Add Node
+		// Add node to network
 		Node newNode = (Node) Network.prototype.clone();
 		for (int j = 0; j < inits.length; ++j)
 			inits[j].initialize(newNode);

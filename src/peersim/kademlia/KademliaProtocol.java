@@ -207,7 +207,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 					// send find request
 					sendMessage(request, neighbour, myPid);
-				} else if (fop.available_requests == KademliaCommonConfig.ALPHA) { // no new neighbour and no outstanding requests
+
+					// no new neighbour and no outstanding requests
+				} else if (fop.available_requests == KademliaCommonConfig.ALPHA) {
 
 //					System.err.println("I have no new valid neighbours and no outstanding requests");
 //					System.err.println("My available fop request is " + fop.available_requests);
@@ -215,24 +217,30 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 					// search operation finished
 					findOp.remove(fop.operationId);
 
-//					System.err.println("The search operation "  + fop.operationId + " is finished!");
+					// if the find operation was not for bootstrapping purposes
+					if (fop.body.equals("Automatically Generated Traffic")) {
 
-					if (fop.body.equals("Automatically Generated Traffic") && fop.closestSet.containsKey(fop.destNode)) {
+						//only add the statistics of no-bootstrap lookups
+						KademliaObserver.finished_lookups.add(1);
 
-//						System.err.println("We were looking for " + fop.destNode + " and we found it!");
-
-						// update statistics
-						long timeInterval = (CommonState.getTime()) - (fop.timestamp);
-						KademliaObserver.timeStore.add(timeInterval);
-						KademliaObserver.hopStore.add(fop.nrHops);
-						KademliaObserver.msg_deliv.add(1);
+						// if the target is found -> successful lookup
+						if(fop.closestSet.containsKey(fop.destNode)){
+							// update statistics
+							long timeInterval = (CommonState.getTime()) - (fop.timestamp);
+							KademliaObserver.timeStore.add(timeInterval);
+							KademliaObserver.hopStore.add(fop.nrHops);
+							KademliaObserver.successful_lookups.add(1);
+						} else{	// failed lookup
+							KademliaObserver.failed_lookups.add(1);
+						}
 					}
+
+					//let it be
 
 					return;
 
 				} else {
 //					System.err.println(" I have no neighbour available, but there exist outstanding requests. So I wait.");
-					// no neighbour available but there exist outstanding requests that are waiting
 					return;
 				}
 			}
@@ -331,8 +339,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	private void ping(Message m, int myPid) {
 		// if I am online -> send a reply message
-//		if()
-
 		// if I am offline -> do nothing and wait until the ping message exceeds timeout deadline.
 
 	}
@@ -341,11 +347,11 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * Send a message with current transport layer and starting the timeout timer (which is an event) if the message is a request
 	 * 
 	 * @param m
-	 *            The message to send
+	 *            The message to send.
 	 * @param destId
-	 *            The Id of the destination node
+	 *            The Id of the destination node.
 	 * @param myPid
-	 *            The sender Pid
+	 *            The sender Pid.
 	 */
 	private void sendMessage(Message m, BigInteger destId, int myPid) {
 		// add destination to routing table
@@ -374,12 +380,17 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	/**
 	 * If the message is not arrived before timeout, try to resend it.
 	 * @param timeout
+	 * 					The timeout event.
 	 * @param myPid
+	 * 					The sender Pid.
 	 */
 	private void handleTimeOut(Timeout timeout, int myPid) {
 
 		// the response msg isn't arrived
 		if (sentMsg.containsKey(timeout.msgID)) {
+
+//			//add to list of failed lookups
+//			KademliaObserver.failed_lookups.add(1);
 
 			// remove form sentMsg
 			sentMsg.remove(timeout.msgID);
@@ -394,6 +405,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			m1.dest = this.findOp.get(timeout.opID).destNode;
 			this.route(m1, myPid);
 		}
+
 	}
 
 	/**
@@ -444,7 +456,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 //				System.err.println("The src of this message is " + m.src);
 //				System.err.println("It wants to find " + m.dest);
 //				System.err.println("And its current routing table is as follows: " + this.routingTable.toString());
-
 
 				routeResponse(m, myPid);
 				break;

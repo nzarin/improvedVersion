@@ -1,0 +1,3 @@
+Turbulence: [p_idle=0.000000] [p_add=0.500000] [p_remove=0.500000] [(min,max)=(1,2147483647)] :
+[N=1001 current nodes UP]
+[20.000000 min hops] [23.540230 average hops] [32.000000 max hops] [1400 min ltcy] [1710 msec average ltcy] [2600 max ltcy] [998.000000 created findops] [967.000000 completed findops] [435.000000 success lookups] [532.000000 failed lookups]  [0.449845 success ratio]
