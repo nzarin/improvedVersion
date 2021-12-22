@@ -1,3 +1,200 @@
-Turbulence: [p_idle=0.000000] [p_add=0.500000] [p_remove=0.500000] [(min,max)=(1,2147483647)] :
-[N=1001 current nodes UP]
-[20.000000 min hops] [23.540230 average hops] [32.000000 max hops] [1400 min ltcy] [1710 msec average ltcy] [2600 max ltcy] [998.000000 created findops] [967.000000 completed findops] [435.000000 success lookups] [532.000000 failed lookups]  [0.449845 success ratio]
+NODE            TYPE MESSAGE             DIRECTION           NODE
+
+326             ROUTE(828)               ->                  793
+326             ROUTE(828)               ->                  895
+326             ROUTE(828)               ->                  883
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(800, 801)       <-                 793
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(956, 953)      <-                  883
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(939,912)       <-                  895
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      793
+326   old       {641=false, 994=false, 839=false, 648=false, 617=false, 971=false, 652=false, 589=false, 719=false, 592=false, 848=false, 529=false, 979=false, 883=true, 565=false, 569=false, 697=false, 793=true, 955=false, 895=true}
+326   new       {800=false, 801=false, 994=false, 839=false, 648=false, 617=false, 971=false, 652=false, 589=false, 592=false, 848=false, 529=false, 979=false, 883=true, 565=false, 569=false, 697=false, 793=true, 955=false, 895=true}
+326             ROUTE(828)               ->                  800
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      895
+326   old       {800=true, 801=false, 994=false, 839=false, 648=false, 617=false, 971=false, 652=false, 589=false, 592=false, 848=false, 529=false, 979=false, 883=true, 565=false, 569=false, 697=false, 793=true, 955=false, 895=true}
+326   new       {800=true, 801=false, 994=false, 839=false, 617=false, 971=false, 939=false, 589=false, 592=false, 848=false, 912=false, 529=false, 979=false, 883=true, 565=false, 569=false, 697=false, 793=true, 955=false, 895=true}
+326             ROUTE(828)              ->                  801
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      883
+326   old       {800=true, 801=true, 994=false, 839=false, 617=false, 971=false, 939=false, 589=false, 592=false, 848=false, 912=false, 529=false, 979=false, 883=true, 565=false, 569=false, 697=false, 793=true, 955=false, 895=true}
+326   new       {800=true, 801=true, 994=false, 839=false, 617=false, 971=false, 939=false, 592=false, 848=false, 912=false, 529=false, 979=false, 883=true, 565=false, 569=false, 793=true, 953=false, 955=false, 956=false, 895=true}
+326             ROUTE(828)              ->                  848
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(940,924)       <-                  800
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(949,924)       <-                  848
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(957,943)       <-                  801
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      848
+326   old       {800=true, 801=true, 994=false, 839=false, 617=false, 971=false, 939=false, 592=false, 912=false, 848=true, 529=false, 979=false, 883=true, 565=false, 569=false, 793=true, 953=false, 955=false, 956=false, 895=true}
+326   new       {800=true, 801=true, 994=false, 839=false, 971=false, 939=false, 912=false, 848=true, 529=false, 979=false, 883=true, 565=false, 949=false, 569=false, 793=true, 953=false, 955=false, 956=false, 924=false, 895=true}
+326             ROUTE(828)              ->                  839
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      801
+326   old       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 912=false, 848=true, 529=false, 979=false, 883=true, 565=false, 949=false, 569=false, 793=true, 953=false, 955=false, 956=false, 924=false, 895=true}
+326   new       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 943=false, 912=false, 848=true, 979=false, 883=true, 949=false, 569=false, 793=true, 953=false, 955=false, 956=false, 924=false, 957=false, 895=true}
+326             ROUTE(828)              ->                  956
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      800
+326   old       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 943=false, 912=false, 848=true, 979=false, 883=true, 949=false, 569=false, 793=true, 953=false, 955=false, 924=false, 956=true, 957=false, 895=true}
+326   new       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 940=false, 943=false, 912=false, 848=true, 979=false, 883=true, 949=false, 793=true, 953=false, 955=false, 924=false, 956=true, 957=false, 895=true}
+326             ROUTE(828)              ->                  957
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(956,924)       <-                  839
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(776,786)       <-                  957
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(808,805)       <-                  956
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      839
+326   old       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 940=false, 943=false, 912=false, 848=true, 979=false, 883=true, 949=false, 793=true, 953=false, 955=false, 924=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 940=false, 943=false, 912=false, 848=true, 979=false, 883=true, 949=false, 793=true, 953=false, 955=false, 924=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  953
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      957
+326   old       {800=true, 801=true, 994=false, 839=true, 971=false, 939=false, 940=false, 943=false, 912=false, 848=true, 979=false, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 994=false, 839=true, 776=false, 939=false, 940=false, 943=false, 912=false, 848=true, 786=false, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  786
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      956
+326   old       {800=true, 801=true, 994=false, 839=true, 776=false, 939=false, 940=false, 943=false, 912=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=false, 839=true, 776=false, 808=false, 939=false, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  808
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(800,801)       <-                  786
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(956,957)       <-                  808
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(826,823)       <-                  953
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      786
+326   old       {800=true, 801=true, 805=false, 839=true, 776=false, 808=true, 939=false, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=false, 839=true, 776=false, 808=true, 939=false, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  805
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      808
+326   old       {800=true, 801=true, 805=true, 839=true, 776=false, 808=true, 939=false, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 776=false, 808=true, 939=false, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  776
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      953
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 939=false, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 793=true, 953=true, 955=false, 924=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=false, 793=true, 953=true, 826=false, 955=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  826
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(953,955)       <-                  805
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(800,801)       <-                  776
+-------------------------------------------------------------------------------------------------------------------------
+326             NO RESPONSE??????                           826                                                                                         CHECK THIS OUT!!!
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      805
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=false, 793=true, 953=true, 826=true, 955=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=false, 793=true, 953=true, 826=true, 955=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  823
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      776
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=true, 793=true, 953=true, 826=true, 955=false, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=true, 793=true, 953=true, 826=true, 955=false, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  955
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(957,955)       <-                  823
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(825,822)       <-                  955
+-------------------------------------------------------------------------------------------------------------------------
+
+                    CHECK THIS OUT!! NODE 826 has not sent response. So we remove it and resend to others.
+
+326             TIMEOUT FROM???
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=true, 793=true, 953=true, 955=true, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  949
+
+
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      955
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=true, 823=true, 793=true, 953=true, 955=true, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 848=true, 786=true, 883=true, 949=true, 822=false, 823=true, 793=true, 953=true, 825=false, 955=true, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  825
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      823
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 848=true, 786=true, 883=true, 949=true, 822=false, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 848=true, 786=true, 883=true, 949=true, 822=false, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true}
+326             ROUTE(828)              ->                  822
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(956,957)       <-                  822
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(818,819)       <-                  949
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(956,959)       <-                  825
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      825
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 848=true, 786=true, 883=true, 949=true, 822=true, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 883=true, 949=true, 822=true, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true, 959=false}
+326             ROUTE(828)              ->                  959
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      822
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 883=true, 949=true, 822=true, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true, 959=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 883=true, 949=true, 822=true, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true, 959=true}
+326             ALL NEIGHBOURS HAVE ALREADY BEEN CONTACTED IN CLOSEST SET. JUST WAIT FOR OUTSTANDING REQUESTS.
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      949
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 883=true, 949=true, 822=true, 823=true, 793=true, 953=true, 825=true, 955=true, 956=true, 957=true, 895=true, 959=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=false, 883=true, 819=false, 822=true, 823=true, 793=true, 953=true, 825=true, 956=true, 957=true, 895=true, 959=true}
+
+                        FIND OUT WHY TWO MESSAGES ARE SENT AND BEFORE ONLY ONE!!!
+
+326             ROUTE(828)              ->                  818
+326             ROUTE(828)              ->                  819
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(957,945)       <-                  819
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(830,826)       <-                  859
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(957,955)       <-                  818
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      818
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 953=true, 825=true, 956=true, 957=true, 895=true, 959=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 953=true, 825=true, 956=true, 957=true, 895=true, 959=true}
+326             ALL NEIGHBOURS HAVE ALREADY BEEN CONTACTED IN CLOSEST SET. JUST WAIT FOR OUTSTANDING REQUESTS.
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      959
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 953=true, 825=true, 956=true, 957=true, 895=true, 959=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 825=true, 826=false, 956=true, 957=true, 830=false, 895=true}
+
+                            FIND OUT WHY TWO MESSAGES ARE SENT AND BEFORE ONLY ONE!!!
+
+326             ROUTE(828)              ->                  830
+326             ROUTE(828)              ->                  826
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      819
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 825=true, 826=true, 956=true, 957=true, 830=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 825=true, 826=true, 956=true, 957=true, 830=true, 895=true}
+326             ALL NEIGHBOURS HAVE ALREADY BEEN CONTACTED IN CLOSEST SET. JUST WAIT FOR OUTSTANDING REQUESTS.
+-------------------------------------------------------------------------------------------------------------------------
+326             RESPONSE(948,939)       <-                  830
+-------------------------------------------------------------------------------------------------------------------------
+
+                              FIND OUT whether node 826 is offline.
+
+326             DOES NOT RECEIVED RESPONSE!!                826
+-------------------------------------------------------------------------------------------------------------------------
+326             receives RESPONSE from                      830
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 825=true, 826=true, 956=true, 957=true, 830=true, 895=true}
+326   new       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 848=true, 786=true, 818=true, 883=true, 819=true, 822=true, 823=true, 793=true, 825=true, 826=true, 956=true, 957=true, 830=true, 895=true}
+326             ALL NEIGHBOURS HAVE ALREADY BEEN CONTACTED IN CLOSEST SET. JUST WAIT FOR OUTSTANDING REQUESTS. ====> this is because 826 did not send the response.
+--------------------------------------------------------------------------------------------------------------------------
+                    CHECK THIS OUT!! NODE 826 has not sent response. So we remove it and resend to others.
+
+326             TIMEOUT
+326   old       {800=true, 801=true, 805=true, 839=true, 808=true, 776=true, 940=false, 943=false, 848=true, 786=true, 883=true, 949=false, 823=true, 793=true, 953=true, 955=true, 956=true, 957=true, 895=true}
+
+We have no valid new neighbours and no outstanding requests.
+But node 326 is still not found. So this lookup failed!
+
+

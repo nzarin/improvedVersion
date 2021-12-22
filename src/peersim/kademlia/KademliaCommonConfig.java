@@ -8,7 +8,7 @@ public class KademliaCommonConfig {
 	/**
 	 * Length of identifiers (default is 160).
 	 */
-	public static int BITS = 160;
+	public static int BITS = 10;
 
 	/**
 	 * Number of simultaneous lookup, so degree of parallelism (default is 3).
