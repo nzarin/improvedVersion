@@ -83,7 +83,7 @@ public class FindOperation {
 //		System.err.println("Operation id (univocally) of find operation:  " + this.operationId );
 //		System.err.println("Unique sequence number generator of the operation :  " + this.OPERATION_ID_GENERATOR );
 
-		// update responseNumber -> WHY?
+		// update response number because we can send another route message
 		available_requests++;
 
 		// add to closestSet
@@ -157,8 +157,6 @@ public class FindOperation {
 		if (res != null) {
 			closestSet.remove(res);
 			closestSet.put(res, true);
-
-			// decrease available request
 			available_requests--;
 		}
 

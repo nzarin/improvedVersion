@@ -44,6 +44,7 @@ public class KademliaObserver implements Control {
 	 */
 	public static IncrementalStats failed_lookups = new IncrementalStats();
 
+	public static IncrementalStats next_node_distance = new IncrementalStats();
 	/**
 	 * Keep statistics on the number of successful lookups
 	 */
@@ -130,18 +131,37 @@ public class KademliaObserver implements Control {
 
 		// create success and failure file
 		try {
+			String fileName;
 			if(TURBOLENCE){
-				String fileName = "results/successratio/success_ratio_with_turbulence.txt";
-				File f = new File(fileName);
-				f.createNewFile();
-				BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
-				out.write(String.valueOf(success_ratio) + ";\n");
-				out.close();
+				 fileName = "results/successratio/avgSR_with_turbelence.txt";
 			} else{
-				// Do nothing. Success ratio will be 1.0 always.
+				fileName = "results/successratio/avgSR_" + Network.size() + "_no_turbulence.txt";
 			}
+			File f = new File(fileName);
+			f.createNewFile();
+			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
+			out.write(String.valueOf(success_ratio) + ";\n");
+			out.close();
 		} catch (IOException e) {
 		}
+
+
+		// create distance convergence file
+		try {
+			String fileName;
+			if(TURBOLENCE){
+				fileName = "results/distance/avg_distance_with_turbelence.txt";
+			} else{
+				fileName = "results/distance/avg_distance_" +Network.size() + "_no_turbulence.txt";
+			}
+			File f = new File(fileName);
+			f.createNewFile();
+			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
+			out.write(String.valueOf(CommonState.getTime() + ", " + next_node_distance.getAverage()) + ";\n");
+			out.close();
+		} catch (IOException e) {
+		}
+
 
 
 		System.err.println(s);

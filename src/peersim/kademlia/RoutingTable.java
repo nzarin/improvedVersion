@@ -114,11 +114,6 @@ public class RoutingTable implements Cloneable {
 			}
 		}
 
-//		System.err.println("The result list from getclosestneighbors method");
-//		for(BigInteger bi : result){
-//			System.err.println(String.format(String.valueOf(bi)));
-//		}
-
 		return result;
 	}
 
