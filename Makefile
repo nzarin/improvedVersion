@@ -11,7 +11,7 @@ doc:
 	javadoc -sourcepath src -classpath $(LIB_JARS) -d doc peersim.kademlia
 
 run:
-	java -Xmx500m -cp $(LIB_JARS):classes peersim.Simulator example.cfg
+	java -Xmx1000m -cp $(LIB_JARS):classes peersim.Simulator example.cfg
 
 all: compile doc run
 

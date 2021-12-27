@@ -88,9 +88,9 @@ public class RoutingTable implements Cloneable {
 			return k_buckets.get(prefix_len).neighbours.keySet().toArray(result);
 		}
 
-		// else get k closest node from ALPHA k-buckets
+		// else get k closest node from all k-buckets
 		prefix_len = 0;
-		while (prefix_len < KademliaCommonConfig.ALPHA) {
+		while (prefix_len < KademliaCommonConfig.BITS) {
 			neighbour_candidates.addAll(k_buckets.get(prefix_len).neighbours.keySet());
 
 			prefix_len++;
