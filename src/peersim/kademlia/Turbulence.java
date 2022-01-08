@@ -204,7 +204,7 @@ public class Turbulence implements Control {
         if (dice < p_idle)
             return false;
 
-        // get network size
+        // update network size
         int sz = Network.size();
         for (int i = 0; i < Network.size(); i++)
             if (!Network.get(i).isUp())

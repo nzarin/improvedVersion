@@ -20,16 +20,9 @@ public class Util {
         String s1 = Util.put0(b1);
         String s2 = Util.put0(b2);
 
-//		System.err.println("%%%%%% Testing the prefix method  %%%%%%%%");
-//		System.err.println("b1 = " + b1 + " and b2 = " + b2);
-//		System.err.println("s1 = " + s1 + " and s2 = " + s2);
-
         int i = 0;
         for (i = 0; i < s1.length(); i++) {
-//			System.err.println("s1.charAt(i) = " + s1.charAt(i));
-//			System.err.println("s2.charAt(i) = " + s2.charAt(i));
             if (s1.charAt(i) != s2.charAt(i))
-//				System.err.println("longest common prefix = " + i);
                 return i;
         }
 
