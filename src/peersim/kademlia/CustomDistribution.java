@@ -15,9 +15,11 @@ public class CustomDistribution implements peersim.core.Control {
 
     //initializers
     private static final String PAR_PROT = "protocol";
+    private static final String PAR_NMR_DOMAINS = "nmrdomains";
     private final int protocolID;
     private final UniformRandomGenerator urg;
     protected TreeMap<Long, BigInteger> mapNIDoPID;
+//    private final int numberOfDomains;
 
     /**
      * Constructor that links the Controller and Protocol IDs and creates a uniform random generator.
@@ -26,6 +28,7 @@ public class CustomDistribution implements peersim.core.Control {
      */
     public CustomDistribution(String prefix) {
         protocolID = Configuration.getPid(prefix + "." + PAR_PROT);
+//        numberOfDomains = Configuration.getInt(prefix + "." + PAR_NMR_DOMAINS, 1); //  default 1
         urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
         mapNIDoPID = new TreeMap<Long, BigInteger>();
     }
@@ -37,17 +40,18 @@ public class CustomDistribution implements peersim.core.Control {
      * @return boolean always false
      */
     public boolean execute() {
-
         System.err.println();
         System.err.println("Assigning kademlia node identifiers to nodes in the network:");
-
-        BigInteger tmp;
+        
         for (int i = 0; i < Network.size(); ++i) {
-            tmp = urg.generate();
-            if (!mapNIDoPID.containsValue(tmp)) {
-                System.err.println("Network node " + Network.get(i).getID() + " gets assigned Node ID : " + tmp + " for (kademlia) protocol with ID " + protocolID);
-                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNodeId(tmp);
-                mapNIDoPID.put(Network.get(i).getID(), tmp);
+            BigInteger tmpID = urg.generateID();
+            int tmpDomain = urg.selectDomain();
+            KadNode node = new KadNode(tmpID, tmpDomain);
+            if (!mapNIDoPID.containsValue(tmpID)) {
+                System.err.println("Network node " + Network.get(i).getID() + " gets assigned Node ID : " + tmpID + " for domain " + tmpDomain );
+//                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNodeId(tmpID);
+                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNode(node);
+                mapNIDoPID.put(Network.get(i).getID(), tmpID);
             } else {
                 // set i back with 1 to retry
                 i--;

@@ -22,7 +22,7 @@ public class FindOperation {
     /**
      * Id of the node to find.
      */
-    public BigInteger destNode;
+    public KadNode destNode;
 
     /**
      * Body of the original find message.
@@ -56,8 +56,9 @@ public class FindOperation {
      *
      * @param destNode Id of the node to find
      */
-    public FindOperation(BigInteger destNode, long timestamp) {
+    public FindOperation(KadNode destNode, long timestamp) {
         this.destNode = destNode;
+
         this.timestamp = timestamp;
 
         // set a new find id
@@ -95,13 +96,13 @@ public class FindOperation {
                     } else {
 
                         // find in the closest set if there are nodes with less distance
-                        BigInteger newdist = Util.distance(n, destNode);
+                        BigInteger newdist = Util.distance(n, destNode.getNodeId());
 
                         // find the node with max distance
                         BigInteger maxdist = newdist;
                         BigInteger nodemaxdist = n;
                         for (BigInteger i : closestSet.keySet()) {
-                            BigInteger dist = Util.distance(i, destNode);
+                            BigInteger dist = Util.distance(i, destNode.getNodeId());
 
                             if (dist.compareTo(maxdist) > 0) {
                                 maxdist = dist;
@@ -133,7 +134,7 @@ public class FindOperation {
             if (n != null && closestSet.get(n) == false) {
                 if (res == null) {
                     res = n;
-                } else if (Util.distance(n, destNode).compareTo(Util.distance(res, destNode)) < 0) {
+                } else if (Util.distance(n, destNode.getNodeId()).compareTo(Util.distance(res, destNode.getNodeId())) < 0) {
                     res = n;
                 }
             }

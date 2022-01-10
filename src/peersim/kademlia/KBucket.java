@@ -28,12 +28,12 @@ public class KBucket implements Cloneable {
      *
      * @param node The to-be added neighbour.
      */
-    public void addNeighbour(BigInteger node) {
+    public void addNeighbour(KadNode node) {
         long time = CommonState.getTime();
 
         // if the k-bucket isn't full, add neighbour to tail of the list.
         if (neighbours.size() < KademliaCommonConfig.K) { // k-bucket isn't full
-            neighbours.put(node, time);
+            neighbours.put(node.getNodeId(), time);
         }
     }
 

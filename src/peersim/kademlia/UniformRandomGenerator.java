@@ -9,30 +9,12 @@ import java.util.Random;
  * This initializator assign to the Nodes a nodeId (stored in the protocol MSPastryProtocol) by using this 128-bit (32 byte)
  * random generator.
  *
- * <b>Warning:</b> this implementation is not serialized and is not thread-safe
- * <p>
- * Title: MSPASTRY
- * </p>
- *
- * <p>
- * Description: MsPastry implementation for PeerSim
- * </p>
- *
- * <p>
- * Copyright: Copyright (c) 2007
- * </p>
- *
- * <p>
- * Company: The Pastry Group
- * </p>
- *
- * @author Elisa Bisoffi, Manuel Cortella
- * @version 1.0
  */
 public final class UniformRandomGenerator {
 
     private final Random rnd;
     private final int bits;
+    private final int nmr_domains;
 
     /**
      * initialized this random generator with the specified random seeder and the number of desider bits to generate
@@ -43,6 +25,7 @@ public final class UniformRandomGenerator {
     public UniformRandomGenerator(int aBits, Random r) {
         bits = aBits;
         rnd = r;
+        nmr_domains = KademliaCommonConfig.NUMBER_OF_DOMAINS;
     }
 
     /**
@@ -65,13 +48,22 @@ public final class UniformRandomGenerator {
     }
 
     /**
+     * Select the next domain in line
+     * @return
+     */
+    public int selectDomain() {
+        return rnd.nextInt(nmr_domains);
+    }
+
+    /**
      * Returns a unique x-bit random number. The number is also put into an internal store to check it will be never returned
      * again.
      *
      * @return BigInteger
      */
-    public final BigInteger generate() {
+    public final BigInteger generateID() {
         return nextRand();
     }
+
 
 }

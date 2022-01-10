@@ -34,6 +34,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	private UnreliableTransport transport;
 	private int tid;
 	private int kademliaid;
+	
+	
+	private KadNode kadNode;
 
 	/**
 	 * allow to call the service initializer only once
@@ -46,9 +49,15 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	public BigInteger nodeId;
 
 	/**
-	 * routing table of this node
+	 * domain this node belongs to
 	 */
-	public RoutingTable routingTable;
+	public int domainId;
+
+
+//	/**
+//	 * routing table of this node
+//	 */
+//	public RoutingTable routingTable;
 
 	/**
 	 * trace message sent for timeout purpose
@@ -79,11 +88,13 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	public KademliaProtocol(String prefix) {
 		this.nodeId = null; // empty nodeId
+		this.domainId = Integer.parseInt(null); //empty domain Id
+
 		KademliaProtocol.prefix = prefix;
 
 		_init();
 
-		routingTable = new RoutingTable();
+//		routingTable = new RoutingTable();
 
 		sentMsg = new TreeMap<Long, Long>();
 
@@ -266,51 +277,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	}
 
 
-
-
-//	private void wrapUpFindOperation(FindOperation fop) {
-//
-//		// Search operation finished. The lookup terminates when the initiator has queried and gotten responses
-//		// from the k closest nodes from the closest set it has seen.
-//		findOp.remove(fop.operationId);
-//
-//		switch((String) fop.body){
-//			case "Bootstrap Traffic":
-//				System.err.println("This is a bootstrap message. Let it be. ");
-//				break;
-//			case "Automatically Generated Traffic":
-//				//check if the lookup succeeded
-//				if(fop.closestSet.containsKey(fop.destNode)){
-//
-//					//update statistics
-//					long timeInterval = (CommonState.getTime()) - (fop.timestamp);
-//					KademliaObserver.timeStore.add(timeInterval);
-//					KademliaObserver.hopStore.add(fop.nrHops);
-//					KademliaObserver.finished_lookups.add(1);
-//					KademliaObserver.successful_lookups.add(1);
-//					System.err.println("!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//					break;
-//				} else{ //check if lookup failed
-//
-//					Node destNode = nodeIdtoNode(fop.destNode);
-//					Node me = nodeIdtoNode(this.nodeId);
-//
-//					// check if both the destination node and me are still up.
-//					if(destNode.isUp() && me.isUp() ){
-//						KademliaObserver.finished_lookups.add(1);
-//						KademliaObserver.failed_lookups.add(1);
-//						System.err.println("!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//					}
-//				}
-//				break;
-//			default:
-//				return;
-//		}
-//		return;
-//
-//	}
-
-
 	/**
 	 * Response to a route request.
 	 * Find the ALPHA closest node consulting the k-buckets and return them to the sender.
@@ -355,8 +321,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	private void find(Message m, int myPid) {
 
 		// if I am the searched node or searched node is down -> skip (should not happen in kademlia)
-		Node dst = nodeIdtoNode(m.dest);
-		if((m.dest == this.nodeId) || (!dst.isUp()))
+		Node dst = nodeIdtoNode(m.dest.getNodeId());
+		if((m.dest.getNodeId() == this.kadNode.getNodeId()) || (!dst.isUp()))
 			return;
 
 		// increase the number of find operations
@@ -371,7 +337,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 //		System.err.println("Size of the findOP of node : " + this.nodeId +" is " + findOp.size());
 
 		// get the K closest node to search key
-		BigInteger[] neighbours = this.routingTable.getKClosestNeighbours(m.dest, this.nodeId);
+		BigInteger[] neighbours = this.kadNode.getRoutingTable().getKClosestNeighbours(m.dest, this.kadNode);
 
 		// update the list of closest nodes and re-initialize available requests
 		fop.updateClosestSet(neighbours);
@@ -380,15 +346,15 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		// set message operation id
 		m.operationId = fop.operationId;
 		m.type = Message.MSG_ROUTE;
-		m.src = this.nodeId;
+		m.src = this.kadNode;
 
 		// send ALPHA messages
 		for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
 			BigInteger nextNode = fop.getNeighbour();
 			if (nextNode != null) {
 				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
-				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode, m.dest));
-				KademliaObserver.next_node_distance.add(Util.distance(nextNode, m.dest).doubleValue());
+				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode, m.dest.getNodeId()));
+				KademliaObserver.next_node_distance.add(Util.distance(nextNode, m.dest.getNodeId()).doubleValue());
 				fop.nrHops++;
 				sendMessage(m.copy(), nextNode, myPid);
 
@@ -489,6 +455,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	public void processEvent(Node myNode, int myPid, Object event) {
 
+
+		// todo: this code is not closed for modification. If the kademliaprotocol gets extended with new messages, then this we have to modify this.
+
 		System.err.println("");
 		System.err.println("-----------------------------------------------------------------------------------------------------");
 
@@ -556,15 +525,32 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 
 
+//	/**
+//	 * Set the current NodeId
+//	 *
+//	 * @param tmp
+//	 *            BigInteger
+//	 */
+//	public void setNodeId(BigInteger tmp) {
+//		this.nodeId = tmp;
+//		this.routingTable.nodeId = tmp;
+//	}
+	
+	
+	public void setNode(KadNode nid){
+		this.kadNode = nid;
+	}
+
+	public KadNode getNode(){
+		return this.kadNode;
+	}
+
 	/**
-	 * Set the current NodeId
-	 * 
+	 * Set the current domain Id
 	 * @param tmp
-	 *            BigInteger
 	 */
-	public void setNodeId(BigInteger tmp) {
-		this.nodeId = tmp;
-		this.routingTable.nodeId = tmp;
+	public void setDomainId(int tmp){
+		this.domainId = tmp;
 	}
 
 	/**

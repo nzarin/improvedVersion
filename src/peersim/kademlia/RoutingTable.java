@@ -13,7 +13,7 @@ public class RoutingTable implements Cloneable {
     /**
      * ID of the node that has this routing table.
      */
-    public BigInteger nodeId = null;
+    public KadNode node = null;
 
     /**
      * K-Buckets of this node.
@@ -37,10 +37,10 @@ public class RoutingTable implements Cloneable {
      *
      * @param node The node to be added.
      */
-    public void addNeighbour(BigInteger node) {
+    public void addNeighbour(KadNode node) {
 
         // get the length of the longest common prefix (correspond to the correct k-bucket)
-        int prefix_len = Util.prefixLen(nodeId, node);
+        int prefix_len = Util.prefixLen(this.node.getNodeId(), node.getNodeId());
 
         // add the node to the corresponding k-bucket
         k_buckets.get(prefix_len).addNeighbour(node);
@@ -52,13 +52,13 @@ public class RoutingTable implements Cloneable {
      *
      * @param node The node to be removed.
      */
-    public void removeNeighbour(BigInteger node) {
+    public void removeNeighbour(KadNode node) {
 
         // get the length of the longest common prefix (correspond to the correct k-bucket)
-        int prefix_len = Util.prefixLen(nodeId, node);
+        int prefix_len = Util.prefixLen(this.node.getNodeId(), node.getNodeId());
 
         // add the node to the k-bucket
-        k_buckets.get(prefix_len).removeNeighbour(node);
+        k_buckets.get(prefix_len).removeNeighbour(node.getNodeId());
     }
 
 
@@ -69,16 +69,16 @@ public class RoutingTable implements Cloneable {
      * @param src       The original requester of this lookup
      * @return The k closest neighbors to the search key
      */
-    public BigInteger[] getKClosestNeighbours(final BigInteger searchkey, final BigInteger src) {
+    public BigInteger[] getKClosestNeighbours(final KadNode searchkey, final KadNode src) {
 
         // resulting neighbors
-        BigInteger[] result = new BigInteger[KademliaCommonConfig.K];
+        KadNode[] result = new KadNode[KademliaCommonConfig.K];
 
         // neighbour candidates
-        ArrayList<BigInteger> neighbour_candidates = new ArrayList<BigInteger>();
+        ArrayList<KadNode> neighbour_candidates = new ArrayList<KadNode>();
 
         // get the length of the longest common prefix
-        int prefix_len = Util.prefixLen(nodeId, searchkey);
+        int prefix_len = Util.prefixLen(this.node.getNodeId(), searchkey.getNodeId());
 
         // return the k-bucket if it is full
         if (k_buckets.get(prefix_len).neighbours.size() >= KademliaCommonConfig.K) {
@@ -99,7 +99,7 @@ public class RoutingTable implements Cloneable {
         // create a map (distance, node)
         TreeMap<BigInteger, BigInteger> distance_map = new TreeMap<BigInteger, BigInteger>();
         for (BigInteger node : neighbour_candidates) {
-            distance_map.put(Util.distance(node, searchkey), node);
+            distance_map.put(Util.distance(node, searchkey.getNodeId()), node);
         }
 
         // select the k closest nodes from the distance map

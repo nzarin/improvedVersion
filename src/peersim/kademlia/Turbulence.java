@@ -116,7 +116,7 @@ public class Turbulence implements Control {
                 Node n2 = (Node) o2;
                 KademliaProtocol p1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
                 KademliaProtocol p2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
-                return Util.put0(p1.nodeId).compareTo(Util.put0(p2.nodeId));
+                return Util.put0(p1.getNode().getNodeId()).compareTo(Util.put0(p2.getNode().getNodeId()));
             }
 
             public boolean equals(Object obj) {
@@ -133,47 +133,70 @@ public class Turbulence implements Control {
     public boolean add() {
 
         // Add node to network
-        Node newNode = (Node) Network.prototype.clone();
+        Node newNetworkNode = (Node) Network.prototype.clone();
         for (int j = 0; j < inits.length; ++j)
-            inits[j].initialize(newNode);
-        Network.add(newNode);
+            inits[j].initialize(newNetworkNode);
+        Network.add(newNetworkNode);
 
-        // get kademlia protocol of new node
-        KademliaProtocol newKad = (KademliaProtocol) (newNode.getProtocol(kademliaid));
+        // get kademlia protocol of new node and create new kademlia node
+        KademliaProtocol newKad = (KademliaProtocol) (newNetworkNode.getProtocol(kademliaid));
+        UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS,  CommonState.r);
+        BigInteger nodeId = urg.generateID();
+        int tmpDomain = urg.selectDomain();
+        KadNode newKadNode = new KadNode(nodeId, tmpDomain);
 
-        // set node Id
-        UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
-        BigInteger nodeId = urg.generate();
-        ((KademliaProtocol) (newNode.getProtocol(kademliaid))).setNodeId(nodeId);
+//        ((KademliaProtocol) (newNode.getProtocol(kademliaid))).setNodeId(nodeId);
+        ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setNode(newKadNode);
 
-        System.err.println("New node is spawn with node id : " + nodeId);
+        System.err.println("New node is spawn with node id : " + newKadNode.getNodeId() + " in domain " + newKadNode.getDomain());
 
         // sort network
         sortNet();
 
-        // select one random bootstrap node
-        Node start;
-        do {
-            start = Network.get(CommonState.r.nextInt(Network.size()));
-        } while ((start == null) || (!start.isUp()));
+        // find random node to add to k-bucket
+        Node bootstrapNode = selectBootstrapNode(newKadNode);
 
         // create auto-search message (search message with destination my own Id)
         Message m = Message.makeEmptyMessage("Bootstrap traffic", Message.MSG_FINDNODE);
         m.timestamp = CommonState.getTime();
-        m.dest = newKad.nodeId;
+        m.dest = newKadNode;
 
         // perform initialization
-        newKad.routingTable.addNeighbour(((KademliaProtocol) (start.getProtocol(kademliaid))).nodeId);
+//        newKad.routingTable.addNeighbour(((KademliaProtocol) (bootstrapNode.getProtocol(kademliaid))).nodeId);
+        newKadNode.getRoutingTable().addNeighbour(((KademliaProtocol) bootstrapNode.getProtocol(kademliaid)).getNode().getNodeId());
 
         // start auto-search
-        EDSimulator.add(0, m, newNode, kademliaid);
+        EDSimulator.add(0, m, newNetworkNode, kademliaid);
 
-        // find another random node (this is to enrich the k-buckets)
-        Message m1 = Message.makeEmptyMessage("Bootstrap traffic", Message.MSG_FINDNODE);
-        m1.timestamp = CommonState.getTime();
-        m1.dest = urg.generate();
+//        // find another random node (this is to enrich the k-buckets)
+//        Node bootstrapNode2 = selectBootstrapNode(newKadNode);
+//
+//        Message m1 = Message.makeEmptyMessage("Bootstrap traffic", Message.MSG_FINDNODE);
+//        m1.timestamp = CommonState.getTime();
+//        m1.dest = urg.generateID();
 
         return false;
+    }
+
+
+    private Node selectBootstrapNode(KadNode newKadNode){
+        // select one random bootstrap node within this domain
+        Node bootstrapNode;
+        KademliaProtocol kadP;
+        KadNode bootstrapKadNode = null;
+        do {
+            bootstrapNode = Network.get(CommonState.r.nextInt(Network.size()));
+            kadP = (KademliaProtocol) (bootstrapNode.getProtocol(kademliaid));
+            KadNode temp = kadP.getNode();
+
+            //only nodes that are in the same domain can be bootstrap nodes
+            if(temp.getDomain() == newKadNode.getDomain()){
+                bootstrapKadNode = temp;
+            }
+
+        } while ((bootstrapNode == null) || (bootstrapKadNode == null) || (!bootstrapNode.isUp()));
+
+        return bootstrapNode;
     }
 
     /**

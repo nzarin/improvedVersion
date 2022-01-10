@@ -46,7 +46,7 @@ public class TrafficGenerator implements Control {
         while (!n.isUp()) {
             n = Network.get(CommonState.r.nextInt(Network.size()));
         }
-        m.dest = ((KademliaProtocol) (n.getProtocol(pid))).nodeId;
+        m.dest = ((KademliaProtocol) (n.getProtocol(pid))).getNode();
 
         return m;
     }
