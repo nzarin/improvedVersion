@@ -48,7 +48,7 @@ public final class UniformRandomGenerator {
     }
 
     /**
-     * Select the next domain in line
+     * Select a random domain to assign an ID to
      * @return
      */
     public int selectDomain() {

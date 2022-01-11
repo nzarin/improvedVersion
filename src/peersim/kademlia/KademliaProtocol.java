@@ -105,46 +105,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		_ALREADY_INSTALLED = true;
 	}
 
-	/**
-	 * Search through the network the Node having a specific node Id, by performing binary search (we concern about the ordering
-	 * of the network).
-	 * 
-	 * @param searchNodeId
-	 *            BigInteger
-	 * @return Node
-	 */
-	private Node nodeIdtoNode(BigInteger searchNodeId) {
-		if (searchNodeId == null)
-			return null;
-
-		int inf = 0;
-		int sup = Network.size() - 1;
-		int m;
-
-		while (inf <= sup) {
-			m = (inf + sup) / 2;
-
-			BigInteger mId = ((KademliaProtocol) Network.get(m).getProtocol(kademliaid)).getKadNode().getNodeId();
-
-			if (mId.equals(searchNodeId))
-				return Network.get(m);
-
-			if (mId.compareTo(searchNodeId) < 0)
-				inf = m + 1;
-			else
-				sup = m - 1;
-		}
-
-		// perform a traditional search for more reliability (maybe the network is not ordered)
-		BigInteger mId;
-		for (int i = Network.size() - 1; i >= 0; i--) {
-			mId = ((KademliaProtocol) Network.get(i).getProtocol(kademliaid)).getKadNode().getNodeId();
-			if (mId.equals(searchNodeId))
-				return Network.get(i);
-		}
-
-		return null;
-	}
 
 	/**
 	 * Perform the required operation upon receiving a message in response to a ROUTE message.
@@ -231,8 +191,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 						} else{	// failed lookup?
 
-							Node destNode = nodeIdtoNode(fop.destNode.getNodeId());
-							Node me = nodeIdtoNode(this.kadNode.getNodeId());
+							Node destNode = Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid);
+							Node me = Util.nodeIdtoNode(this.kadNode.getNodeId(), kademliaid);
 
 							// check if both the destination node and me are still up.
 							if(destNode.isUp() && me.isUp() ){
@@ -251,7 +211,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 					return;
 
 				} else {
-					System.err.println(" I have no neighbour available, but there exist outstanding requests. So I wait.");
+//					System.err.println(" I have no neighbour available, but there exist outstanding requests. So I wait.");
 					return;
 				}
 			}
@@ -304,7 +264,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	private void find(Message m, int myPid) {
 
 		// if I am the searched node or searched node is down -> skip (should not happen in kademlia)
-		Node dst = nodeIdtoNode(m.dest.getNodeId());
+		Node dst = Util.nodeIdtoNode(m.dest.getNodeId(), kademliaid);
 		if((m.dest.getNodeId() == this.kadNode.getNodeId()) || (!dst.isUp()))
 			return;
 
@@ -348,17 +308,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 
 	/**
-	 * When a node receives a ping message it should reply or do nothing.
-	 * @param m
-	 * @param myPid
-	 */
-	private void ping(Message m, int myPid) {
-		// if I am online -> send a reply message
-		// if I am offline -> do nothing and wait until the ping message exceeds timeout deadline.
-
-	}
-
-	/**
 	 * Send a message with current transport layer and starting the timeout timer (which is an event) if the message is a request
 	 * 
 	 * @param m
@@ -372,8 +321,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		// add destination to routing table
 		this.kadNode.getRoutingTable().addNeighbour(destId);
 
-		Node src = nodeIdtoNode(this.kadNode.getNodeId());
-		Node dest = nodeIdtoNode(destId.getNodeId());
+		Node src = Util.nodeIdtoNode(this.kadNode.getNodeId(), kademliaid);
+		Node dest = Util.nodeIdtoNode(destId.getNodeId(), kademliaid);
 
 		transport = (UnreliableTransport) (Network.prototype).getProtocol(tid);
 		transport.send(src, dest, m, kademliaid);
@@ -438,7 +387,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	public void processEvent(Node myNode, int myPid, Object event) {
 
-
 		// todo: this code is not closed for modification. If the kademliaprotocol gets extended with new messages, then this we have to modify this.
 
 //		System.err.println("");
@@ -457,7 +405,17 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 //				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" received a FIND NODE message");
 //				System.err.println("It should find node " + m.dest);
 
-				find(m, myPid);
+				if(this.kadNode.getDomain() == m.dest.getDomain()){		// intra-domain lookup
+					IntraDomainLookup intraLookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m);
+					intraLookup.lookup(); 	//todo: want this eventually
+					FindOperation fop = intraLookup.find();
+					sendXMessages(m,fop, KademliaCommonConfig.ALPHA);
+				} else{	//inter-domain lookup
+					InterDomainLookup interLookup = new InterDomainLookup();
+					interLookup.lookup();
+				}
+
+//				find(m, myPid);
 				break;
 
 
@@ -483,17 +441,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				handleResponse(m, myPid);
 				break;
 
-			case Message.MSG_PING:
-				m = (Message) event;
 
-//				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" has received a PING message");
-//				System.err.println("The src of this message is " + m.src);
-
-				ping(m, myPid);
-				break;
-
-
-			case Timeout.TIMEOUT: // timeout
+			case Timeout.TIMEOUT:
 				Timeout t = (Timeout) event;
 
 //				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" has received a TIMEOUT message");
@@ -506,29 +455,24 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	}
 
 
+	private void sendXMessages(Message m, FindOperation fop, int x){
+		for (int i = 0; i < x; i++) {
+//			System.err.println(" SEND X MESSAGES method. Next node ....." );
+			KadNode nextNode = fop.getNeighbour();
+			if (nextNode != null) {
+//				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
+//				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode.getNodeId(), m.dest.getNodeId()));
+				KademliaObserver.next_node_distance.add(Util.distance(nextNode.getNodeId(), m.dest.getNodeId()).doubleValue());
+				fop.nrHops++;
+				sendMessage(m.copy(), nextNode, this.kademliaid);
+			}
+		}
+	}
 
-//	/**
-//	 * Set the current NodeId
-//	 *
-//	 * @param tmp
-//	 *            BigInteger
-//	 */
-//	public void setNodeId(BigInteger tmp) {
-//		this.nodeId = tmp;
-//		this.routingTable.nodeId = tmp;
-//	}
-	
+
 	
 	public void setNode(KadNode nid){
 		this.kadNode = nid;
-	}
-
-	/**
-	 * Set the current domain Id
-	 * @param tmp
-	 */
-	public void setDomainId(int tmp){
-		this.domainId = tmp;
 	}
 
 	/**

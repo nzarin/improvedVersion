@@ -42,6 +42,7 @@ public class CustomDistribution implements peersim.core.Control {
         System.err.println("Assigning kademlia node identifiers to nodes in the network:");
         
         for (int i = 0; i < Network.size(); ++i) {
+            //create a KadNode
             BigInteger tmpID = urg.generateID();
             int tmpDomain = urg.selectDomain();
             KadNode node = new KadNode(tmpID, tmpDomain);
