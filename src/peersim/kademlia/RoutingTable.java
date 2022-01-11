@@ -13,7 +13,7 @@ public class RoutingTable implements Cloneable {
     /**
      * ID of the node that has this routing table.
      */
-    public KadNode node = null;
+    public KadNode owner = null;
 
     /**
      * K-Buckets of this node.
@@ -35,15 +35,15 @@ public class RoutingTable implements Cloneable {
     /**
      * Add a neighbour to the correct k-bucket.
      *
-     * @param node The node to be added.
+     * @param neighbour The node to be added.
      */
-    public void addNeighbour(KadNode node) {
+    public void addNeighbour(KadNode neighbour) {
 
         // get the length of the longest common prefix (correspond to the correct k-bucket)
-        int prefix_len = Util.prefixLen(this.node.getNodeId(), node.getNodeId());
+        int prefix_len = Util.prefixLen(owner.getNodeId(), neighbour.getNodeId());
 
         // add the node to the corresponding k-bucket
-        k_buckets.get(prefix_len).addNeighbour(node);
+        k_buckets.get(prefix_len).addNeighbour(neighbour);
     }
 
 
@@ -55,10 +55,10 @@ public class RoutingTable implements Cloneable {
     public void removeNeighbour(KadNode node) {
 
         // get the length of the longest common prefix (correspond to the correct k-bucket)
-        int prefix_len = Util.prefixLen(this.node.getNodeId(), node.getNodeId());
+        int prefix_len = Util.prefixLen(this.owner.getNodeId(), node.getNodeId());
 
         // add the node to the k-bucket
-        k_buckets.get(prefix_len).removeNeighbour(node.getNodeId());
+        k_buckets.get(prefix_len).removeNeighbour(node);
     }
 
 
@@ -69,27 +69,26 @@ public class RoutingTable implements Cloneable {
      * @param src       The original requester of this lookup
      * @return The k closest neighbors to the search key
      */
-    public BigInteger[] getKClosestNeighbours(final KadNode searchkey, final KadNode src) {
+    public KadNode[] getKClosestNeighbours(final KadNode searchkey, final KadNode src) {
 
         // resulting neighbors
         KadNode[] result = new KadNode[KademliaCommonConfig.K];
 
-        // neighbour candidates
+        // neighbour candidates identifiers
         ArrayList<KadNode> neighbour_candidates = new ArrayList<KadNode>();
 
         // get the length of the longest common prefix
-        int prefix_len = Util.prefixLen(this.node.getNodeId(), searchkey.getNodeId());
+        int prefix_len = Util.prefixLen(this.owner.getNodeId(), searchkey.getNodeId());
 
         // return the k-bucket if it is full
         if (k_buckets.get(prefix_len).neighbours.size() >= KademliaCommonConfig.K) {
-            return k_buckets.get(prefix_len).neighbours.keySet().toArray(result);
+            return k_buckets.get(prefix_len).neighbours.keySet().toArray(result);   //todo: check what representation
         }
 
         // else get k closest node from all k-buckets
         prefix_len = 0;
         while (prefix_len < KademliaCommonConfig.BITS) {
             neighbour_candidates.addAll(k_buckets.get(prefix_len).neighbours.keySet());
-
             prefix_len++;
         }
 
@@ -97,9 +96,9 @@ public class RoutingTable implements Cloneable {
         neighbour_candidates.remove(src);
 
         // create a map (distance, node)
-        TreeMap<BigInteger, BigInteger> distance_map = new TreeMap<BigInteger, BigInteger>();
-        for (BigInteger node : neighbour_candidates) {
-            distance_map.put(Util.distance(node, searchkey.getNodeId()), node);
+        TreeMap<BigInteger, KadNode> distance_map = new TreeMap<BigInteger, KadNode>();
+        for (KadNode node : neighbour_candidates) {
+            distance_map.put(Util.distance(node.getNodeId(), searchkey.getNodeId()), node);
         }
 
         // select the k closest nodes from the distance map
@@ -130,10 +129,20 @@ public class RoutingTable implements Cloneable {
     public String toString() {
         String s = "";
         for (Map.Entry<Integer, KBucket> entry : k_buckets.entrySet()) {
-            String ith_k_bucket = entry.getValue().toString();
+            KBucket kBucket = entry.getValue();
+            String ith_k_bucket = kBucket.toString();
             s = s + "Nodes with common prefix " + entry.getKey() + " are : " + ith_k_bucket + "\n";
         }
         return s;
     }
 
+
+
+    /**
+     * Bind the owner id (legacy code permits)
+     * @param node
+     */
+    public void setOwnerKadNode(KadNode node) {
+        this.owner = node;
+    }
 }

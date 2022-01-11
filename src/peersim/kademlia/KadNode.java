@@ -15,11 +15,6 @@ public class KadNode {
         this.routingTable = new RoutingTable();
     }
 
-
-    public void setNodeId(BigInteger nodeId) {
-        this.nodeId = nodeId;
-    }
-
     public void setDomain(int domain) {
         this.domain = domain;
     }
@@ -36,12 +31,21 @@ public class KadNode {
         return this.routingTable;
     }
 
+
     @Override
     public String toString() {
         return "KadNode{" +
                 "nodeId=" + nodeId +
                 ", domain=" + domain +
-                ", routingTable=" + routingTable +
+                ", routingTable=" + routingTable.toString() +
+                '}';
+    }
+
+
+    public String toString2() {
+        return "KadNode{" +
+                "nodeId=" + nodeId +
+                ", domain=" + domain +
                 '}';
     }
 }

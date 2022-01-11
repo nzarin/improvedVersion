@@ -49,7 +49,7 @@ public class FindOperation {
      * This map contains the K closest nodes and corresponding boolean value that indicates if the nodes has been already queried
      * or not
      */
-    public HashMap<BigInteger, Boolean> closestSet;
+    public HashMap<KadNode, Boolean> closestSet;
 
     /**
      * default constructor
@@ -68,7 +68,7 @@ public class FindOperation {
         available_requests = KademliaCommonConfig.ALPHA;
 
         // initialize closestSet
-        closestSet = new HashMap<BigInteger, Boolean>();
+        closestSet = new HashMap<KadNode, Boolean>();
     }
 
     /**
@@ -76,13 +76,15 @@ public class FindOperation {
      *
      * @param neighbours
      */
-    public void updateClosestSet(BigInteger[] neighbours) {
+    public void updateClosestSet(KadNode[] neighbours) {
+
+        //todo: test this
 
         // update response number because we can send another route message
         available_requests++;
 
         // add to closestSet
-        for (BigInteger n : neighbours) {
+        for (KadNode n : neighbours) {
 
             if (n != null) {
 
@@ -96,22 +98,22 @@ public class FindOperation {
                     } else {
 
                         // find in the closest set if there are nodes with less distance
-                        BigInteger newdist = Util.distance(n, destNode.getNodeId());
+                        BigInteger newdist = Util.distance(n.getNodeId(), destNode.getNodeId());
 
                         // find the node with max distance
                         BigInteger maxdist = newdist;
-                        BigInteger nodemaxdist = n;
-                        for (BigInteger i : closestSet.keySet()) {
-                            BigInteger dist = Util.distance(i, destNode.getNodeId());
+                        BigInteger nodemaxdist = n.getNodeId();
+                        for (KadNode i : closestSet.keySet()) {
+                            BigInteger dist = Util.distance(i.getNodeId(), destNode.getNodeId());
 
                             if (dist.compareTo(maxdist) > 0) {
                                 maxdist = dist;
-                                nodemaxdist = i;
+                                nodemaxdist = i.getNodeId();
                             }
                         }
 
                         // replace the node with larger distance with n
-                        if (nodemaxdist.compareTo(n) != 0) {
+                        if (nodemaxdist.compareTo(n.getNodeId()) != 0) {
                             closestSet.remove(nodemaxdist);
                             closestSet.put(n, false);
                         }
@@ -126,15 +128,15 @@ public class FindOperation {
      *
      * @return the Id of the node or null if there aren't available node.
      */
-    public BigInteger getNeighbour() {
+    public KadNode getNeighbour() {
 
         // find closest neighbour (the first not already queried)
-        BigInteger res = null;
-        for (BigInteger n : closestSet.keySet()) {
+        KadNode res = null;
+        for (KadNode n : closestSet.keySet()) {
             if (n != null && closestSet.get(n) == false) {
                 if (res == null) {
                     res = n;
-                } else if (Util.distance(n, destNode.getNodeId()).compareTo(Util.distance(res, destNode.getNodeId())) < 0) {
+                } else if (Util.distance(n.getNodeId(), destNode.getNodeId()).compareTo(Util.distance(res.getNodeId(), destNode.getNodeId())) < 0) {
                     res = n;
                 }
             }
@@ -155,7 +157,7 @@ public class FindOperation {
      *
      * @return
      */
-    public HashMap<BigInteger, Boolean> getClosestSet() {
+    public HashMap<KadNode, Boolean> getClosestSet() {
         return closestSet;
     }
 

@@ -3,6 +3,7 @@ package peersim.kademlia;
 import peersim.core.CommonState;
 
 import java.math.BigInteger;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 /**
@@ -13,14 +14,15 @@ public class KBucket implements Cloneable {
     /**
      * The k-bucket array.
      */
-    protected TreeMap<BigInteger, Long> neighbours = null;
+    protected LinkedHashMap<KadNode, Long> neighbours = null;
 
     /**
      * Empty constructor.
      */
     public KBucket() {
-        neighbours = new TreeMap<BigInteger, Long>();
+        neighbours = new LinkedHashMap<>();
     }
+
 
 
     /**
@@ -33,7 +35,7 @@ public class KBucket implements Cloneable {
 
         // if the k-bucket isn't full, add neighbour to tail of the list.
         if (neighbours.size() < KademliaCommonConfig.K) { // k-bucket isn't full
-            neighbours.put(node.getNodeId(), time);
+            neighbours.put(node, time);
         }
     }
 
@@ -43,7 +45,7 @@ public class KBucket implements Cloneable {
      *
      * @param node The to-be removed neighbour.
      */
-    public void removeNeighbour(BigInteger node) {
+    public void removeNeighbour(KadNode node) {
         neighbours.remove(node);
     }
 
@@ -55,8 +57,10 @@ public class KBucket implements Cloneable {
      */
     public Object clone() {
         KBucket dolly = new KBucket();
-        for (BigInteger node : neighbours.keySet()) {
-            dolly.neighbours.put(new BigInteger(node.toByteArray()), 0l);
+        for (KadNode node : neighbours.keySet()) {
+            KadNode dupl = new KadNode(new BigInteger(node.getNodeId().toByteArray()), node.getDomain());
+//            dupl.setNodeId(new BigInteger(node.getNodeId().toByteArray()), 0l);
+            dolly.neighbours.put(dupl, 0l);
         }
         return dolly;
     }
@@ -66,7 +70,7 @@ public class KBucket implements Cloneable {
      *
      * @return Current KBucket.
      */
-    public TreeMap<BigInteger, Long> getKBucket() {
+    public LinkedHashMap<KadNode, Long> getKBucket() {
         return this.neighbours;
     }
 
@@ -76,10 +80,11 @@ public class KBucket implements Cloneable {
      * @return
      */
     public String toString() {
+        System.err.println("we reach the toString of KBucket class");
         String res = "{\n";
 
-        for (BigInteger node : neighbours.keySet()) {
-            res += node + "\n";
+        for (KadNode node : neighbours.keySet()) {
+            res += node.toString2() + "\n";
         }
 
         return res + "}";

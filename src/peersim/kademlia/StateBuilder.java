@@ -80,7 +80,7 @@ public class StateBuilder implements peersim.core.Control {
 
                 KademliaProtocol pr1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
                 KademliaProtocol pr2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
-                return Util.put0(pr1.getNode().getNodeId()).compareTo(Util.put0(pr2.getNode().getNodeId()));
+                return Util.put0(pr1.getKadNode().getNodeId()).compareTo(Util.put0(pr2.getKadNode().getNodeId()));
             }
 
         });
@@ -91,16 +91,16 @@ public class StateBuilder implements peersim.core.Control {
         for(int i = 0; i < sz; i++){
             Node networkNode = Network.get(i);
             KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
-            KadNode iNode = iKad.getNode();
+            KadNode iNode = iKad.getKadNode();
 
             for(int j = 0; j < 100; j++){
                 Node randomNetworkNode = Network.get(CommonState.r.nextInt(sz));
                 KademliaProtocol jKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
-                KadNode jNode = jKad.getNode();
+                KadNode jNode = jKad.getKadNode();
 
                 //add if it's in the same domain
                 if(iNode.getDomain() == jNode.getDomain()){
-                    iNode.getRoutingTable().addNeighbour(jKad.nodeId);  //todo: fix dat later routingTable uit KadNode, KBucket bestaat
+                    iNode.getRoutingTable().addNeighbour(jNode);
                 } else {
                     j--;
                 }
@@ -109,23 +109,12 @@ public class StateBuilder implements peersim.core.Control {
         }
 
 
-//        // for every node take 50 random node and add to k-bucket of it
-//        for (int i = 0; i < sz; i++) {
-//            Node iNode = Network.get(i);
-//            KademliaProtocol iKad = (KademliaProtocol) (iNode.getProtocol(kademliaid));
-//
-//            for (int k = 0; k < 100; k++) {
-//                KademliaProtocol jKad = (KademliaProtocol) (Network.get(CommonState.r.nextInt(sz)).getProtocol(kademliaid));
-//                iKad.routingTable.addNeighbour(jKad.nodeId);
-//            }
-////			System.err.println("Its routing table is: [" + iKad.routingTable.toString() + "]");
-//        }
 
         // add other 50 near nodes
         for(int i =0; i < sz; i++){
             Node networkNode = Network.get(i);
             KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
-            KadNode iNode = iKad.getNode();
+            KadNode iNode = iKad.getKadNode();
 
             int start = i;
             if (i > sz - 50){
@@ -137,35 +126,16 @@ public class StateBuilder implements peersim.core.Control {
                 if(start > 0 && start < sz){
                     Node neighbour = Network.get(start++);
                     KademliaProtocol jKad = (KademliaProtocol) neighbour.getProtocol(kademliaid);
-                    KadNode jNode = jKad.getNode();
+                    KadNode jNode = jKad.getKadNode();
 
                     if(iNode.getDomain() == jNode.getDomain()){
-                        iNode.getRoutingTable().addNeighbour(jNode.getNodeId());
+                        iNode.getRoutingTable().addNeighbour(jNode);
                     } else {
                         j--;
                     }
                 }
             }
-
         }
-
-//        // add other 50 near nodes
-//        for (int i = 0; i < sz; i++) {
-//            Node iNode = Network.get(i);
-//            KademliaProtocol iKad = (KademliaProtocol) (iNode.getProtocol(kademliaid));
-//
-//            int start = i;
-//            if (i > sz - 50) {
-//                start = sz - 25;
-//            }
-//            for (int k = 0; k < 50; k++) {
-//                start = start++;
-//                if (start > 0 && start < sz) {
-//                    KademliaProtocol jKad = (KademliaProtocol) (Network.get(start++).getProtocol(kademliaid));
-//                    iKad.routingTable.addNeighbour(jKad.nodeId);
-//                }
-//            }
-//        }
 
         System.err.println("Routing tables are filled to their domains");
 

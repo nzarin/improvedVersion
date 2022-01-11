@@ -19,7 +19,6 @@ public class CustomDistribution implements peersim.core.Control {
     private final int protocolID;
     private final UniformRandomGenerator urg;
     protected TreeMap<Long, BigInteger> mapNIDoPID;
-//    private final int numberOfDomains;
 
     /**
      * Constructor that links the Controller and Protocol IDs and creates a uniform random generator.
@@ -28,7 +27,6 @@ public class CustomDistribution implements peersim.core.Control {
      */
     public CustomDistribution(String prefix) {
         protocolID = Configuration.getPid(prefix + "." + PAR_PROT);
-//        numberOfDomains = Configuration.getInt(prefix + "." + PAR_NMR_DOMAINS, 1); //  default 1
         urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
         mapNIDoPID = new TreeMap<Long, BigInteger>();
     }
@@ -47,9 +45,9 @@ public class CustomDistribution implements peersim.core.Control {
             BigInteger tmpID = urg.generateID();
             int tmpDomain = urg.selectDomain();
             KadNode node = new KadNode(tmpID, tmpDomain);
+            node.getRoutingTable().setOwnerKadNode(node);
             if (!mapNIDoPID.containsValue(tmpID)) {
                 System.err.println("Network node " + Network.get(i).getID() + " gets assigned Node ID : " + tmpID + " for domain " + tmpDomain );
-//                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNodeId(tmpID);
                 ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNode(node);
                 mapNIDoPID.put(Network.get(i).getID(), tmpID);
             } else {

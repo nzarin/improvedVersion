@@ -116,7 +116,7 @@ public class Turbulence implements Control {
                 Node n2 = (Node) o2;
                 KademliaProtocol p1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
                 KademliaProtocol p2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
-                return Util.put0(p1.getNode().getNodeId()).compareTo(Util.put0(p2.getNode().getNodeId()));
+                return Util.put0(p1.getKadNode().getNodeId()).compareTo(Util.put0(p2.getKadNode().getNodeId()));
             }
 
             public boolean equals(Object obj) {
@@ -138,15 +138,11 @@ public class Turbulence implements Control {
             inits[j].initialize(newNetworkNode);
         Network.add(newNetworkNode);
 
-        // get kademlia protocol of new node and create new kademlia node
-        KademliaProtocol newKad = (KademliaProtocol) (newNetworkNode.getProtocol(kademliaid));
+        // create new kademlia node
         UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS,  CommonState.r);
-        BigInteger nodeId = urg.generateID();
-        int tmpDomain = urg.selectDomain();
-        KadNode newKadNode = new KadNode(nodeId, tmpDomain);
-
-//        ((KademliaProtocol) (newNode.getProtocol(kademliaid))).setNodeId(nodeId);
+        KadNode newKadNode = new KadNode(urg.generateID(), urg.selectDomain());
         ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setNode(newKadNode);
+        newKadNode.getRoutingTable().setOwnerKadNode(newKadNode);
 
         System.err.println("New node is spawn with node id : " + newKadNode.getNodeId() + " in domain " + newKadNode.getDomain());
 
@@ -162,8 +158,7 @@ public class Turbulence implements Control {
         m.dest = newKadNode;
 
         // perform initialization
-//        newKad.routingTable.addNeighbour(((KademliaProtocol) (bootstrapNode.getProtocol(kademliaid))).nodeId);
-        newKadNode.getRoutingTable().addNeighbour(((KademliaProtocol) bootstrapNode.getProtocol(kademliaid)).getNode().getNodeId());
+        newKadNode.getRoutingTable().addNeighbour(((KademliaProtocol) bootstrapNode.getProtocol(kademliaid)).getKadNode());
 
         // start auto-search
         EDSimulator.add(0, m, newNetworkNode, kademliaid);
@@ -187,7 +182,7 @@ public class Turbulence implements Control {
         do {
             bootstrapNode = Network.get(CommonState.r.nextInt(Network.size()));
             kadP = (KademliaProtocol) (bootstrapNode.getProtocol(kademliaid));
-            KadNode temp = kadP.getNode();
+            KadNode temp = kadP.getKadNode();
 
             //only nodes that are in the same domain can be bootstrap nodes
             if(temp.getDomain() == newKadNode.getDomain()){
