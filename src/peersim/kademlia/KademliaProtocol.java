@@ -119,7 +119,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			this.kadNode.getRoutingTable().addNeighbour(m.src);
 		}
 
-		// get corresponding find operation (using the message field operationId)
 		FindOperation fop = this.findOp.get(m.operationId);
 
 		if (fop != null) {
@@ -218,41 +217,10 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	}
 
 
-	/**
-	 * Response to a route request.
-	 * Find the ALPHA closest node consulting the k-buckets and return them to the sender.
-	 * 
-	 * @param m
-	 *            Message
-	 * @param senderPid
-	 *            The sender Pid
-	 */
-	private void respond(Message m, int senderPid) {
-
-		// get the k closest nodes to target node
-		KadNode[] neighbours = this.kadNode.getRoutingTable().getKClosestNeighbours(m.dest, m.src);
-
-		//get the BETA closest nodes from the neighbours
-		KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
-
-
-		// create a response message containing the neighbours (with the same id as of the request)
-		Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
-		response.operationId = m.operationId;
-		response.dest = m.dest;
-		response.src = this.kadNode;
-		response.ackId = m.id; // set ACK number
-
-//		System.err.println("Node " + this.kadNode.getNodeId() + " is sending a RESPONSE message to node " + m.src + " with the following list of neighbors: " + Arrays.toString(betaNeighbours));
-
-		// send back the neighbours to the source of the message
-		sendMessage(response, m.src, senderPid);
-	}
-
 
 	/**
 	 * Send a message with current transport layer and starting the timeout timer (which is an event) if the message is a request
-	 * 
+	 *
 	 * @param m
 	 *            The message to send.
 	 * @param destId
@@ -351,25 +319,77 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				lookup =  new InterDomainLookup();
 			}
 
-			// check what type of message and handle appropriatly
+			// check what type of message and handle appropriately
 			switch (m.getType()) {
 				case Message.MSG_FINDNODE:
 					lookup.find();
 					break;
 				case Message.MSG_ROUTE:
-					respond(m, myPid);
-//					lookup.find(); todo: fix this
+					lookup.respond();
 					break;
 				case Message.MSG_RESPONSE:
 					sentMsg.remove(m.ackId);
-					handleResponse(m, myPid);
-//					lookup.find(); todo: fix this
+					lookup.handleResponse();
 					break;
 			}
 
 		} else {	//it is a timeout
-			Timeout t = (Timeout) ev;
-			handleTimeOut(t, myPid);
+			handleTimeOut((Timeout) ev, this.kademliaid);
+		}
+
+	}
+
+
+
+	/**
+	 * Manage the peersim simulator receiving the events
+	 *
+	 * @param myNode
+	 *            Node
+	 * @param myPid
+	 *            int
+	 * @param event
+	 *            Object
+	 */
+	public void processEvent2(Node myNode, int myPid, Object event) {
+
+		// todo: this code is not closed for modification. If the kademliaprotocol gets extended with new messages, then this we have to modify this.
+
+//		System.err.println("");
+//		System.err.println("-----------------------------------------------------------------------------------------------------");
+
+		// Parse message content Activate the correct event manager for the particular event
+		this.kademliaid = myPid;
+		SimpleEvent ev = (SimpleEvent) event;
+
+		//if it's a message
+		if(ev instanceof Message){
+
+			Message m = (Message) ev;
+			Lookup lookup;
+
+			if(this.kadNode.getDomain() == m.dest.getDomain()){
+				lookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m, tid, sentMsg);
+			} else{
+				lookup =  new InterDomainLookup();
+			}
+
+			// check what type of message and handle appropriately
+			switch (m.getType()) {
+				case Message.MSG_FINDNODE:
+					lookup.find();
+					break;
+				case Message.MSG_ROUTE:
+					lookup.respond();
+					break;
+				case Message.MSG_RESPONSE:
+					sentMsg.remove(m.ackId);
+					lookup.handleResponse();
+					break;
+			}
+
+		} else {	//it is a timeout
+			handleTimeOut((Timeout) ev, this.kademliaid);
 		}
 
 	}

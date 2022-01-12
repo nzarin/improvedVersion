@@ -23,7 +23,8 @@ public class RoutingTable implements Cloneable {
     /**
      * Instantiates a new empty routing table with the specified size
      */
-    public RoutingTable() {
+    public RoutingTable(KadNode owner) {
+        this.owner = owner;
         k_buckets = new TreeMap<Integer, KBucket>();
         // initialize k-bukets
         for (int i = 0; i <= KademliaCommonConfig.BITS; i++) {
@@ -114,9 +115,9 @@ public class RoutingTable implements Cloneable {
     }
 
     public Object clone() {
-        RoutingTable dolly = new RoutingTable();
+        RoutingTable dolly = new RoutingTable(this.owner);
         for (int i = 0; i < KademliaCommonConfig.BITS; i++) {
-            k_buckets.put(i, new KBucket());// (KBucket) k_buckets.get(i).clone());
+            dolly.k_buckets.put(i, new KBucket());
         }
         return dolly;
     }

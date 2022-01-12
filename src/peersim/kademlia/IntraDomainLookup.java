@@ -1,10 +1,12 @@
 package peersim.kademlia;
 
+import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 import peersim.transport.UnreliableTransport;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -18,6 +20,9 @@ public class IntraDomainLookup implements Lookup{
     private UnreliableTransport transport;
     private TreeMap<Long, Long> sentMsg;
 
+    public IntraDomainLookup(){
+        System.err.println("do nothing for now");
+    }
 
     public IntraDomainLookup(int kademliaId, KadNode current, LinkedHashMap<Long, FindOperation> findOps, Message lookupMessage, int transportID, TreeMap<Long,Long> sentMsg) {
         this.kademliaid = kademliaId;
@@ -49,8 +54,6 @@ public class IntraDomainLookup implements Lookup{
         fop.body = m.body;
         findOpMap.put(fop.operationId, fop);
 
-//		System.err.println("The operationID is : " + fop.operationId);
-//		System.err.println("Size of the findOP of node : " + this.nodeId +" is " + findOp.size());
 
         // get the K closest node to search key
         KadNode[] neighbours = this.currentNode.getRoutingTable().getKClosestNeighbours(m.dest, this.currentNode);
@@ -64,18 +67,139 @@ public class IntraDomainLookup implements Lookup{
         m.type = Message.MSG_ROUTE;
         m.src = this.currentNode;
 
-        // send ALPHA messages
+        // send alpha ROUTE messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
             KadNode nextNode = fop.getNeighbour();
             if (nextNode != null) {
-//				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
-//				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode.getNodeId(), m.dest.getNodeId()));
                 KademliaObserver.next_node_distance.add(Util.distance(nextNode.getNodeId(), m.dest.getNodeId()).doubleValue());
                 fop.nrHops++;
                 sendMessage(m.copy(), nextNode, this.kademliaid);
 
             }
         }
+    }
+
+
+    /**
+     * Response to a route request.
+     * Find the ALPHA closest node consulting the k-buckets and return them to the sender.
+     */
+    @Override
+    public void respond() {
+
+        // get the k closest nodes to target node
+        KadNode[] neighbours = this.currentNode.getRoutingTable().getKClosestNeighbours(m.dest, m.src);
+
+        //get the BETA closest nodes from the neighbours
+        KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
+
+        // create a response message containing the neighbours (with the same id as of the request)
+        Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
+        response.operationId = m.operationId;
+        response.dest = m.dest;
+        response.src = this.currentNode;
+        response.ackId = m.id; // set ACK number
+
+        // send back the neighbours to the source of the message
+        sendMessage(response, m.src, this.kademliaid);
+    }
+
+    @Override
+    public void handleResponse() {
+
+        // add message source to my routing table
+        if(m.src != null){
+            this.currentNode.getRoutingTable().addNeighbour(m.src);
+        }
+
+        // get corresponding find operation (using the message field operationId)
+        FindOperation fop = this.findOpMap.get(m.operationId);
+
+        // if the fop is valid
+        if(fop != null) {
+
+            //update the closest set by saving the received neighbour
+            try{
+                fop.updateClosestSet((KadNode[]) m.body);
+            }catch (Exception e){
+                fop.available_requests++;
+            }
+
+            // send the new requests if allowed
+            while(fop.available_requests > 0) {
+
+                KadNode neighbour = fop.getNeighbour();
+
+                //SCENARIO 1: there exists some neighbour we can visit.
+                if(neighbour != null){
+
+                    //create new request to send to neighbour
+                    Message request = new Message(Message.MSG_ROUTE);
+                    request.operationId = m.operationId;
+                    request.src = this.currentNode;
+                    request.dest = m.dest;
+
+                    //increment hop count
+                    fop.nrHops++;
+
+                    //send messages
+                    sendMessage(request, neighbour, this.kademliaid);
+
+                    //SCENARIO 2: no new neighbour and no outstanding requests
+                } else if(fop.available_requests == KademliaCommonConfig.ALPHA){
+
+                    // Search operation finished. The lookup terminates when the initiator has queried and gotten responses
+                    // from the k closest nodes (from the closest set) it has seen.
+                    findOpMap.remove(fop.operationId);
+
+                    // if the find operation was not for bootstrapping purposes
+                    if(fop.body.equals("Automatically Generated Traffic")){
+                        updateLookupStatistics(fop);
+                    } else {
+                        System.err.println("This is a bootstrap message. Let it be.");
+                    }
+
+                    return;
+
+                    //SCENARIO 3: no neighbour available, but there are some open outstanding requests so just wait.
+                } else {
+                    return;
+                }
+            }
+
+        } else {
+            System.err.println("There has been some error in the protocol");
+        }
+
+    }
+
+    /**
+     * Update the lookup statistics for the Kademlia Observer
+     * @param fop
+     */
+    private void updateLookupStatistics(FindOperation fop) {
+
+        // if the target is found -> successful lookup
+        if(fop.closestSet.containsKey(fop.destNode)){
+
+            // update statistics
+            long timeInterval = (CommonState.getTime()) - (fop.timestamp);
+            KademliaObserver.timeStore.add(timeInterval);
+            KademliaObserver.hopStore.add(fop.nrHops);
+            KademliaObserver.finished_lookups.add(1);
+            KademliaObserver.successful_lookups.add(1);
+            System.err.println("!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            // if relevant parties were up -> failed lookup
+        } else if(Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() && Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp()){
+
+            // update statistics
+            KademliaObserver.finished_lookups.add(1);
+            KademliaObserver.failed_lookups.add(1);
+            System.err.println("!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+        }
+
     }
 
 

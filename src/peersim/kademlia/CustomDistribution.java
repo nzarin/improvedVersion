@@ -40,22 +40,23 @@ public class CustomDistribution implements peersim.core.Control {
     public boolean execute() {
         System.err.println();
         System.err.println("Assigning kademlia node identifiers to nodes in the network:");
-        
+
+        // create normal nodes
         for (int i = 0; i < Network.size(); ++i) {
-            //create a KadNode
             BigInteger tmpID = urg.generateID();
             int tmpDomain = urg.selectDomain();
             KadNode node = new KadNode(tmpID, tmpDomain);
-            node.getRoutingTable().setOwnerKadNode(node);
             if (!mapNIDoPID.containsValue(tmpID)) {
                 System.err.println("Network node " + Network.get(i).getID() + " gets assigned Node ID : " + tmpID + " for domain " + tmpDomain );
-                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNode(node);
+                ((KademliaProtocol) (Network.get(i).getProtocol(protocolID))).setNode(node);    // todo: een node zou kademlia protocol moeten hebben niet andersom
                 mapNIDoPID.put(Network.get(i).getID(), tmpID);
             } else {
                 // set i back with 1 to retry
                 i--;
             }
         }
+
+        //todo: create bridge nodes
 
         System.err.println();
 

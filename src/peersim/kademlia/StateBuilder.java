@@ -5,8 +5,10 @@ import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.transport.Transport;
+import peersim.vector.UniformDistribution;
 
 import java.math.BigInteger;
+import java.net.NetPermission;
 import java.util.Comparator;
 
 /**
@@ -74,10 +76,6 @@ public class StateBuilder implements peersim.core.Control {
                 Node n1 = o1;
                 Node n2 = o2;
 
-//                KademliaProtocol p1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
-//                KademliaProtocol p2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
-//                return Util.put0(p1.nodeId).compareTo(Util.put0(p2.nodeId));
-
                 KademliaProtocol pr1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
                 KademliaProtocol pr2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
                 return Util.put0(pr1.getKadNode().getNodeId()).compareTo(Util.put0(pr2.getKadNode().getNodeId()));
@@ -87,10 +85,15 @@ public class StateBuilder implements peersim.core.Control {
 
         int sz = Network.size();
 
+        //todo: check of je kan loopen door kadnodes
+
+
         //for every node in every domain, take 100 random nodes in the same domain and add to k-bucket of it
         for(int i = 0; i < sz; i++){
+//            KadNode temp = KadNode.getKadNodeByNetworkNode(Network.get(i));
+
             Node networkNode = Network.get(i);
-            KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
+            KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));   //todo:  kademliaprotocol zou idealiter hier niet voor nodig moeten zijn
             KadNode iNode = iKad.getKadNode();
 
             for(int j = 0; j < 100; j++){

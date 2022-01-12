@@ -16,15 +16,20 @@ public class Message extends SimpleEvent {
     /**
      * Message Type: FINDNODE (message regarding node find)
      */
-    public static final int MSG_FINDNODE = 2;
+    public static final int MSG_FINDNODE = 1;
     /**
      * Message Type: ROUTE (message during lookup)
      */
-    public static final int MSG_ROUTE = 3;
+    public static final int MSG_ROUTE = 2;
     /**
      * Message Type: RESPONSE (response message to a findvalue or findnode)
      */
-    public static final int MSG_RESPONSE = 4;
+    public static final int MSG_RESPONSE = 3;
+    /**
+     * Message Type: RESPONSE (response message to a findvalue or findnode)
+     */
+    public static final int TIMEOUT = 4;
+
     /**
      * internal generator for unique message IDs
      */
