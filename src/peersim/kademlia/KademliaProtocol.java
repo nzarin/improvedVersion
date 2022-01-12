@@ -1,5 +1,4 @@
 package peersim.kademlia;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
@@ -77,8 +76,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		KademliaProtocol.prefix = prefix;
 
 		_init();
-
-//		routingTable = new RoutingTable();
 
 		sentMsg = new TreeMap<Long, Long>();
 
@@ -340,58 +337,39 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 		// Parse message content Activate the correct event manager for the particular event
 		this.kademliaid = myPid;
+		SimpleEvent ev = (SimpleEvent) event;
 
-		Message m;
+		//if it's a message
+		if(ev instanceof Message){
 
-		switch (((SimpleEvent) event).getType()) {
+			Message m = (Message) ev;
+			Lookup lookup;
 
-			case Message.MSG_FINDNODE:
-				m = (Message) event;
+			if(this.kadNode.getDomain() == m.dest.getDomain()){
+				lookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m, tid, sentMsg);
+			} else{
+				lookup =  new InterDomainLookup();
+			}
 
-//				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" received a FIND NODE message");
-//				System.err.println("It should find node " + m.dest);
+			// check what type of message and handle appropriatly
+			switch (m.getType()) {
+				case Message.MSG_FINDNODE:
+					lookup.find();
+					break;
+				case Message.MSG_ROUTE:
+					respond(m, myPid);
+//					lookup.find(); todo: fix this
+					break;
+				case Message.MSG_RESPONSE:
+					sentMsg.remove(m.ackId);
+					handleResponse(m, myPid);
+//					lookup.find(); todo: fix this
+					break;
+			}
 
-				if(this.kadNode.getDomain() == m.dest.getDomain()){		// intra-domain lookup
-					IntraDomainLookup intraLookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m, tid, sentMsg);
-					intraLookup.lookup();
-				} else{	//inter-domain lookup
-					InterDomainLookup interLookup = new InterDomainLookup();
-					interLookup.lookup();
-				}
-				break;
-
-
-			case Message.MSG_ROUTE:
-				m = (Message) event;
-
-//				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" has received a ROUTE message");
-//				System.err.println("The src of this message is " + m.src);
-//				System.err.println("It wants to find " + m.dest);
-//				System.err.println("Node " + this.nodeId + "'s current routing table is as follows: " + this.routingTable.toString());
-
-				respond(m, myPid);
-				break;
-
-			case Message.MSG_RESPONSE:
-				m = (Message) event;
-
-//				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" has received a RESPONSE message");
-//				System.err.println("The src of this message is " + m.src);
-//				System.err.println("We were looking for " + m.dest);
-
-				sentMsg.remove(m.ackId);
-				handleResponse(m, myPid);
-				break;
-
-
-			case Timeout.TIMEOUT:
-				Timeout t = (Timeout) event;
-
-//				System.err.println("Node with protocol node ID " + this.kadNode.getNodeId() +" has received a TIMEOUT message");
-
-				handleTimeOut(t, myPid);
-				break;
-
+		} else {	//it is a timeout
+			Timeout t = (Timeout) ev;
+			handleTimeOut(t, myPid);
 		}
 
 	}

@@ -7,7 +7,7 @@ public class InterDomainLookup implements Lookup {
     }
 
     @Override
-    public void lookup() {
+    public void find() {
 
     }
 }

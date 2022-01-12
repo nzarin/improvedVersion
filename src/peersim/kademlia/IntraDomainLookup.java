@@ -28,17 +28,12 @@ public class IntraDomainLookup implements Lookup{
         this.sentMsg = sentMsg;
     }
 
-    @Override
-    public void lookup() {
-        find();
-    }
-
-
     /**
      * Start a find node operation.
      * Find the ALPHA closest node and send find request to them.
      *
      */
+    @Override
     public void find() {
 
         // if I am the searched node or searched node is down -> skip (should not happen in kademlia)

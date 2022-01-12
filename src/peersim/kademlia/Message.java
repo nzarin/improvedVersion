@@ -5,17 +5,6 @@ import java.math.BigInteger;
 /**
  * Message class provide all functionalities to manage the various messages, principally LOOKUP messages (messages from
  * application level sender designated to another application level).
- * <p>
- * Types Of messages:
- * (application messages)
- * - MSG_LOOKUP: indicates that the body Object contains information to application level of the recipient
- * (service internal protocol messages)
- * - MSG_JOINREQUEST: message containing a join request of a node, the message is passed between many pastry nodes according to
- * the protocol
- * - MSG_JOINREPLY: according to protocol, the body transport information related to a join reply message
- * - MSG_LSPROBEREQUEST:according to protocol, the body transport information related to a probe request message <br>
- * - MSG_LSPROBEREPLY: not used in the current implementation<br>
- * - MSG_SERVICEPOLL: internal message used to provide cyclic cleaning service of dead nodes<br>
  */
 // ______________________________________________________________________________________
 public class Message extends SimpleEvent {
@@ -24,10 +13,6 @@ public class Message extends SimpleEvent {
      * Message Type: EMPTY (used to construct empty message)
      */
     public static final int MSG_EMPTY = 0;
-    /**
-     * Message Type: STORE (Stores a (key, value) pair in one node)
-     */
-    public static final int MSG_STORE = 1;
     /**
      * Message Type: FINDNODE (message regarding node find)
      */
@@ -40,14 +25,6 @@ public class Message extends SimpleEvent {
      * Message Type: RESPONSE (response message to a findvalue or findnode)
      */
     public static final int MSG_RESPONSE = 4;
-    /**
-     * Message Type: PING (used to verify that a node is still alive)
-     */
-    public static final int MSG_PING = 5;
-    /**
-     * Message Type: FINDVALUE (used to verify that a node is still alive)
-     */
-    public static final int MSG_FINDVALUE = 6;
     /**
      * internal generator for unique message IDs
      */
@@ -167,18 +144,12 @@ public class Message extends SimpleEvent {
         switch (type) {
             case MSG_EMPTY:
                 return "MSG_EMPTY";
-            case MSG_STORE:
-                return "MSG_STORE";
             case MSG_FINDNODE:
                 return "MSG_FINDNODE";
             case MSG_ROUTE:
                 return "MSG_ROUTE";
             case MSG_RESPONSE:
                 return "MSG_RESPONSE";
-            case MSG_PING:
-                return "MSG_PING";
-            case MSG_FINDVALUE:
-                return "MSG_FINDVALUE";
             default:
                 return "UNKNOWN:" + type;
         }
