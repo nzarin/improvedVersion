@@ -252,60 +252,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		sendMessage(response, m.src, senderPid);
 	}
 
-	/**
-	 * Start a find node operation.
-	 * Find the ALPHA closest node and send find request to them.
-	 * 
-	 * @param m
-	 *            Message received (contains the node to find)
-	 * @param myPid
-	 *            the sender Pid
-	 */
-	private void find(Message m, int myPid) {
-
-		// if I am the searched node or searched node is down -> skip (should not happen in kademlia)
-		Node dst = Util.nodeIdtoNode(m.dest.getNodeId(), kademliaid);
-		if((m.dest.getNodeId() == this.kadNode.getNodeId()) || (!dst.isUp()))
-			return;
-
-		// increase the number of find operations
-		KademliaObserver.find_op.add(1);
-
-		// create find operation and add to operations array for bookkeeping
-		FindOperation fop = new FindOperation(m.dest, m.timestamp);
-		fop.body = m.body;
-		findOp.put(fop.operationId, fop);
-
-//		System.err.println("The operationID is : " + fop.operationId);
-//		System.err.println("Size of the findOP of node : " + this.nodeId +" is " + findOp.size());
-
-		// get the K closest node to search key
-		KadNode[] neighbours = this.kadNode.getRoutingTable().getKClosestNeighbours(m.dest, this.kadNode);
-
-		// update the list of closest nodes and re-initialize available requests
-		fop.updateClosestSet(neighbours);
-		fop.available_requests = KademliaCommonConfig.ALPHA;
-
-		// set message operation id
-		m.operationId = fop.operationId;
-		m.type = Message.MSG_ROUTE;
-		m.src = this.kadNode;
-
-		// send ALPHA messages
-		for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
-			KadNode nextNode = fop.getNeighbour();
-			if (nextNode != null) {
-//				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
-//				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode.getNodeId(), m.dest.getNodeId()));
-				KademliaObserver.next_node_distance.add(Util.distance(nextNode.getNodeId(), m.dest.getNodeId()).doubleValue());
-				fop.nrHops++;
-				sendMessage(m.copy(), nextNode, myPid);
-
-			}
-		}
-
-	}
-
 
 	/**
 	 * Send a message with current transport layer and starting the timeout timer (which is an event) if the message is a request
@@ -406,16 +352,12 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 //				System.err.println("It should find node " + m.dest);
 
 				if(this.kadNode.getDomain() == m.dest.getDomain()){		// intra-domain lookup
-					IntraDomainLookup intraLookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m);
-					intraLookup.lookup(); 	//todo: want this eventually
-					FindOperation fop = intraLookup.find();
-					sendXMessages(m,fop, KademliaCommonConfig.ALPHA);
+					IntraDomainLookup intraLookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m, tid, sentMsg);
+					intraLookup.lookup();
 				} else{	//inter-domain lookup
 					InterDomainLookup interLookup = new InterDomainLookup();
 					interLookup.lookup();
 				}
-
-//				find(m, myPid);
 				break;
 
 
@@ -452,21 +394,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 		}
 
-	}
-
-
-	private void sendXMessages(Message m, FindOperation fop, int x){
-		for (int i = 0; i < x; i++) {
-//			System.err.println(" SEND X MESSAGES method. Next node ....." );
-			KadNode nextNode = fop.getNeighbour();
-			if (nextNode != null) {
-//				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
-//				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode.getNodeId(), m.dest.getNodeId()));
-				KademliaObserver.next_node_distance.add(Util.distance(nextNode.getNodeId(), m.dest.getNodeId()).doubleValue());
-				fop.nrHops++;
-				sendMessage(m.copy(), nextNode, this.kademliaid);
-			}
-		}
 	}
 
 

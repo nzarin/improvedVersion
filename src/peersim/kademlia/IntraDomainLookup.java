@@ -1,8 +1,12 @@
 package peersim.kademlia;
 
+import peersim.core.Network;
 import peersim.core.Node;
+import peersim.edsim.EDSimulator;
+import peersim.transport.UnreliableTransport;
 
 import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 public class IntraDomainLookup implements Lookup{
 
@@ -10,12 +14,18 @@ public class IntraDomainLookup implements Lookup{
     private KadNode currentNode;
     private LinkedHashMap<Long, FindOperation> findOpMap;
     private Message m;
+    private int transportID;
+    private UnreliableTransport transport;
+    private TreeMap<Long, Long> sentMsg;
 
-    public IntraDomainLookup(int kademlia_id, KadNode current, LinkedHashMap<Long, FindOperation> findOps, Message lookupMessage ) {
-        this.kademliaid = kademlia_id;
+
+    public IntraDomainLookup(int kademliaId, KadNode current, LinkedHashMap<Long, FindOperation> findOps, Message lookupMessage, int transportID, TreeMap<Long,Long> sentMsg) {
+        this.kademliaid = kademliaId;
         this.currentNode =  current;
         this.findOpMap = findOps;
         this.m = lookupMessage;
+        this.transportID = transportID;
+        this.sentMsg = sentMsg;
     }
 
     @Override
@@ -29,12 +39,12 @@ public class IntraDomainLookup implements Lookup{
      * Find the ALPHA closest node and send find request to them.
      *
      */
-    public FindOperation find() {
+    public void find() {
 
         // if I am the searched node or searched node is down -> skip (should not happen in kademlia)
         Node dst = Util.nodeIdtoNode(m.dest.getNodeId(), kademliaid);
         if((m.dest.getNodeId() == this.currentNode.getNodeId()) || (!dst.isUp()))
-            return null;
+            return;
 
         // increase the number of find operations
         KademliaObserver.find_op.add(1);
@@ -59,13 +69,52 @@ public class IntraDomainLookup implements Lookup{
         m.type = Message.MSG_ROUTE;
         m.src = this.currentNode;
 
-        if(fop == null){
-            System.err.println("fop in IntraDomainClass is null " + fop);
+        // send ALPHA messages
+        for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
+            KadNode nextNode = fop.getNeighbour();
+            if (nextNode != null) {
+//				System.err.println("A ROUTE message with id: " + m.id + " is sent next to node " + nextNode);
+//				System.err.println("the distance between the target node " + m.dest + " and the next node " + nextNode + " is : " + Util.distance(nextNode.getNodeId(), m.dest.getNodeId()));
+                KademliaObserver.next_node_distance.add(Util.distance(nextNode.getNodeId(), m.dest.getNodeId()).doubleValue());
+                fop.nrHops++;
+                sendMessage(m.copy(), nextNode, this.kademliaid);
+
+            }
         }
+    }
 
-        //return the find operaration
-        return fop;
 
+    /**
+     * Send a message with current transport layer and starting the timeout timer (which is an event) if the message is a request
+     *
+     * @param m
+     *            The message to send.
+     * @param destId
+     *            The Id of the destination node.
+     * @param myPid
+     *            The sender Pid.
+     */
+    private void sendMessage(Message m, KadNode destId, int myPid) {
+        // add destination to routing table
+        this.currentNode.getRoutingTable().addNeighbour(destId);
+
+        Node src = Util.nodeIdtoNode(this.currentNode.getNodeId(), kademliaid);
+        Node dest = Util.nodeIdtoNode(destId.getNodeId(), kademliaid);
+
+        transport = (UnreliableTransport) (Network.prototype).getProtocol(transportID);
+        transport.send(src, dest, m, kademliaid);
+
+        if (m.getType() == Message.MSG_ROUTE) { // is a request
+            Timeout t = new Timeout(destId, m.id, m.operationId);
+
+            // set delay at 2*RTT
+            long latency = transport.getLatency(src, dest);
+            long delay = 4*latency;
+
+            // add to sent msg
+            this.sentMsg.put(m.id, m.timestamp);
+            EDSimulator.add(delay, t, src, myPid);
+        }
     }
 
 

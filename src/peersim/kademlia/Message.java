@@ -183,4 +183,9 @@ public class Message extends SimpleEvent {
                 return "UNKNOWN:" + type;
         }
     }
+
+
+    public void send(){
+
+    }
 }
