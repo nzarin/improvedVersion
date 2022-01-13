@@ -29,8 +29,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	private static boolean _ALREADY_INSTALLED = false;
 
-	private KademliaNode kadNode;
-	private BridgeNode bridgeNode;
+	//todo: check if this should not be a kadnode
+	private KademliaNode kadNode = null;
+//	private BridgeNode bridgeNode = null;
 
 	/**
 	 * domain this node belongs to
@@ -180,22 +181,44 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 	}
 
-
-	
+	/**
+	 * Make it clear that this kademlia protocol has an owner that is a kadNode
+	 * @param nid
+	 */
 	public void setKadNode(KadNode nid){
 		this.kadNode = nid;
 	}
 
+	/**
+	 * Make it clear that this kademlia protocol has an owner that is a bridgeNode
+	 * @param nid
+	 */
 	public void setBridgeNode(BridgeNode nid){
-		this.bridgeNode = nid;
+		this.kadNode = nid;
 	}
 
 	/**
-	 * Get the current NodeID
+	 * Get the current kadNode if it is kadNode.
 	 * @return nodeId
 	 */
 	public KadNode getKadNode(){
-		return (KadNode) this.kadNode;
+		if (this.kadNode instanceof KadNode){
+			return (KadNode) this.kadNode;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Get the current bridge node if it is a bridgeNode.
+	 * @return
+	 */
+	public BridgeNode getBridgeNode(){
+		if(this.kadNode instanceof BridgeNode){
+			return (BridgeNode) this.kadNode;
+		} else{
+			return null;
+		}
 	}
 
 	/**

@@ -5,10 +5,7 @@ import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.transport.Transport;
-import peersim.vector.UniformDistribution;
 
-import java.math.BigInteger;
-import java.net.NetPermission;
 import java.util.Comparator;
 
 /**
@@ -63,6 +60,166 @@ public class StateBuilder implements peersim.core.Control {
     }
 
     /**
+     * Add random nodes to the routing table
+     */
+    private void createState(){
+        int sz = Network.size();
+
+        //for every node i in the complete network -> add 100 random nodes.
+        for(int i = 0; i < sz; i++){
+
+            Node networkNode = Network.get(i);
+            KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
+            KademliaNode iNode;
+
+            //if i am a kadNode
+            if (iKad.getKadNode() != null){
+                iNode =  iKad.getKadNode();
+
+                // fill the routing table with random nodes
+                addRandomNodesToKadNode((KadNode) iNode, sz);
+
+                //fill the routing table with close nodes
+                int start = i;
+                if(i > sz - 50){
+                    start = sz - 25;
+                }
+                addCloseNodesToKadNode((KadNode) iNode, sz, start);
+
+            } else {
+                iNode = iKad.getBridgeNode();
+
+                //fill the list
+                addNodesToBridgeNode((BridgeNode) iNode, sz);
+            }
+
+        }
+
+
+    }
+
+
+    /**
+     * Add hundred of random nodes to the routing table of iNode
+     * @param iNode
+     * @param networkSize
+     */
+    private void addRandomNodesToKadNode(KadNode iNode, int networkSize){
+
+        //take 100 random nodes add to routing table or arraylist according to the rules
+        for(int j = 0; j < 100; j++){
+            Node randomNetworkNode = Network.get(CommonState.r.nextInt(networkSize));
+            KademliaProtocol jKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
+            KademliaNode jNode;
+
+            //if this random node is a KadNode
+            if(jKad.getKadNode() != null){
+                jNode = jKad.getKadNode();
+
+                //if it is in the same domain -> add it to iNode its routing table
+                if(iNode.getDomain() == jNode.getDomain()){
+                    iNode.getRoutingTable().addNeighbour((KadNode) jNode);
+                } else {
+                    //retry
+                    j--;
+                }
+
+                // if this random node is a BridgeNode
+            } else{
+                jNode = jKad.getBridgeNode();
+
+                //if it is in the same domain AND if there is still room for bridge nodes && its available -> add it to iNodes list of bridge nodes
+                if(iNode.getDomain() == jNode.getDomain() && iNode.getBridgeNodes().size() < KademliaCommonConfig.NUMBER_OF_BRIDGES_PER_DOMAIN && ((BridgeNode) jNode).isAvailable()){
+                    iNode.getBridgeNodes().add((BridgeNode) jNode);
+                    ((BridgeNode) jNode).makeBridgeNodeUnavailable();
+                }
+
+                // retry always because we want 100 random kad nodes
+                j--;
+            }
+        }
+    }
+
+    /**
+     * Add hundred of random nodes to the routing table of iNode
+     * @param iNode
+     * @param networkSize
+     */
+    private void addCloseNodesToKadNode(KadNode iNode, int networkSize, int start){
+
+        //take 50 close nodes add to routing table or arraylist according to the rules
+        for(int j = 0; j < 50; j++){
+            start++;
+
+            if(start > 0 && start < networkSize){
+                Node neighbourNetworkNode = Network.get(start++);
+                KademliaProtocol jKad = (KademliaProtocol) (neighbourNetworkNode.getProtocol(kademliaid));
+                KademliaNode jNode;
+
+                //if this random node is a KadNode
+                if(jKad.getKadNode() != null){
+                    jNode = jKad.getKadNode();
+
+                    //if it is in the same domain -> add it to iNode its routing table
+                    if(iNode.getDomain() == jNode.getDomain()){
+                        iNode.getRoutingTable().addNeighbour((KadNode) jNode);
+                    } else {
+                        //retry
+                        j--;
+                    }
+
+                    // this must be a bridge node then
+                } else{
+                    jNode = jKad.getBridgeNode();
+
+                    //if it is in the same domain AND if there is still room for bridge nodes && its available -> add it to iNodes list of bridge nodes
+                    if(iNode.getDomain() == jNode.getDomain() && iNode.getBridgeNodes().size() < KademliaCommonConfig.NUMBER_OF_BRIDGES_PER_DOMAIN && ((BridgeNode) jNode).isAvailable()){
+                        iNode.getBridgeNodes().add((BridgeNode) jNode);
+                        ((BridgeNode) jNode).makeBridgeNodeUnavailable();
+                    }
+
+                    // retry always because we want 50 close kad nodes
+                    j--;
+                }
+            }
+            }
+
+    }
+
+
+    /**
+     * Add nodes to bridge node i.
+     * @param iNode
+     * @param networkSize
+     */
+    private void addNodesToBridgeNode(BridgeNode iNode, int networkSize){
+
+        //iterate over all the network nodes and add all bridge nodes to the routing table and all domain kadnode to list
+        for(int j=0; j < networkSize; j++){
+
+            Node networkNode = Network.get(j);
+            KademliaProtocol jKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
+            KademliaNode jNode;
+
+            //if this j node is a kadNode
+            if (jKad.getKadNode() != null){
+                jNode = jKad.getKadNode();
+
+                //if this kadNode is in the same domain -> add to list of kad nodes. Otherwise, ignore it.
+                if(jNode.getDomain() == iNode.getDomain()) {
+                    iNode.addKadNode((KadNode) jNode);
+                }
+
+                // This j node must be a bridge node -> add to the list of bridge nodes
+            } else {
+                jNode = jKad.getBridgeNode();
+                jNode.getBridgeNodes().add((BridgeNode) jNode);
+            }
+
+        }
+    }
+
+    /**
      * Every call of this control performs bootstrapping procedure.
      *
      * @return
@@ -78,67 +235,26 @@ public class StateBuilder implements peersim.core.Control {
 
                 KademliaProtocol pr1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
                 KademliaProtocol pr2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
-                return Util.put0(pr1.getKadNode().getNodeId()).compareTo(Util.put0(pr2.getKadNode().getNodeId()));
+
+                    //Scenario 1: pr1 is kad and pr2 is kad
+                if (pr1.getKadNode() != null && pr2.getKadNode() != null){
+                    return Util.put0(pr1.getKadNode().getNodeId()).compareTo(Util.put0(pr2.getKadNode().getNodeId()));
+                    //Scenario 2: pr1 is kad and pr2 is bridge
+                } else if(pr1.getKadNode() != null && pr2.getBridgeNode() != null){
+                    return Util.put0(pr1.getKadNode().getNodeId()).compareTo(Util.put0(pr2.getBridgeNode().getNodeId()));
+                    //Scenario 3: pr1 is bridge and pr2 is kad
+                } else if(pr1.getBridgeNode() != null && pr2.getKadNode() != null){
+                    return Util.put0(pr1.getBridgeNode().getNodeId()).compareTo(Util.put0(pr2.getKadNode().getNodeId()));
+                    //Scenario 4: pr1 is bridge and pr2 is bridge
+                } else if(pr1.getBridgeNode() != null && pr2.getBridgeNode() != null){
+                    return Util.put0(pr1.getBridgeNode().getNodeId()).compareTo(Util.put0(pr2.getBridgeNode().getNodeId()));
+                }
+                return 0;
             }
 
         });
 
-        int sz = Network.size();
-
-        //todo: check of je kan loopen door kadnodes
-
-
-        //for every node in every domain, take 100 random nodes in the same domain and add to k-bucket of it
-        for(int i = 0; i < sz; i++){
-//            KadNode temp = KadNode.getKadNodeByNetworkNode(Network.get(i));
-
-            Node networkNode = Network.get(i);
-            KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));   //todo:  kademliaprotocol zou idealiter hier niet voor nodig moeten zijn
-            KadNode iNode = iKad.getKadNode();
-
-            for(int j = 0; j < 100; j++){
-                Node randomNetworkNode = Network.get(CommonState.r.nextInt(sz));
-                KademliaProtocol jKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
-                KadNode jNode = jKad.getKadNode();
-
-                //add if it's in the same domain
-                if(iNode.getDomain() == jNode.getDomain()){
-                    iNode.getRoutingTable().addNeighbour(jNode);
-                } else {
-                    j--;
-                }
-
-            }
-        }
-
-
-
-        // add other 50 near nodes
-        for(int i =0; i < sz; i++){
-            Node networkNode = Network.get(i);
-            KademliaProtocol iKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
-            KadNode iNode = iKad.getKadNode();
-
-            int start = i;
-            if (i > sz - 50){
-                start = sz - 25;
-            }
-            for(int j =0; j < 50; j++){
-                start = start++;
-
-                if(start > 0 && start < sz){
-                    Node neighbour = Network.get(start++);
-                    KademliaProtocol jKad = (KademliaProtocol) neighbour.getProtocol(kademliaid);
-                    KadNode jNode = jKad.getKadNode();
-
-                    if(iNode.getDomain() == jNode.getDomain()){
-                        iNode.getRoutingTable().addNeighbour(jNode);
-                    } else {
-                        j--;
-                    }
-                }
-            }
-        }
+        createState();
 
         System.err.println("Routing tables are filled to their domains");
 
