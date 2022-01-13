@@ -13,7 +13,7 @@ public class RoutingTable implements Cloneable {
     /**
      * ID of the node that has this routing table.
      */
-    public KadNode owner = null;
+    public KademliaNode owner = null;
 
     /**
      * K-Buckets of this node.
@@ -23,7 +23,7 @@ public class RoutingTable implements Cloneable {
     /**
      * Instantiates a new empty routing table with the specified size
      */
-    public RoutingTable(KadNode owner) {
+    public RoutingTable(KademliaNode owner) {
         this.owner = owner;
         k_buckets = new TreeMap<Integer, KBucket>();
         // initialize k-bukets

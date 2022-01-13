@@ -8,7 +8,6 @@ import peersim.core.Node;
 import peersim.dynamics.NodeInitializer;
 import peersim.edsim.EDSimulator;
 
-import java.math.BigInteger;
 import java.util.Comparator;
 
 /**
@@ -141,7 +140,7 @@ public class Turbulence implements Control {
         // create new kademlia node
         UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS,  CommonState.r);
         KadNode newKadNode = new KadNode(urg.generateID(), urg.selectDomain());
-        ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setNode(newKadNode);
+        ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setKadNode(newKadNode);
         newKadNode.getRoutingTable().setOwnerKadNode(newKadNode);
 
         System.err.println("New node is spawn with node id : " + newKadNode.getNodeId() + " in domain " + newKadNode.getDomain());

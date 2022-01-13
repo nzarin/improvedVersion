@@ -188,15 +188,15 @@ public class IntraDomainLookup implements Lookup{
             KademliaObserver.hopStore.add(fop.nrHops);
             KademliaObserver.finished_lookups.add(1);
             KademliaObserver.successful_lookups.add(1);
-            System.err.println("!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//            System.err.println("!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
             // if relevant parties were up -> failed lookup
-        } else if(Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() && Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp()){
+        } else if(Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() && Util.nodeIdtoNode(this.currentNode.getNodeId(), kademliaid).isUp()){
 
             // update statistics
             KademliaObserver.finished_lookups.add(1);
             KademliaObserver.failed_lookups.add(1);
-            System.err.println("!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//            System.err.println("!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         }
 

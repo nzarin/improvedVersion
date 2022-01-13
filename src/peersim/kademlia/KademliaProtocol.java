@@ -1,15 +1,10 @@
 package peersim.kademlia;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import peersim.config.Configuration;
-import peersim.core.CommonState;
-import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
-import peersim.edsim.EDSimulator;
-import peersim.transport.UnreliableTransport;
 
 /**
  * The actual protocol.
@@ -24,7 +19,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 	private static final String PAR_TRANSPORT = "transport";
 	private static String prefix = null;
-	private UnreliableTransport transport;
 	private int tid;
 	private int kademliaid;
 	
@@ -35,7 +29,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	private static boolean _ALREADY_INSTALLED = false;
 
-	private KadNode kadNode;
+	private KademliaNode kadNode;
+	private BridgeNode bridgeNode;
 
 	/**
 	 * domain this node belongs to
@@ -124,11 +119,11 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			// try another node
 			Message m1 = new Message();
 			m1.operationId = timeout.opID;
-			m1.src = this.kadNode;
+			m1.src = (KadNode) this.kadNode;
 			m1.dest = this.findOp.get(timeout.opID).destNode;
 			Lookup lookup;
 			if(this.kadNode.getDomain() == m1.dest.getDomain()){
-				lookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m1, tid, sentMsg);
+				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
 			} else{
 				lookup =  new InterDomainLookup();
 			}
@@ -160,7 +155,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			Lookup lookup;
 
 			if(this.kadNode.getDomain() == m.dest.getDomain()){
-				lookup = new IntraDomainLookup(kademliaid, this.kadNode, findOp, m, tid, sentMsg);
+				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
 			} else{
 				lookup =  new InterDomainLookup();
 			}
@@ -187,8 +182,12 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 
 	
-	public void setNode(KadNode nid){
+	public void setKadNode(KadNode nid){
 		this.kadNode = nid;
+	}
+
+	public void setBridgeNode(BridgeNode nid){
+		this.bridgeNode = nid;
 	}
 
 	/**
@@ -196,7 +195,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @return nodeId
 	 */
 	public KadNode getKadNode(){
-		return this.kadNode;
+		return (KadNode) this.kadNode;
 	}
 
 	/**
