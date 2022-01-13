@@ -80,7 +80,6 @@ public class KBucket implements Cloneable {
      * @return
      */
     public String toString() {
-        System.err.println("we reach the toString of KBucket class");
         String res = "{\n";
 
         for (KadNode node : neighbours.keySet()) {

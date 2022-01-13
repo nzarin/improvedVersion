@@ -64,9 +64,8 @@ public class TrafficGenerator implements Control {
             start = Network.get(CommonState.r.nextInt(Network.size()));
         } while ((start == null) || (!start.isUp()));
 
-
         // send message
-        EDSimulator.add(0, generateFindNodeMessage(), start, pid);
+        EDSimulator.add(0, generateFindNodeMessage() , start, pid);
 
         return false;
     }

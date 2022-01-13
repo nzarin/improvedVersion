@@ -10,6 +10,7 @@ public class KadNode {
     private int networkNodeId;
     private int domain;
     private RoutingTable routingTable;
+    private KademliaProtocol kademliaProtocol;
     private NodeType type;
 
 
@@ -19,6 +20,13 @@ public class KadNode {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
+    }
+
+    public KadNode(BigInteger id, int domain, KademliaProtocol kadprotocol){
+        this.nodeId = id;
+        this.domain = domain;
+        this.routingTable = new RoutingTable(this);
+        this.kademliaProtocol = kadprotocol;
     }
 
     // getters
