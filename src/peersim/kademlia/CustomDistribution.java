@@ -49,7 +49,7 @@ public class CustomDistribution implements peersim.core.Control {
             if (!mapNIDoPID.containsValue(tmpID)) {
                 KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
                 KadNode kadNode = new KadNode(tmpID, tmpDomain, kademliaProtocol);
-                System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " gets assigned Node ID : " + tmpID + " for domain " + tmpDomain );
+                System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " is a KADNODE and gets assigned Node ID : " + tmpID + " for domain " + tmpDomain );
                 kademliaProtocol.setKadNode(kadNode);    // todo: een node zou kademlia protocol moeten hebben niet andersom
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
                 currentIndexNetworkNode++;
@@ -65,8 +65,6 @@ public class CustomDistribution implements peersim.core.Control {
      */
     private void generateBridgeNodes(){
         //determine number of bridgeNodes
-        int amountBridgeNodes = numberOfDomains * numberOfBridgeNodesPerDomain;
-        //currentIndexNetworkNode = Network.size() - (numberOfDomains * numberOfBridgeNodesPerDomain);
 
         //for every domain
         for (int i = 0; i < numberOfDomains; ++i) {
@@ -75,8 +73,8 @@ public class CustomDistribution implements peersim.core.Control {
                 BigInteger tmpId = urg.generateID();
                 if(!mapNIDoPID.containsValue(tmpId)){
                     KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
-                    BridgeNode bridgeNode = new BridgeNode(tmpId,j,kademliaProtocol);
-                    System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " gets assigned Node ID : " + tmpId + " for domain " + j );
+                    BridgeNode bridgeNode = new BridgeNode(tmpId,i,kademliaProtocol);
+                    System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " is a BRIDGENODE and gets assigned Node ID : " + tmpId + " for domain " + i );
                     kademliaProtocol.setBridgeNode(bridgeNode);    // todo: een node zou kademlia protocol moeten hebben niet andersom
                     mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpId);
                     currentIndexNetworkNode++;

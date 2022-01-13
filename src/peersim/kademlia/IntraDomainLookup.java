@@ -21,7 +21,7 @@ public class IntraDomainLookup implements Lookup{
     private TreeMap<Long, Long> sentMsg;
 
     public IntraDomainLookup(){
-        System.err.println("do nothing for now");
+        System.err.println("This is an intra domain lookup. Do nothing for now.");
     }
 
     public IntraDomainLookup(int kademliaId, KadNode current, LinkedHashMap<Long, FindOperation> findOps, Message lookupMessage, int transportID, TreeMap<Long,Long> sentMsg) {

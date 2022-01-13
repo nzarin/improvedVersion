@@ -29,9 +29,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	private static boolean _ALREADY_INSTALLED = false;
 
-	//todo: check if this should not be a kadnode
-	private KademliaNode kadNode = null;
-//	private BridgeNode bridgeNode = null;
+	private KadNode kadNode = null;
+	private BridgeNode bridgeNode = null;
 
 	/**
 	 * domain this node belongs to
@@ -149,34 +148,44 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		this.kademliaid = myPid;
 		SimpleEvent ev = (SimpleEvent) event;
 
-		//if it's a message
-		if(ev instanceof Message){
+		//if I am kad node
+		if (this.kadNode != null){
 
-			Message m = (Message) ev;
-			Lookup lookup;
+			//if it's a message
+			if(ev instanceof Message){
 
-			if(this.kadNode.getDomain() == m.dest.getDomain()){
-				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-			} else{
-				lookup =  new InterDomainLookup();
+				Message m = (Message) ev;
+				Lookup lookup;
+
+				//determine what type of lookup this is
+				if(this.kadNode.getDomain() == m.dest.getDomain()){
+					lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
+				} else{
+					lookup =  new InterDomainLookup();
+				}
+
+				// check what type of message and handle appropriately
+				switch (m.getType()) {
+					case Message.MSG_FINDNODE:
+						lookup.find();
+						break;
+					case Message.MSG_ROUTE:
+						lookup.respond();
+						break;
+					case Message.MSG_RESPONSE:
+						sentMsg.remove(m.ackId);
+						lookup.handleResponse();
+						break;
+				}
+
+			} else {	//it is a timeout
+				handleTimeOut((Timeout) ev);
 			}
 
-			// check what type of message and handle appropriately
-			switch (m.getType()) {
-				case Message.MSG_FINDNODE:
-					lookup.find();
-					break;
-				case Message.MSG_ROUTE:
-					lookup.respond();
-					break;
-				case Message.MSG_RESPONSE:
-					sentMsg.remove(m.ackId);
-					lookup.handleResponse();
-					break;
-			}
-
-		} else {	//it is a timeout
-			handleTimeOut((Timeout) ev);
+			//otherwise, I am a bridge node
+		} else {
+			System.err.println("My network Node ID is : " + myNode.getID());
+			System.err.println("Am I a Bridge Node? " + this.getBridgeNode() != null);
 		}
 
 	}
@@ -194,7 +203,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @param nid
 	 */
 	public void setBridgeNode(BridgeNode nid){
-		this.kadNode = nid;
+		this.bridgeNode = nid;
 	}
 
 	/**
@@ -202,11 +211,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @return nodeId
 	 */
 	public KadNode getKadNode(){
-		if (this.kadNode instanceof KadNode){
-			return (KadNode) this.kadNode;
-		} else {
-			return null;
-		}
+		return this.kadNode;
 	}
 
 	/**
@@ -214,11 +219,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @return
 	 */
 	public BridgeNode getBridgeNode(){
-		if(this.kadNode instanceof BridgeNode){
-			return (BridgeNode) this.kadNode;
-		} else{
-			return null;
-		}
+		return this.bridgeNode;
 	}
 
 	/**

@@ -22,6 +22,7 @@ public class TrafficGenerator implements Control {
      */
     private final int pid;
 
+    private Message findMessage;
     /**
      * Constructor that links the CONTROL and PROTOCOL objects.
      *
@@ -40,18 +41,28 @@ public class TrafficGenerator implements Control {
     private Message generateFindNodeMessage() {
         Message m = Message.makeEmptyMessage("Automatically Generated Traffic", Message.MSG_FINDNODE);
         m.timestamp = CommonState.getTime();
+        KadNode randomKadNode = selectRandomKadNode();
+        m.dest = randomKadNode;
+        return m;
+    }
 
+    private KadNode selectRandomKadNode(){
         // existing active destination node
         Node n = Network.get(CommonState.r.nextInt(Network.size()));
         while (!n.isUp()) {
             n = Network.get(CommonState.r.nextInt(Network.size()));
         }
-        m.dest = ((KademliaProtocol) (n.getProtocol(pid))).getKadNode();
 
-        return m;
+        // prevent that a find message is generated for a bridge node
+        KademliaProtocol kademliaProtocol = (KademliaProtocol) n.getProtocol(pid);
+        if(kademliaProtocol.getKadNode() != null){
+            return kademliaProtocol.getKadNode();
+        }
+
+        return selectRandomKadNode();
+
     }
 
-    // ______________________________________________________________________________________________
 
     /**
      * Every call of this control generates and send a random find node message

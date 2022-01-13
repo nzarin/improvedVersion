@@ -4,7 +4,7 @@ public class InterDomainLookup implements Lookup {
 
 
     public InterDomainLookup() {
-        System.err.println("do nothing for now");
+        System.err.println("This is a inter-domain request.. Do nothing for now");
     }
 
     @Override
