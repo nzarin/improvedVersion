@@ -1,6 +1,6 @@
 package peersim.kademlia;
 
-public interface Lookup {
+public interface LookupFactory {
 
     void find();
     void respond();

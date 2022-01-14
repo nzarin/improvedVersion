@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
-public class IntraDomainLookup implements Lookup{
+public class IntraDomainLookup implements LookupFactory {
 
     private int kademliaid;
     private KadNode currentNode;

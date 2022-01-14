@@ -121,11 +121,11 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			m1.operationId = timeout.opID;
 			m1.src = (KadNode) this.kadNode;
 			m1.dest = this.findOp.get(timeout.opID).destNode;
-			Lookup lookup;
+			LookupFactory lookup;
 			if(this.kadNode.getDomain() == m1.dest.getDomain()){
 				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
 			} else{
-				lookup =  new InterDomainLookup();
+				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
 			}
 			lookup.handleResponse();
 		}
@@ -148,45 +148,48 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		this.kademliaid = myPid;
 		SimpleEvent ev = (SimpleEvent) event;
 
-		//if I am kad node
-		if (this.kadNode != null){
+		//Scenario 1: sender is kadnode and receiver is kadnode -->
+			// normal intra-domain lookup
+		//Scenario 2: sender is kadnode and receiver is bridgenode -->
+			// 2a: forward request to bridge (inter-domain)
+			// 2b: forward result (inter-domain)
+		//scenario 3: sender is bridge and receiver is kadnode -->
+			// forward request to kad (inter-domain)
+		//scenario 4: sender is bridge and receiver is bridge -->
+			//	forward request to bridge (inter-domain)
 
-			//if it's a message
-			if(ev instanceof Message){
+		//if it's a message
+		if(ev instanceof Message){
 
-				Message m = (Message) ev;
-				Lookup lookup;
+			Message m = (Message) ev;
+			LookupFactory lookup;
 
-				//determine what type of lookup this is
-				if(this.kadNode.getDomain() == m.dest.getDomain()){
-					lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-				} else{
-					lookup =  new InterDomainLookup();
-				}
 
-				// check what type of message and handle appropriately
-				switch (m.getType()) {
-					case Message.MSG_FINDNODE:
-						lookup.find();
-						break;
-					case Message.MSG_ROUTE:
-						lookup.respond();
-						break;
-					case Message.MSG_RESPONSE:
-						sentMsg.remove(m.ackId);
-						lookup.handleResponse();
-						break;
-				}
-
-			} else {	//it is a timeout
-				handleTimeOut((Timeout) ev);
+			//determine what type of lookup this is
+			if(this.kadNode.getDomain() == m.dest.getDomain()){
+				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
+			} else{
+				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
 			}
 
-			//otherwise, I am a bridge node
-		} else {
-			System.err.println("My network Node ID is : " + myNode.getID());
-			System.err.println("Am I a Bridge Node? " + this.getBridgeNode() != null);
+			// check what type of message and handle appropriately
+			switch (m.getType()) {
+				case Message.MSG_FINDNODE:
+					lookup.find();
+					break;
+				case Message.MSG_ROUTE:
+					lookup.respond();
+					break;
+				case Message.MSG_RESPONSE:
+					sentMsg.remove(m.ackId);
+					lookup.handleResponse();
+					break;
+			}
+
+		} else {	//it is a timeout
+			handleTimeOut((Timeout) ev);
 		}
+
 
 	}
 

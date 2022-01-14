@@ -58,7 +58,6 @@ public class TrafficGenerator implements Control {
         if(kademliaProtocol.getKadNode() != null){
             return kademliaProtocol.getKadNode();
         }
-
         return selectRandomKadNode();
 
     }
