@@ -3,17 +3,17 @@ package peersim.kademlia.experiment;
 public class InterDomainLookupFactory implements LookupFactory2 {
 
     @Override
-    public void createFindOperation() {
-
+    public FindOperation2 createFindOperation() {
+        return new KadToKadFindOperation();
     }
 
     @Override
-    public void createRespondOperation() {
-
+    public RespondOperation2 createRespondOperation() {
+        return new KadToBridgeRespondOperation();
     }
 
     @Override
-    public void createHandleResponseOperation() {
-
+    public HandleResponseOperation2 createHandleResponseOperation() {
+        return new KadToKadHandleResponseOperation();
     }
 }
