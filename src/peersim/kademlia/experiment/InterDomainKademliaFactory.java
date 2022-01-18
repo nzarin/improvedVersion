@@ -1,6 +1,6 @@
 package peersim.kademlia.experiment;
 
-public class InterDomainLookupFactory implements LookupFactory2 {
+public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
 
     @Override
     public FindOperation2 createFindOperation() {

@@ -67,6 +67,23 @@ public class MessageSender {
     }
 
     private void sendMessageKadToBridge(KadNode s, BridgeNode r, Message m, TreeMap sentMsg){
+        Node src = Util.nodeIdtoNode(s.getNodeId(), kademliaid);
+        Node dest = Util.nodeIdtoNode(r.getNodeId(), kademliaid);
+
+        transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
+        transport.send(src, dest, m, kademliaid);
+
+        if (m.getType() == Message.MSG_ROUTE) { // is a request
+            Timeout t = new Timeout(r, m.id, m.operationId);
+
+            // set delay at 2*RTT
+            long latency = transport.getLatency(src, dest);
+            long delay = 4*latency;
+
+            // add to sent msg
+            sentMsg.put(m.id, m.timestamp);
+            EDSimulator.add(delay, t, src, pid);
+        }
     }
 
     private void sendMessageBridgeToKad(BridgeNode s, KadNode r, Message m, TreeMap sentMsg){

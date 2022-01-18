@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 
-public class KadNode implements KademliaNode {
+public class KadNode extends KademliaNode {
 
     private BigInteger nodeId;
     private int networkNodeId;

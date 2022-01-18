@@ -3,7 +3,7 @@ package peersim.kademlia;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-public class BridgeNode implements  KademliaNode{
+public class BridgeNode extends  KademliaNode{
 
     private BigInteger nodeId;
     private int domain;

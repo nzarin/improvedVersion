@@ -8,7 +8,6 @@ import peersim.kademlia.*;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
-// THE STORE
 public class KadProtocol implements Cloneable, EDProtocol {
 
     // VARIABLE PARAMETERS
@@ -111,8 +110,10 @@ public class KadProtocol implements Cloneable, EDProtocol {
 
             // remove form sentMsg
             sentMsg.remove(timeout.msgID);
-            // remove node from my routing table
-            this.kadNode.getRoutingTable().removeNeighbour(timeout.node);
+            // remove node from my routing table if its a kadnode
+            if(timeout.node instanceof KadNode){
+                this.kadNode.getRoutingTable().removeNeighbour((KadNode) timeout.node);
+            }
             // remove from closestSet of find operation
             this.findOp.get(timeout.opID).closestSet.remove(timeout.node);
 

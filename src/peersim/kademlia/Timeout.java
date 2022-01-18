@@ -15,7 +15,7 @@ public class Timeout extends SimpleEvent {
     /**
      * The node which failed to response
      */
-    public KadNode node;
+    public KademliaNode node;
 
     /**
      * The id of the message sent to the node
@@ -31,7 +31,7 @@ public class Timeout extends SimpleEvent {
      * Creates an empty message by using default values (message type = MSG_LOOKUP and <code>new String("")</code> value for the
      * body of the message)
      */
-    public Timeout(KadNode node, long msgID, long opID) {
+    public Timeout(KademliaNode node, long msgID, long opID) {
         super(TIMEOUT);
         this.node = node;
         this.msgID = msgID;

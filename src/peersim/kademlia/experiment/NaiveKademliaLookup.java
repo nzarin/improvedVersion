@@ -1,18 +1,22 @@
 package peersim.kademlia.experiment;
 
 public class NaiveKademliaLookup extends Lookup {
-    LookupFactory2 lookupFactory2;
+    LookupIngredientFactory2 lif2;
 
-    public NaiveKademliaLookup(LookupFactory2 fact){
-        this.lookupFactory2 = fact;
+    public NaiveKademliaLookup(LookupIngredientFactory2 lif){
+        this.lif2 = lif;
     }
 
+    @Override
+    void prepare() {
+        findOp = lif2.createFindOperation();
+        resOp = lif2.createRespondOperation();
+        handleResOp = lif2.createHandleResponseOperation();
+    }
 
     @Override
-    void create() {
-        findOp = lookupFactory2.createFindOperation();
-        resOp = lookupFactory2.createRespondOperation();
-        handleResOp = lookupFactory2.createHandleResponseOperation();
+    void performLookup() {
+        findOp.find();
 
     }
 }
