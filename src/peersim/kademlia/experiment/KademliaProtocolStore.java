@@ -1,27 +1,39 @@
 package peersim.kademlia.experiment;
 
+import peersim.kademlia.KademliaNode;
+
 public class KademliaProtocolStore extends DHTProtocolStore{
 
 
     @Override
-    Lookup createLookup(String type) {
+    Lookup createLookup(String type, KademliaNode s, KademliaNode r) {
+
         Lookup lookup = null;
 
-        // the factory determines what type of operations we want
-//        LookupIngredientFactory2 lookupIngredientFactory2 = new KademliaIngredientFactory();
-        LookupIngredientFactory2 interdomainFactory = new InterDomainKademliaFactory();
+        //determine what type of lookup we have and create the correct factory
+        LookupIngredientFactory2 interDomainLookupFactory = new InterDomainKademliaFactory();
         LookupIngredientFactory2 intraDomainLookupFactory = new IntraDomainKademliaFactory();
 
         switch(type){
             case "naive":
-                lookup = new NaiveKademliaLookup(intraDomainLookupFactory);
+                if(s.getDomain() == r.getDomain()){
+                    lookup = new NaiveKademliaLookup(intraDomainLookupFactory);
+                    System.err.println("it is a naive lookup we just created for intra-domain lookup in kademlia store");
+                } else {
+                    lookup = new NaiveKademliaLookup(interDomainLookupFactory);
+                    System.err.println("it is a naive lookup we just created for inter-domain lookup in kademlia store");
+                }
                 lookup.setType("naive kademlia lookup");
-                System.err.println("it is a naive lookup we just created for kademlia protocol in kademlia store");
                 break;
             case "improved":
-                lookup = new ImprovedKademliaProtocol(intraDomainLookupFactory);
-                lookup.setType("improved kademlia lookup");
-                System.err.println("it is a improved lookup we just created for kademlia protocol in kademlia store");
+                if(s.getDomain() == r.getDomain()){
+                    lookup = new ImprovedKademliaProtocol(intraDomainLookupFactory);
+                    System.err.println("it is the improved lookup we just created for intra-domain lookup in kademlia store");
+                } else {
+                    lookup = new ImprovedKademliaProtocol(interDomainLookupFactory);
+                    System.err.println("it is the improved lookup we just created for inter-domain lookup in kademlia store");
+                }
+                lookup.setType("naive kademlia lookup");
                 break;
         }
 

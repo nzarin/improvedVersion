@@ -16,8 +16,7 @@ public class MessageSender {
     private int transportid;
     private int pid;
 
-    public MessageSender(Transport tr, int pid, int kademliaid, int transportid) {
-        this.transport = tr;
+    public MessageSender(int pid, int kademliaid, int transportid) {
         this.kademliaid = kademliaid;
         this.transportid = transportid;
         this.pid = pid;
@@ -43,7 +42,7 @@ public class MessageSender {
 
     }
 
-    private void sendMessageKadToKad(KadNode s, KadNode r, Message m, TreeMap sentMsg){
+    public void sendMessageKadToKad(KadNode s, KadNode r, Message m, TreeMap<Long, Long> sentMsg){
         //todo: fix dat "current node" (dit kan een tussennode zijn, zijn routing table updates (check oude code)
         s.getRoutingTable().addNeighbour(r);
 
@@ -66,7 +65,7 @@ public class MessageSender {
         }
     }
 
-    private void sendMessageKadToBridge(KadNode s, BridgeNode r, Message m, TreeMap sentMsg){
+    private void sendMessageKadToBridge(KadNode s, BridgeNode r, Message m, TreeMap<Long, Long> sentMsg){
         Node src = Util.nodeIdtoNode(s.getNodeId(), kademliaid);
         Node dest = Util.nodeIdtoNode(r.getNodeId(), kademliaid);
 

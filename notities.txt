@@ -264,5 +264,15 @@ But node 828 is still not found. So this lookup failed!
 test similarity of routing tables from the nodes around the target node
 test how often a new node is proposed as the closest (in plaats van dat iedereen zelfde nodes voorstelt) -> number of learned nodes?
     -> number of unique learned nodes should be smaller than duplicated nodes when they are closer to target node
+-------------------------
 
 
+        //Scenario 1: sender is kadnode and receiver is kadnode -->
+        // normal intra-domain lookup
+        //Scenario 2: sender is kadnode and receiver is bridgenode -->
+        // 2a: forward request to bridge (inter-domain)
+        // 2b: forward result (inter-domain)
+        //scenario 3: sender is bridge and receiver is kadnode -->
+        // forward request to kad (inter-domain)
+        //scenario 4: sender is bridge and receiver is bridge -->
+        //	forward request to bridge (inter-domain)

@@ -11,7 +11,7 @@ public class SimpleEvent {
     /**
      * The identifier of the type of the event.
      */
-    protected int type;
+    public int type;
 
     public SimpleEvent() {
         this.timestamp = CommonState.getTime();

@@ -20,6 +20,8 @@ public class KadProtocol implements Cloneable, EDProtocol {
     private static String prefix = null;
     private int tid;
     private int kademliaid;
+    private String type;
+    private Lookup currentLookup;
 
 
 
@@ -28,8 +30,8 @@ public class KadProtocol implements Cloneable, EDProtocol {
      */
     private static boolean _ALREADY_INSTALLED = false;
 
-    private KadNode kadNode = null;
-    private BridgeNode bridgeNode = null;
+
+    private KademliaNode me;
 
     /**
      * domain this node belongs to
@@ -64,8 +66,6 @@ public class KadProtocol implements Cloneable, EDProtocol {
      *            String
      */
     public KadProtocol(String prefix) {
-//		this.kadNode = null; // empty nodeId
-//		this.domainId = -1; //empty domain Id
 
         KadProtocol.prefix = prefix;
 
@@ -76,6 +76,16 @@ public class KadProtocol implements Cloneable, EDProtocol {
         findOp = new LinkedHashMap<Long, FindOperation>();
 
         tid = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
+
+        //determine whether the protocol is naive
+        if(KademliaCommonConfig.NAIVE_KADEMLIA_PROTOCOL == 1){
+            this.type = "naive";
+        } else {
+            this.type = "improved";
+        }
+
+        this.currentLookup = null;
+
     }
 
     /**
@@ -112,7 +122,7 @@ public class KadProtocol implements Cloneable, EDProtocol {
             sentMsg.remove(timeout.msgID);
             // remove node from my routing table if its a kadnode
             if(timeout.node instanceof KadNode){
-                this.kadNode.getRoutingTable().removeNeighbour((KadNode) timeout.node);
+                this.me.getRoutingTable().removeNeighbour((KadNode) timeout.node);
             }
             // remove from closestSet of find operation
             this.findOp.get(timeout.opID).closestSet.remove(timeout.node);
@@ -120,13 +130,13 @@ public class KadProtocol implements Cloneable, EDProtocol {
             // try another node
             Message m1 = new Message();
             m1.operationId = timeout.opID;
-            m1.src = (KadNode) this.kadNode;
+            m1.src = (KadNode) this.me;
             m1.dest = this.findOp.get(timeout.opID).destNode;
             LookupFactory lookup;
-            if(this.kadNode.getDomain() == m1.dest.getDomain()){
-                lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
+            if(((KadNode) this.me).getDomain() == m1.dest.getDomain()){
+                lookup = new IntraDomainLookup(kademliaid, (KadNode) this.me, findOp, m1, tid, sentMsg);
             } else{
-                lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
+                lookup =  new InterDomainLookup(kademliaid, (KadNode) this.me, findOp, m1, tid, sentMsg);
             }
             lookup.handleResponse();
         }
@@ -149,40 +159,24 @@ public class KadProtocol implements Cloneable, EDProtocol {
         this.kademliaid = myPid;
         SimpleEvent ev = (SimpleEvent) event;
 
-        //Scenario 1: sender is kadnode and receiver is kadnode -->
-        // normal intra-domain lookup
-        //Scenario 2: sender is kadnode and receiver is bridgenode -->
-        // 2a: forward request to bridge (inter-domain)
-        // 2b: forward result (inter-domain)
-        //scenario 3: sender is bridge and receiver is kadnode -->
-        // forward request to kad (inter-domain)
-        //scenario 4: sender is bridge and receiver is bridge -->
-        //	forward request to bridge (inter-domain)
-
         //if it's a message
         if(ev instanceof Message){
 
             Message m = (Message) ev;
-            LookupFactory lookup;
-
-            //determine what type of lookup this is
-            if(this.kadNode.getDomain() == m.dest.getDomain()){
-                lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-            } else{
-                lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-            }
 
             // check what type of message and handle appropriately
             switch (m.getType()) {
                 case Message.MSG_FINDNODE:
-                    lookup.find();
+                    DHTProtocolStore prot = new KademliaProtocolStore();
+                    this.currentLookup = prot.orderLookup(this.type, this.me, m.dest);
+                    currentLookup.performFindOp();
                     break;
                 case Message.MSG_ROUTE:
-                    lookup.respond();
+                    this.currentLookup.performRespondOp();
                     break;
                 case Message.MSG_RESPONSE:
                     sentMsg.remove(m.ackId);
-                    lookup.handleResponse();
+                    this.currentLookup.performHandleResponseOp();
                     break;
             }
 
@@ -198,7 +192,7 @@ public class KadProtocol implements Cloneable, EDProtocol {
      * @param nid
      */
     public void setKadNode(KadNode nid){
-        this.kadNode = nid;
+        this.me = nid;
     }
 
     /**
@@ -206,7 +200,7 @@ public class KadProtocol implements Cloneable, EDProtocol {
      * @param nid
      */
     public void setBridgeNode(BridgeNode nid){
-        this.bridgeNode = nid;
+        this.me = nid;
     }
 
     /**
@@ -214,7 +208,7 @@ public class KadProtocol implements Cloneable, EDProtocol {
      * @return nodeId
      */
     public KadNode getKadNode(){
-        return this.kadNode;
+        return (KadNode) this.me;
     }
 
     /**
@@ -222,7 +216,7 @@ public class KadProtocol implements Cloneable, EDProtocol {
      * @return
      */
     public BridgeNode getBridgeNode(){
-        return this.bridgeNode;
+        return (BridgeNode) this.me;
     }
 
     /**

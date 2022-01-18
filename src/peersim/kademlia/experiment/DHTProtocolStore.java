@@ -1,22 +1,27 @@
 package peersim.kademlia.experiment;
 
+import peersim.kademlia.KademliaNode;
+
 public abstract class DHTProtocolStore {
 
-    public Lookup orderLookup(String type){
-        Lookup lookup;
+    private Lookup lookup;
 
-        //now createLookup is back to being a call to a method in the DHTProtocolStore rather than on a factory object.
-        lookup = createLookup(type);
+    public Lookup orderLookup(String type, KademliaNode s, KademliaNode r){
 
-        //todo: check if this should be here
-        lookup.prepare();
+        //create either the correct protocol (naive or improved) and the corresponding factory
+        this.lookup = createLookup(type, s, r);
 
-        //todo: check if this should be here
-        lookup.performLookup();
+        //initialize all the operations and prepare to perform one
+        lookup.prepare(s, r);
 
         return lookup;
     }
 
     //note that the factory method is now abstract in DHTProtocolStore
-    abstract Lookup createLookup(String type);
+    abstract Lookup createLookup(String type, KademliaNode sender, KademliaNode receiver);
+
+    public void performFindOperation(){
+        this.lookup.performFindOp();
+    }
+
 }

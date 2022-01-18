@@ -36,6 +36,11 @@ public class KademliaCommonConfig {
     public static int NUMBER_OF_BRIDGES_PER_DOMAIN = 2;
 
     /**
+     * The version of the protocol: either naive or improved
+     */
+    public static int NAIVE_KADEMLIA_PROTOCOL = 1;
+
+    /**
      * short information about current kademlia configuration
      *
      * @return String

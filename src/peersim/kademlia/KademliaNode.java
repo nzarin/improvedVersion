@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 public abstract class KademliaNode {
     abstract BigInteger getNodeId();
-    abstract RoutingTable getRoutingTable();
-    abstract int getDomain();
+    public abstract RoutingTable getRoutingTable();
+    public abstract int getDomain();
     abstract ArrayList<BridgeNode> getBridgeNodes();
     abstract ArrayList<KadNode> getKadNodes();
 }
