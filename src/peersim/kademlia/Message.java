@@ -86,7 +86,6 @@ public class Message extends SimpleEvent {
         this(messageType, "");
     }
 
-    // ______________________________________________________________________________________________
 
     /**
      * Creates a message with specific type and body
@@ -98,6 +97,23 @@ public class Message extends SimpleEvent {
         super(messageType);
         this.msgId = (ID_GENERATOR++);
         this.body = body;
+    }
+
+
+    /**
+     * Constructor for timeout messages
+     * @param messageType
+     * @param operationId
+     */
+    public Message(int messageType, long operationId, KademliaNode sender, KademliaNode receiver){
+        super(messageType);
+        this.msgId = (ID_GENERATOR++);
+        this.operationId = operationId;
+
+        //note that the current code simulates that the receiver of a message sends after some latency a timeout to sender
+        //this means that the source of this message is the receiver of the timeout request
+        this.src = sender;
+        this.dest = receiver;
     }
 
 

@@ -30,6 +30,9 @@ public class KadToKadHandleResponseOperation implements HandleResponseOperation2
     @Override
     public void handleResponse() {
 
+        //create new room for sending  s we received a response for the sent message
+        sentMsg.remove(m.ackId);
+
         // add message source to my routing table
         if(m.src != null){
             this.myself.getRoutingTable().addNeighbour((KadNode) m.src);

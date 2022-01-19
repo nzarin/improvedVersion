@@ -1,4 +1,5 @@
 package peersim.kademlia;
+import java.sql.SQLSyntaxErrorException;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -115,49 +116,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 
 	/**
-	 * If the message is not arrived before timeout, try to resend it.
-	 * @param timeout
-	 * 					The timeout event.
-	 */
-	private void handleTimeOut(Timeout timeout) {
-
-		// the response msg isn't arrived
-		if (sentMsg.containsKey(timeout.msgID)) {
-
-			// remove form sentMsg
-			sentMsg.remove(timeout.msgID);
-
-			//if its a kadnode that is not responding
-			if(timeout.node instanceof KadNode){
-
-				//remove this node from routing table as it is not available
-				this.me.getRoutingTable().removeNeighbour((KadNode) timeout.node);
-
-				// remove from closestSet of find operation
-				this.findOp.get(timeout.opID).closestSet.remove(timeout.node);
-
-				// try another node
-				Message m1 = new Message();
-				m1.operationId = timeout.opID;
-				m1.src = (KadNode) this.me;
-				m1.dest = this.findOp.get(timeout.opID).destNode;
-
-				//create the correct lookup object
-//				currentLookup = prot.orderLookup(this.type, this.me, m1.dest, this.kademliaid, m1, findOp, sentMsg, this.tid);
-				currentLookup.performHandleResponseOp();
-
-				// todo: if it is a bridgenode that is not responding
-			} else {
-
-			}
-
-
-
-		}
-
-	}
-
-	/**
 	 * Manage the peersim simulator receiving the events
 	 * 
 	 * @param myNode
@@ -190,13 +148,41 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 					currentLookup.performRespondOp();
 					break;
 				case Message.MSG_RESPONSE:
-					sentMsg.remove(m.ackId);
 					currentLookup.performHandleResponseOp();
+					break;
+				case Message.TIMEOUT:
+					// the response msg is not arrived
+					if(sentMsg.containsKey(m.msgId)){
+
+						//remove from the sentMsg
+						sentMsg.remove(m.msgId);
+
+						//if it is a KadNode that is not responding
+						if(m.src instanceof KadNode){
+
+							//remove this node from routing table and from the closest set of findOperation
+							this.me.getRoutingTable().removeNeighbour((KadNode) m.src);
+							this.findOp.get(m.operationId).closestSet.remove((KadNode) m.src);
+
+							//try another node
+							Message m2 = new Message();
+							m2.operationId = m.operationId;
+							m2.src = this.me;
+							m2.dest = this.findOp.get(m.operationId).destNode;
+
+							//because all variables have changed, we need to initialized everything again
+							currentLookup = prot.orderLookup(this.type, this.me, m2.dest, this.kademliaid, m2, findOp, sentMsg, this.tid);
+							currentLookup.performHandleResponseOp();
+
+							//todo: it is a BridgeNode that is not responding
+						} else {
+						}
+					}
 					break;
 			}
 
-		} else {	//it is a timeout
-			handleTimeOut((Timeout) ev);
+		} else {
+			System.err.println("this event is of a type we don't know");
 		}
 
 

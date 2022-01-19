@@ -16,6 +16,8 @@ public class KademliaProtocolStore extends DHTProtocolStore{
 
         switch(type){
             case "naive":
+                System.err.println("sender: " + s.getNodeId());
+                System.err.println("receiver:" + r.getNodeId());
                 if(s.getDomain() == r.getDomain()){
                     lookup = new NaiveKademliaLookup(intraDomainLookupFactory);
                     System.err.println("it is a naive lookup we just created for intra-domain lookup in kademlia store");
