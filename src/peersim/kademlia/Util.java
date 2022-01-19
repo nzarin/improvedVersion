@@ -1,5 +1,6 @@
 package peersim.kademlia;
 
+import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 
@@ -102,5 +103,29 @@ public class Util {
 
         return null;
     }
+
+
+    public static void updateLookupStatistics( KadNode currentNode, FindOperation fop, int kademliaid){
+
+        //if the target is found -> successful lookup
+        if(fop.closestSet.containsKey(fop.destNode)){
+
+            //update stats
+            long duration = (CommonState.getTime() - (fop.timestamp));
+            KademliaObserver.timeStore.add(duration);
+            KademliaObserver.hopStore.add(fop.nrHops);
+            KademliaObserver.finished_lookups.add(1);
+            KademliaObserver.successful_lookups.add(1);
+            System.err.println("!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            // if I and the destination node are up -> failed lookup
+        } else if(Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() & Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()){
+            KademliaObserver.finished_lookups.add(1);
+            KademliaObserver.failed_lookups.add(1);
+            System.err.println("!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+        }
+    }
+
 
 }

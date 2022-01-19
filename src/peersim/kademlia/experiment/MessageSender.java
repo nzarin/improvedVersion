@@ -52,14 +52,14 @@ public class MessageSender {
         transport.send(src, dest, m, kademliaid);
 
         if (m.getType() == Message.MSG_ROUTE) { // is a request
-            Timeout t = new Timeout(r, m.id, m.operationId);
+            Timeout t = new Timeout(r, m.msgId, m.operationId);
 
             // set delay at 2*RTT
             long latency = transport.getLatency(src, dest);
             long delay = 4*latency;
 
             // add to sent msg
-            sentMsg.put(m.id, m.timestamp);
+            sentMsg.put(m.msgId, m.timestamp);
             EDSimulator.add(delay, t, src, this.kademliaid);
         }
     }
@@ -72,14 +72,14 @@ public class MessageSender {
         transport.send(src, dest, m, kademliaid);
 
         if (m.getType() == Message.MSG_ROUTE) { // is a request
-            Timeout t = new Timeout(r, m.id, m.operationId);
+            Timeout t = new Timeout(r, m.msgId, m.operationId);
 
             // set delay at 2*RTT
             long latency = transport.getLatency(src, dest);
             long delay = 4*latency;
 
             // add to sent msg
-            sentMsg.put(m.id, m.timestamp);
+            sentMsg.put(m.msgId, m.timestamp);
             EDSimulator.add(delay, t, src, this.kademliaid);
         }
     }

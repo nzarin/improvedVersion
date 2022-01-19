@@ -25,8 +25,6 @@ public abstract class DHTProtocolStore {
     //note that the factory method is now abstract in DHTProtocolStore
     abstract Lookup createLookup(String type, KademliaNode sender, KademliaNode receiver);
 
-    public void performFindOperation(){
-        this.lookup.performFindOp();
-    }
+
 
 }

@@ -32,6 +32,6 @@ public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
 
     @Override
     public HandleResponseOperation2 createHandleResponseOperation(KademliaNode sender, KademliaNode destination, int kademliaid, Message lookupMessage, LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid) {
-        return new KadToKadHandleResponseOperation();
+        return new KadToBridgeHandleRespondOperation();
     }
 }

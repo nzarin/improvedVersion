@@ -25,21 +25,18 @@ public class NaiveKademliaLookup extends Lookup {
 
     @Override
     public void performFindOp() {
-        System.err.println("we are now going to perform the findoperation for the NaiveKademliaLookup");
         findOp.find();
 
     }
 
     @Override
     public void performRespondOp() {
-        System.err.println("we are now in the perform respond of NaiveKademliaLookup class");
         resOp.respond();
 
     }
 
     @Override
     public void performHandleResponseOp() {
-        System.err.println("we are now in the perform handle response of NaiveKademliaLookup class");
         handleResOp.handleResponse();
 
     }

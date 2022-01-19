@@ -3302,3 +3302,8 @@
 0, NaN;
 0, NaN;
 0, NaN;
+0, NaN;
+0, NaN;
+0, NaN;
+0, NaN;
+0, NaN;

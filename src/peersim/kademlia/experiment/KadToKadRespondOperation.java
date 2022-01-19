@@ -2,8 +2,10 @@ package peersim.kademlia.experiment;
 
 import peersim.kademlia.FindOperation;
 import peersim.kademlia.KadNode;
+import peersim.kademlia.KademliaCommonConfig;
 import peersim.kademlia.Message;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -33,7 +35,20 @@ public class KadToKadRespondOperation implements RespondOperation2 {
     @Override
     public void respond() {
 
+        // get the k closest nodes to target node
+        KadNode[] neighbours = this.myself.getRoutingTable().getKClosestNeighbours((KadNode) m.dest, (KadNode) m.src);
 
-        System.err.println(" we are in the kad to kad respond operation class");
+        //get the BETA closest nodes from the neighbours
+        KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
+
+        // create a response message containing the neighbours (with the same id as of the request)
+        Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
+        response.operationId = m.operationId;
+        response.dest = m.dest;
+        response.src = this.myself;
+        response.ackId = m.msgId;
+        System.err.println("We are sending a RESPONSE message to " + m.dest.getNodeId() + " which is a KadNode" );
+        messageSender.sendMessage(response, m.src, this.myself, sentMsg);
+
     }
 }

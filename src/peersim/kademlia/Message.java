@@ -1,7 +1,5 @@
 package peersim.kademlia;
 
-import java.math.BigInteger;
-
 /**
  * Message class provide all functionalities to manage the various messages, principally LOOKUP messages (messages from
  * application level sender designated to another application level).
@@ -26,9 +24,9 @@ public class Message extends SimpleEvent {
      */
     public static final int MSG_RESPONSE = 3;
     /**
-     * Message Type: RESPONSE (response message to a findvalue or findnode)
+     * Message Type: TIMEOUT (timeout message to a findvalue or findnode)
      */
-    public static final int TIMEOUT = 4;
+    public static final int TIMEOUT = 100;
 
     /**
      * internal generator for unique message IDs
@@ -42,7 +40,7 @@ public class Message extends SimpleEvent {
     /**
      * ID of the message. this is automatically generated univocally, and should not change
      */
-    public long id;
+    public long msgId;
 
     /**
      * ACK number of the message. This is in the response message.
@@ -57,12 +55,12 @@ public class Message extends SimpleEvent {
     /**
      * Recipient address of the message
      */
-    public KadNode dest;
+    public KademliaNode dest;
 
     /**
      * Source address of the message: has to be filled at application level
      */
-    public KadNode src;
+    public KademliaNode src;
 
     /**
      * Available to count the number of hops the message did.
@@ -98,7 +96,7 @@ public class Message extends SimpleEvent {
      */
     public Message(int messageType, Object body) {
         super(messageType);
-        this.id = (ID_GENERATOR++);
+        this.msgId = (ID_GENERATOR++);
         this.body = body;
     }
 
@@ -120,7 +118,7 @@ public class Message extends SimpleEvent {
      * @return The printed message.
      */
     public String toString() {
-        String s = "[ID=" + id + "][DEST=" + dest + "]";
+        String s = "[ID=" + msgId + "][DEST=" + dest + "]";
         return s + "[Type=" + messageTypetoString() + "] BODY=(...)";
     }
 

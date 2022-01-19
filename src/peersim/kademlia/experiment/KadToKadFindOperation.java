@@ -37,10 +37,10 @@ public class KadToKadFindOperation implements FindOperation2{
 
         KademliaObserver.find_op.add(1);
 
-        FindOperation fop = new FindOperation(m.dest, m.timestamp);
+        FindOperation fop = new FindOperation((KadNode) m.dest, m.timestamp);
         findOpsMap.put(fop.operationId, fop);
 
-        KadNode[] neighbours = this.myself.getRoutingTable().getKClosestNeighbours(m.dest, this.myself);
+        KadNode[] neighbours = this.myself.getRoutingTable().getKClosestNeighbours((KadNode) m.dest, this.myself);
 
         fop.updateClosestSet(neighbours);
         fop.available_requests = KademliaCommonConfig.ALPHA;

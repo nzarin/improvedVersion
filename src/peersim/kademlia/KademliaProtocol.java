@@ -90,6 +90,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		}
 
 		this.currentLookup = null;
+
+		this.prot = new KademliaProtocolStore();
 	}
 
 	/**
@@ -125,26 +127,32 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			// remove form sentMsg
 			sentMsg.remove(timeout.msgID);
 
-			// remove node from my routing table if its a kadnode
+			//if its a kadnode that is not responding
 			if(timeout.node instanceof KadNode){
+
+				//remove this node from routing table as it is not available
 				this.me.getRoutingTable().removeNeighbour((KadNode) timeout.node);
+
+				// remove from closestSet of find operation
+				this.findOp.get(timeout.opID).closestSet.remove(timeout.node);
+
+				// try another node
+				Message m1 = new Message();
+				m1.operationId = timeout.opID;
+				m1.src = (KadNode) this.me;
+				m1.dest = this.findOp.get(timeout.opID).destNode;
+
+				//create the correct lookup object
+//				currentLookup = prot.orderLookup(this.type, this.me, m1.dest, this.kademliaid, m1, findOp, sentMsg, this.tid);
+				currentLookup.performHandleResponseOp();
+
+				// todo: if it is a bridgenode that is not responding
+			} else {
+
 			}
 
-			// remove from closestSet of find operation
-			this.findOp.get(timeout.opID).closestSet.remove(timeout.node);
 
-			// try another node
-			Message m1 = new Message();
-			m1.operationId = timeout.opID;
-			m1.src = (KadNode) this.me;
-			m1.dest = this.findOp.get(timeout.opID).destNode;
-			LookupFactory lookup;
-			if(this.me.getDomain() == m1.dest.getDomain()){
-				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.me, findOp, m1, tid, sentMsg);
-			} else{
-				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.me, findOp, m1, tid, sentMsg);
-			}
-			lookup.handleResponse();
+
 		}
 
 	}
@@ -154,52 +162,15 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * 
 	 * @param myNode
 	 *            Node
-	 * @param myPid
+	 * @param myProtocolID
 	 *            int
 	 * @param event
 	 *            Object
 	 */
-	public void processEvent(Node myNode, int myPid, Object event) {
-//
-//		// Parse message content Activate the correct event manager for the particular event
-//		this.kademliaid = myPid;
-//		SimpleEvent ev = (SimpleEvent) event;
-//
-//		//if it's a message
-//		if(ev instanceof Message){
-//
-//			Message m = (Message) ev;
-//			LookupFactory lookup;
-//
-//
-//			//determine what type of lookup this is
-//			if(this.kadNode.getDomain() == m.dest.getDomain()){
-//				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-//			} else{
-//				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-//			}
-//
-//			// check what type of message and handle appropriately
-//			switch (m.getType()) {
-//				case Message.MSG_FINDNODE:
-//					lookup.find();
-//					break;
-//				case Message.MSG_ROUTE:
-//					lookup.respond();
-//					break;
-//				case Message.MSG_RESPONSE:
-//					sentMsg.remove(m.ackId);
-//					lookup.handleResponse();
-//					break;
-//			}
-//
-//		} else {	//it is a timeout
-//			handleTimeOut((Timeout) ev);
-//		}
-
+	public void processEvent(Node myNode, int myProtocolID, Object event) {
 
 		// Parse message content Activate the correct event manager for the particular event
-		this.kademliaid = myPid;
+		this.kademliaid = myProtocolID;
 		SimpleEvent ev = (SimpleEvent) event;
 
 		//if it's a message
@@ -207,19 +178,20 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			Message m = (Message) ev;
 
+			//create the correct lookup object
+			this.currentLookup = prot.orderLookup(this.type, this.me, m.dest, this.kademliaid, m, findOp, sentMsg, this.tid);
+
 			// check what type of message and handle appropriately
 			switch (m.getType()) {
 				case Message.MSG_FINDNODE:
-					this.prot = new KademliaProtocolStore();
-					this.currentLookup = prot.orderLookup(this.type, this.me, m.dest,this.kademliaid, m, findOp, sentMsg, this.tid);
 					currentLookup.performFindOp();
 					break;
 				case Message.MSG_ROUTE:
-					this.currentLookup.performRespondOp();
+					currentLookup.performRespondOp();
 					break;
 				case Message.MSG_RESPONSE:
 					sentMsg.remove(m.ackId);
-					this.currentLookup.performHandleResponseOp();
+					currentLookup.performHandleResponseOp();
 					break;
 			}
 
@@ -235,8 +207,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @param nid
 	 */
 	public void setKadNode(KadNode nid){
-
-//		this.kadNode = nid;
 		this.me = nid;
 	}
 
@@ -245,26 +215,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @param nid
 	 */
 	public void setBridgeNode(BridgeNode nid){
-//		this.bridgeNode = nid;
 		this.me = nid;
 	}
-
-//	/**
-//	 * Get the current kadNode if it is kadNode.
-//	 * @return nodeId
-//	 */
-//	public KadNode getKadNode(){
-//		return this.kadNode;
-//	}
-
-//	/**
-//	 * Get the current bridge node if it is a bridgeNode.
-//	 * @return
-//	 */
-//	public BridgeNode getBridgeNode(){
-//		return this.bridgeNode;
-//	}
-
 
 
 	public KademliaNode getCurrentNode(){
