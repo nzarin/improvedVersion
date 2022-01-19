@@ -80,12 +80,7 @@ public class Util {
             m = (inf + sup) / 2;
 
             KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(m).getProtocol(kademliaid);
-            BigInteger mId;
-            if(kademliaProtocol.getKadNode() != null){
-                mId = kademliaProtocol.getKadNode().getNodeId();
-            } else {
-                mId = kademliaProtocol.getBridgeNode().getNodeId();
-            }
+            BigInteger mId = kademliaProtocol.getCurrentNode().getNodeId();
 
             if (mId.equals(searchNodeId))
                 return Network.get(m);
@@ -100,11 +95,7 @@ public class Util {
         BigInteger mId;
         for (int i = Network.size() - 1; i >= 0; i--) {
             KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(i).getProtocol(kademliaid);
-            if(kademliaProtocol.getKadNode() != null){
-                mId = kademliaProtocol.getKadNode().getNodeId();
-            } else {
-                mId = kademliaProtocol.getBridgeNode().getNodeId();
-            }
+            mId = kademliaProtocol.getCurrentNode().getNodeId();
             if (mId.equals(searchNodeId))
                 return Network.get(i);
         }

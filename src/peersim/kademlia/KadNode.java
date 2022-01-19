@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class KadNode extends KademliaNode {
 
     private BigInteger nodeId;
-    private int networkNodeId;
     private int domain;
     private RoutingTable routingTable;
     private KademliaProtocol kademliaProtocol;

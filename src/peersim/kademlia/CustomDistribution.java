@@ -51,8 +51,8 @@ public class CustomDistribution implements peersim.core.Control {
                 KademliaNode kadNode = new KadNode(tmpID, tmpDomain, kademliaProtocol);
                 kademliaProtocol.setKadNode((KadNode) kadNode);    // todo: een node zou kademlia protocol moeten hebben niet andersom
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
-                currentIndexNetworkNode++;
                 System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " is a KADNODE and gets assigned Node ID : " + tmpID + " for domain " + tmpDomain );
+                currentIndexNetworkNode++;
             } else {
                 // set i back with 1 to retry
                 i--;
@@ -64,7 +64,6 @@ public class CustomDistribution implements peersim.core.Control {
      * Generates bridge nodes in the network.
      */
     private void generateBridgeNodes(){
-        //determine number of bridgeNodes
 
         //for every domain
         for (int i = 0; i < numberOfDomains; ++i) {
@@ -76,8 +75,8 @@ public class CustomDistribution implements peersim.core.Control {
                     KademliaNode bridgeNode = new BridgeNode(tmpId,i,kademliaProtocol);
                     kademliaProtocol.setBridgeNode((BridgeNode) bridgeNode);    // todo: een node zou kademlia protocol moeten hebben niet andersom
                     mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpId);
-                    currentIndexNetworkNode++;
                     System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " is a BRIDGENODE and gets assigned Node ID : " + tmpId + " for domain " + i );
+                    currentIndexNetworkNode++;
                 } else {
                     j--;
                 }

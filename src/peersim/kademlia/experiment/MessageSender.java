@@ -14,12 +14,11 @@ public class MessageSender {
     private Transport transport;
     private int kademliaid;
     private int transportid;
-    private int pid;
 
-    public MessageSender(int pid, int kademliaid, int transportid) {
+
+    public MessageSender(int kademliaid, int transportid) {
         this.kademliaid = kademliaid;
         this.transportid = transportid;
-        this.pid = pid;
     }
 
 
@@ -61,7 +60,7 @@ public class MessageSender {
 
             // add to sent msg
             sentMsg.put(m.id, m.timestamp);
-            EDSimulator.add(delay, t, src, pid);
+            EDSimulator.add(delay, t, src, this.kademliaid);
         }
     }
 
@@ -81,7 +80,7 @@ public class MessageSender {
 
             // add to sent msg
             sentMsg.put(m.id, m.timestamp);
-            EDSimulator.add(delay, t, src, pid);
+            EDSimulator.add(delay, t, src, this.kademliaid);
         }
     }
 

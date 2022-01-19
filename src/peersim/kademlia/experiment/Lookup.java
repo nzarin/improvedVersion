@@ -1,6 +1,11 @@
 package peersim.kademlia.experiment;
 
+import peersim.kademlia.FindOperation;
 import peersim.kademlia.KademliaNode;
+import peersim.kademlia.Message;
+
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 public abstract class Lookup {
     String type;
@@ -10,10 +15,11 @@ public abstract class Lookup {
     KademliaNode sender;
     KademliaNode receiver;
 
-    abstract void prepare(KademliaNode sender, KademliaNode receiver);
-    abstract void performFindOp();
-    abstract void performRespondOp();
-    abstract void performHandleResponseOp();
+    //todo: removed the folder experiment and make everything here protected again (so remove public"
+    abstract void prepare(KademliaNode sender, KademliaNode destination, int kademliaid, Message lookupMessage, LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid);
+    public abstract void performFindOp();
+    public abstract void performRespondOp();
+    public abstract void performHandleResponseOp();
 
     void setType(String s){
         this.type = s;

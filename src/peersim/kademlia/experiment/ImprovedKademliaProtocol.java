@@ -1,6 +1,11 @@
 package peersim.kademlia.experiment;
 
+import peersim.kademlia.FindOperation;
 import peersim.kademlia.KademliaNode;
+import peersim.kademlia.Message;
+
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 public class ImprovedKademliaProtocol extends Lookup {
 
@@ -11,24 +16,24 @@ public class ImprovedKademliaProtocol extends Lookup {
     }
 
     @Override
-    void prepare(KademliaNode s, KademliaNode r) {
-        findOp = lookupFactory2.createFindOperation(s, r);
-        resOp = lookupFactory2.createRespondOperation();
-        handleResOp = lookupFactory2.createHandleResponseOperation();
+    void prepare( KademliaNode sender, KademliaNode destination, int kademliaid, Message lookupMessage, LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid) {
+        findOp = lookupFactory2.createFindOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
+        resOp = lookupFactory2.createRespondOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
+        handleResOp = lookupFactory2.createHandleResponseOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
     }
 
     @Override
-    void performFindOp() {
-
-    }
-
-    @Override
-    void performRespondOp() {
+    public void performFindOp() {
 
     }
 
     @Override
-    void performHandleResponseOp() {
+    public void performRespondOp() {
+
+    }
+
+    @Override
+    public void performHandleResponseOp() {
 
     }
 

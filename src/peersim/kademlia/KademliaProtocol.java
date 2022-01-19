@@ -5,6 +5,9 @@ import java.util.TreeMap;
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
+import peersim.kademlia.experiment.DHTProtocolStore;
+import peersim.kademlia.experiment.KademliaProtocolStore;
+import peersim.kademlia.experiment.Lookup;
 
 /**
  * The actual protocol.
@@ -21,7 +24,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	private static String prefix = null;
 	private int tid;
 	private int kademliaid;
-	
+	private String type;
+	private Lookup currentLookup;
+	private DHTProtocolStore prot;
 
 
 	/**
@@ -29,8 +34,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	private static boolean _ALREADY_INSTALLED = false;
 
-	private KadNode kadNode = null;
-	private BridgeNode bridgeNode = null;
+	private KademliaNode me;
 
 	/**
 	 * domain this node belongs to
@@ -77,6 +81,15 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		findOp = new LinkedHashMap<Long, FindOperation>();
 
 		tid = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
+
+		//determine whether the protocol is naive
+		if(KademliaCommonConfig.NAIVE_KADEMLIA_PROTOCOL == 1){
+			this.type = "naive";
+		} else {
+			this.type = "improved";
+		}
+
+		this.currentLookup = null;
 	}
 
 	/**
@@ -114,7 +127,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			// remove node from my routing table if its a kadnode
 			if(timeout.node instanceof KadNode){
-				this.kadNode.getRoutingTable().removeNeighbour((KadNode) timeout.node);
+				this.me.getRoutingTable().removeNeighbour((KadNode) timeout.node);
 			}
 
 			// remove from closestSet of find operation
@@ -123,13 +136,13 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			// try another node
 			Message m1 = new Message();
 			m1.operationId = timeout.opID;
-			m1.src = (KadNode) this.kadNode;
+			m1.src = (KadNode) this.me;
 			m1.dest = this.findOp.get(timeout.opID).destNode;
 			LookupFactory lookup;
-			if(this.kadNode.getDomain() == m1.dest.getDomain()){
-				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
+			if(this.me.getDomain() == m1.dest.getDomain()){
+				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.me, findOp, m1, tid, sentMsg);
 			} else{
-				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m1, tid, sentMsg);
+				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.me, findOp, m1, tid, sentMsg);
 			}
 			lookup.handleResponse();
 		}
@@ -147,46 +160,66 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 *            Object
 	 */
 	public void processEvent(Node myNode, int myPid, Object event) {
+//
+//		// Parse message content Activate the correct event manager for the particular event
+//		this.kademliaid = myPid;
+//		SimpleEvent ev = (SimpleEvent) event;
+//
+//		//if it's a message
+//		if(ev instanceof Message){
+//
+//			Message m = (Message) ev;
+//			LookupFactory lookup;
+//
+//
+//			//determine what type of lookup this is
+//			if(this.kadNode.getDomain() == m.dest.getDomain()){
+//				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
+//			} else{
+//				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
+//			}
+//
+//			// check what type of message and handle appropriately
+//			switch (m.getType()) {
+//				case Message.MSG_FINDNODE:
+//					lookup.find();
+//					break;
+//				case Message.MSG_ROUTE:
+//					lookup.respond();
+//					break;
+//				case Message.MSG_RESPONSE:
+//					sentMsg.remove(m.ackId);
+//					lookup.handleResponse();
+//					break;
+//			}
+//
+//		} else {	//it is a timeout
+//			handleTimeOut((Timeout) ev);
+//		}
+
 
 		// Parse message content Activate the correct event manager for the particular event
 		this.kademliaid = myPid;
 		SimpleEvent ev = (SimpleEvent) event;
 
-		//Scenario 1: sender is kadnode and receiver is kadnode -->
-			// normal intra-domain lookup
-		//Scenario 2: sender is kadnode and receiver is bridgenode -->
-			// 2a: forward request to bridge (inter-domain)
-			// 2b: forward result (inter-domain)
-		//scenario 3: sender is bridge and receiver is kadnode -->
-			// forward request to kad (inter-domain)
-		//scenario 4: sender is bridge and receiver is bridge -->
-			//	forward request to bridge (inter-domain)
-
 		//if it's a message
 		if(ev instanceof Message){
 
 			Message m = (Message) ev;
-			LookupFactory lookup;
-
-
-			//determine what type of lookup this is
-			if(this.kadNode.getDomain() == m.dest.getDomain()){
-				lookup = new IntraDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-			} else{
-				lookup =  new InterDomainLookup(kademliaid, (KadNode) this.kadNode, findOp, m, tid, sentMsg);
-			}
 
 			// check what type of message and handle appropriately
 			switch (m.getType()) {
 				case Message.MSG_FINDNODE:
-					lookup.find();
+					this.prot = new KademliaProtocolStore();
+					this.currentLookup = prot.orderLookup(this.type, this.me, m.dest,this.kademliaid, m, findOp, sentMsg, this.tid);
+					currentLookup.performFindOp();
 					break;
 				case Message.MSG_ROUTE:
-					lookup.respond();
+					this.currentLookup.performRespondOp();
 					break;
 				case Message.MSG_RESPONSE:
 					sentMsg.remove(m.ackId);
-					lookup.handleResponse();
+					this.currentLookup.performHandleResponseOp();
 					break;
 			}
 
@@ -202,7 +235,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @param nid
 	 */
 	public void setKadNode(KadNode nid){
-		this.kadNode = nid;
+
+//		this.kadNode = nid;
+		this.me = nid;
 	}
 
 	/**
@@ -210,23 +245,30 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 * @param nid
 	 */
 	public void setBridgeNode(BridgeNode nid){
-		this.bridgeNode = nid;
+//		this.bridgeNode = nid;
+		this.me = nid;
 	}
 
-	/**
-	 * Get the current kadNode if it is kadNode.
-	 * @return nodeId
-	 */
-	public KadNode getKadNode(){
-		return this.kadNode;
-	}
+//	/**
+//	 * Get the current kadNode if it is kadNode.
+//	 * @return nodeId
+//	 */
+//	public KadNode getKadNode(){
+//		return this.kadNode;
+//	}
 
-	/**
-	 * Get the current bridge node if it is a bridgeNode.
-	 * @return
-	 */
-	public BridgeNode getBridgeNode(){
-		return this.bridgeNode;
+//	/**
+//	 * Get the current bridge node if it is a bridgeNode.
+//	 * @return
+//	 */
+//	public BridgeNode getBridgeNode(){
+//		return this.bridgeNode;
+//	}
+
+
+
+	public KademliaNode getCurrentNode(){
+		return this.me;
 	}
 
 	/**

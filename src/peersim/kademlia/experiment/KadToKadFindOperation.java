@@ -3,6 +3,7 @@ package peersim.kademlia.experiment;
 import peersim.core.Node;
 import peersim.kademlia.*;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -13,29 +14,20 @@ public class KadToKadFindOperation implements FindOperation2{
     private int kademliaid;
     private Message m;
     private LinkedHashMap<Long, FindOperation> findOpsMap;
-    private MessageSender messageSender;
+    private int tid;
     private TreeMap<Long, Long> sentMsg;
+    private MessageSender messageSender;
 
-    public KadToKadFindOperation(KadNode myself, KadNode destination, int kademliaid, Message lookupMessage,  LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, MessageSender ms) {
+    public KadToKadFindOperation(KadNode myself, KadNode destination, int kademliaid, Message lookupMessage,  LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid) {
         this.myself = myself;
         this.dest = destination;
         this.kademliaid = kademliaid;
         this.m = lookupMessage;
         this.findOpsMap = findOpsMap;
         this.sentMsg = sentMsg;
-        this.messageSender = ms;
+        this.tid = tid;
+        this.messageSender = new MessageSender(kademliaid, tid);
     }
-
-    public KadToKadFindOperation(KadNode myself, KadNode destination, int kademliaid){
-        this.myself = myself;
-        this.dest = destination;
-        this.kademliaid = kademliaid;
-    }
-
-    public KadToKadFindOperation(){
-        System.err.println("gets into the empty constructor");
-    }
-
 
     @Override
     public void find() {
@@ -63,6 +55,7 @@ public class KadToKadFindOperation implements FindOperation2{
             KadNode nextNode = fop.getNeighbour();
             if(nextNode != null){
                 fop.nrHops++;
+                System.err.println("We are sending a ROUTE message to " + nextNode.getNodeId() + " which is a KadNode" );
                 messageSender.sendMessage(m.copy(), this.myself, m.dest, sentMsg);
             }
         }
