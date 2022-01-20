@@ -1,14 +1,10 @@
 package peersim.kademlia;
-import java.sql.SQLSyntaxErrorException;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
-import peersim.kademlia.experiment.DHTProtocolStore;
-import peersim.kademlia.experiment.KademliaProtocolStore;
-import peersim.kademlia.experiment.Lookup;
 
 /**
  * The actual protocol.
@@ -25,8 +21,9 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	private static String prefix = null;
 	private int tid;
 	private int kademliaid;
-	private String type;
-	private Lookup currentLookup;
+	private KademliaNode me;
+	private String typeOfLookup;
+	private Lookup currentLookup = null;
 	private DHTProtocolStore prot;
 
 
@@ -35,12 +32,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 */
 	private static boolean _ALREADY_INSTALLED = false;
 
-	private KademliaNode me;
 
-	/**
-	 * domain this node belongs to
-	 */
-	public int domainId;
+
 
 	/**
 	 * trace message sent for timeout purpose
@@ -50,7 +43,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	/**
 	 * find operations set
 	 */
-	private LinkedHashMap<Long, FindOperation> findOp;
+	private LinkedHashMap<Long, FindOperation> findOps;
 
 	/**
 	 * Replicate this object by returning an identical copy.
@@ -70,8 +63,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	 *            String
 	 */
 	public KademliaProtocol(String prefix) {
-//		this.kadNode = null; // empty nodeId
-//		this.domainId = -1; //empty domain Id
+
+		this.me = null;
 
 		KademliaProtocol.prefix = prefix;
 
@@ -79,20 +72,19 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 		sentMsg = new TreeMap<Long, Long>();
 
-		findOp = new LinkedHashMap<Long, FindOperation>();
+		findOps = new LinkedHashMap<Long, FindOperation>();
 
 		tid = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
 
 		//determine whether the protocol is naive
 		if(KademliaCommonConfig.NAIVE_KADEMLIA_PROTOCOL == 1){
-			this.type = "naive";
+			this.typeOfLookup = "naive";
 		} else {
-			this.type = "improved";
+			this.typeOfLookup = "improved";
 		}
 
-		this.currentLookup = null;
-
 		this.prot = new KademliaProtocolStore();
+
 	}
 
 	/**
@@ -131,13 +123,17 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		this.kademliaid = myProtocolID;
 		SimpleEvent ev = (SimpleEvent) event;
 
-		//if it's a message
+		//if it's a message (in the future there might be different types of events)
 		if(ev instanceof Message){
 
 			Message m = (Message) ev;
 
-			//create the correct lookup object
-			this.currentLookup = prot.orderLookup(this.type, this.me, m.dest, this.kademliaid, m, findOp, sentMsg, this.tid);
+			// if I do not have a lookup object yet, create one.
+			if (this.currentLookup == null){
+				//create the correct lookup object
+				this.currentLookup = prot.orderLookup(this.typeOfLookup, this.me, m.dest, this.kademliaid, m, findOps, sentMsg, this.tid);
+			}
+
 
 			// check what type of message and handle appropriately
 			switch (m.getType()) {
@@ -162,16 +158,16 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 							//remove this node from routing table and from the closest set of findOperation
 							this.me.getRoutingTable().removeNeighbour((KadNode) m.src);
-							this.findOp.get(m.operationId).closestSet.remove((KadNode) m.src);
+							this.findOps.get(m.operationId).closestSet.remove((KadNode) m.src);
 
 							//try another node
 							Message m2 = new Message();
 							m2.operationId = m.operationId;
 							m2.src = this.me;
-							m2.dest = this.findOp.get(m.operationId).destNode;
+							m2.dest = this.findOps.get(m.operationId).destNode;
 
 							//because all variables have changed, we need to initialized everything again
-							currentLookup = prot.orderLookup(this.type, this.me, m2.dest, this.kademliaid, m2, findOp, sentMsg, this.tid);
+							currentLookup = prot.orderLookup(this.typeOfLookup, this.me, m2.dest, this.kademliaid, m2, findOps, sentMsg, this.tid);
 							currentLookup.performHandleResponseOp();
 
 							//todo: it is a BridgeNode that is not responding
@@ -209,13 +205,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 		return this.me;
 	}
 
-	/**
-	 * Get the current transport ID
-	 * @return tid
-	 */
-	public int getTransportID(){
-		return this.tid;
-	}
 
 
 }
