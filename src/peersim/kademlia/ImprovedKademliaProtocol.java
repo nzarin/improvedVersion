@@ -18,6 +18,9 @@ public class ImprovedKademliaProtocol extends Lookup {
         handleResOp = lookupFactory2.createHandleResponseOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
     }
 
+    /**
+     * Added new shizzle
+     */
     @Override
     public void performFindOp() {
 
