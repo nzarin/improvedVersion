@@ -7,6 +7,8 @@ import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 
+import java.util.Optional;
+
 /**
  * This control generates random search traffic from nodes to random destination node.
  */
@@ -46,6 +48,8 @@ public class TrafficGenerator implements Control {
         m.receiver = source;
         m.target = randomTargetNode;
         m.newLookup = true;
+        System.err.println("we created a new findnode message in traffic  generator");
+        System.err.println("the operationId of this message is: " + m.operationId);
         return m;
     }
 
@@ -79,7 +83,6 @@ public class TrafficGenerator implements Control {
             KademliaProtocol kademliaProtocol = (KademliaProtocol) start.getProtocol(pid);
             kNode = kademliaProtocol.getCurrentNode();
         } while ((start == null) || (!start.isUp()) || kNode instanceof BridgeNode);
-
 
         // send message
         EDSimulator.add(0, generateFindNodeMessage((KadNode) kNode) , start, pid);

@@ -32,6 +32,10 @@ public class Message extends SimpleEvent {
      * internal generator for unique message IDs
      */
     private static long ID_GENERATOR = 0;
+
+    private static long FIND_OPERATION_ID = 0;
+
+
     /**
      * This Object contains the body of the message, no matter what it contains
      */
@@ -132,7 +136,9 @@ public class Message extends SimpleEvent {
      * @return Message
      */
     public static final Message makeEmptyMessage(Object body, int type) {
-        return new Message(type, body);
+        Message emptyMessage = new Message(type, body);
+        emptyMessage.operationId = (FIND_OPERATION_ID++);
+        return emptyMessage;
     }
 
 

@@ -59,8 +59,6 @@ public class MessageSender {
             long latency = transport.getLatency(src, dest);
             long delay = 4*latency;
 
-            System.err.println(" we are in the message sender class and we know this message is a ROUTE message");
-
             // add to sent msg
             sender.getSentMsgTracker().put(m.msgId, m.timestamp);
             EDSimulator.add(delay, timeout, src, this.kademliaid);

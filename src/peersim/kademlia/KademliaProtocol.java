@@ -126,8 +126,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			Message m = (Message) ev;
 
-			System.err.println(" current lookup is null?: " + (this.currentLookup == null));
-			System.err.println(" newLookup is:  " + m.newLookup);
+//			System.err.println(" current lookup is null?: " + (this.currentLookup == null));
+//			System.err.println(" newLookup is:  " + m.newLookup);
 
 
 			// if I do not have a lookup object yet OR THIS IS A NEW LOOKUP ->  create new one.
@@ -135,10 +135,11 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 				//create the correct lookup object
 				System.err.println("Since we do not have a new lookup, we create a new lookup object");
 				this.currentLookup = prot.orderLookup(this.typeOfLookup, this.kademliaid, m, this.tid);
-				System.err.println("  -> the source of this new lookup:" + currentLookup.source.getNodeId());
-				System.err.println("  -> the target of this new lookup:  " + currentLookup.target.getNodeId());
-				System.err.println("  -> the sender of this new lookup:  " + currentLookup.sender.getNodeId());
-				System.err.println("  -> the receiver of this new lookup:  " + currentLookup.receiver.getNodeId());
+				//initialize all the operations and prepare to perform one
+//				System.err.println("  -> lookup.source:" + currentLookup.source.getNodeId());
+//				System.err.println("  -> lookup.target:  " + currentLookup.target.getNodeId());
+//				System.err.println("  -> lookup.sender:  " + currentLookup.sender.getNodeId());
+//				System.err.println("  -> lookup.receiver:  " + currentLookup.receiver.getNodeId());
 			}
 
 
@@ -146,34 +147,43 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 			switch (m.getType()) {
 				case Message.MSG_FINDNODE:
 					System.err.println("I am node " + this.me.getNodeId() + " and I have received a find message for " + m.target.getNodeId());
-					System.err.println("this.me gives " + this.me.getNodeId());
-					System.err.println("m.source gives " + m.src.getNodeId());
-					System.err.println("m.target gives " + m.target.getNodeId());
-					System.err.println("m.sender gives " + m.sender.getNodeId());
-					System.err.println("m.receiver gives " + m.receiver.getNodeId());
+//					System.err.println("  --> this.me: " + this.me.getNodeId());
+//					System.err.println("  --> m.source: " + m.src.getNodeId());
+//					System.err.println("  --> m.target: " + m.target.getNodeId());
+//					System.err.println("  --> m.sender: " + m.sender.getNodeId());
+//					System.err.println("  --> m.receiver: " + m.receiver.getNodeId());
+//					System.err.println("  --> m.msgID: " + m.msgId);
+					System.err.println("  --> m.operationId: " + m.operationId);
+					this.currentLookup.prepare(m.src, m.target, m.sender, m.receiver, kademliaid, m, tid);
 					currentLookup.performFindOp();
 					this.currentOperationId++;
-					System.err.println("-----------");
+					System.err.println("---------------------------------------------------------------------------------");
 					break;
 				case Message.MSG_ROUTE:
 					System.err.println("I am node " + this.me.getNodeId() + " and I have received a route message from " + m.sender.getNodeId() + " to find node " + m.target.getNodeId());
-					System.err.println("this.me gives " + this.me.getNodeId());
-					System.err.println("m.source gives " + m.src.getNodeId());
-					System.err.println("m.target gives " + m.target.getNodeId());
-					System.err.println("m.sender gives " + m.sender.getNodeId());
-					System.err.println("m.receiver gives " + m.receiver.getNodeId());
+//					System.err.println("  --> this.me: " + this.me.getNodeId());
+//					System.err.println("  --> m.source: " + m.src.getNodeId());
+//					System.err.println("  --> m.target: " + m.target.getNodeId());
+//					System.err.println("  --> m.sender: " + m.sender.getNodeId());
+//					System.err.println("  --> m.receiver: " + m.receiver.getNodeId());
+//					System.err.println("  --> m.msgID: " + m.msgId);
+					System.err.println("  --> m.operationId: " + m.operationId);
+					this.currentLookup.prepare(m.src, m.target, m.sender, m.receiver, kademliaid, m, tid);
 					currentLookup.performRespondOp();
-					System.err.println("-----------");
+					System.err.println("---------------------------------------------------------------------------------");
 					break;
 				case Message.MSG_RESPONSE:
 					System.err.println("I am node " + this.me.getNodeId() + " and I have received response message  from  " +  m.sender.getNodeId() + " and we tried to find " + m.target.getNodeId());
-					System.err.println("this.me gives " + this.me.getNodeId());
-					System.err.println("m.source gives " + m.src.getNodeId());
-					System.err.println("m.target gives " + m.target.getNodeId());
-					System.err.println("m.sender gives " + m.sender.getNodeId());
-					System.err.println("m.receiver gives " + m.receiver.getNodeId());
+//					System.err.println("  --> this.me: " + this.me.getNodeId());
+//					System.err.println("  --> m.source: " + m.src.getNodeId());
+//					System.err.println("  --> m.target: " + m.target.getNodeId());
+//					System.err.println("  --> m.sender: " + m.sender.getNodeId());
+//					System.err.println("  --> m.receiver: " + m.receiver.getNodeId());
+//					System.err.println("  --> m.msgID: " + m.msgId);
+					System.err.println("  --> m.operationId: " + m.operationId);
+					this.currentLookup.prepare(m.src, m.target, m.sender, m.receiver, kademliaid, m, tid);
 					currentLookup.performHandleResponseOp();
-					System.err.println("-----------");
+					System.err.println("---------------------------------------------------------------------------------");
 					break;
 				case Message.TIMEOUT:
 					// the response msg is not arrived

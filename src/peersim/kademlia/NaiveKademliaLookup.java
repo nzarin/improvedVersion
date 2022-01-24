@@ -29,7 +29,7 @@ public class NaiveKademliaLookup extends Lookup {
 
     @Override
     public void performFindOp() {
-        System.err.println(" ~ NaiveKademliaLookup.java~ performFindOp() ");
+//        System.err.println(" ~ NaiveKademliaLookup.java~ performFindOp() ");
         findOp = lif2.createFindOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
         findOp.find();
 
@@ -37,7 +37,7 @@ public class NaiveKademliaLookup extends Lookup {
 
     @Override
     public void performRespondOp() {
-        System.err.println(" ~ NaiveKademliaLookup.java~ performRespondOp() ");
+//        System.err.println(" ~ NaiveKademliaLookup.java~ performRespondOp() ");
         //todo: problem here is that we don't use the findOp which contains the latest knowledge on the different sets
         resOp = lif2.createRespondOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
         resOp.respond();
@@ -46,7 +46,7 @@ public class NaiveKademliaLookup extends Lookup {
 
     @Override
     public void performHandleResponseOp() {
-        System.err.println(" ~ NaiveKademliaLookup.java~ performHandleResponseOp() ");
+//        System.err.println(" ~ NaiveKademliaLookup.java~ performHandleResponseOp() ");
         handleResOp = lif2.createHandleResponseOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
         handleResOp.handleResponse();
 

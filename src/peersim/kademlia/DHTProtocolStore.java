@@ -14,9 +14,6 @@ public abstract class DHTProtocolStore {
         //create either the correct protocol (naive or improved) and the corresponding intra or inter-domain factory
         this.lookup = createLookup(type, lookupMessage.src, lookupMessage.target);
 
-        //initialize all the operations and prepare to perform one
-        this.lookup.prepare(lookupMessage.src, lookupMessage.target, lookupMessage.sender, lookupMessage.receiver, kademliaid, lookupMessage, tid);
-
         return this.lookup;
     }
 

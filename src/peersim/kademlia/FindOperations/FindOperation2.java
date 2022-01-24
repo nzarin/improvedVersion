@@ -5,6 +5,7 @@ import peersim.kademlia.*;
 
 public abstract class FindOperation2 {
 
+    long operationId;
     KadNode source;
     KadNode target;
     KademliaNode sender;

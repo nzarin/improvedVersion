@@ -9,6 +9,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
 
     public KadToKadHandleResponseOperation(KadNode source, KadNode target, KadNode sender, KadNode receiver, int kid, Message lookupMsg,  int tid) {
+//        System.err.println("~KadToKadHandleResponseOperation~ constructor");
         this.source = source;
         this.target = target;
         this.sender = sender;
@@ -22,19 +23,23 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
     @Override
     public void handleResponse() {
-        System.err.println("~KadToKadHandleResponseOperation~ handleResponse()");
+//        System.err.println("~KadToKadHandleResponseOperation~ handleResponse()");
         //create new room for sending  s we received a response for the sent message -> I AM THE RECEIVER
-        System.err.println("this.receiver in handleResponse: " + this.receiver.getNodeId());
-        System.err.println("this.receiver.getSentMsgTracker in handleResponse: " + this.receiver.getSentMsgTracker());
-        this.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
+//        System.err.println("this.receiver in handleResponse: " + this.receiver.getNodeId());
+//        System.err.println("this.receiver.getSentMsgTracker in handleResponse: " + this.receiver.getSentMsgTracker());
+        this.source.getSentMsgTracker().remove(lookupMessage.ackId);
 
         // add message sender to my routing table
         if(lookupMessage.sender != null){
-            this.receiver.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
+            this.source.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
         }
-        System.err.println(" i am trying to get the fop from " + this.receiver.getNodeId() + " for the operationid " + lookupMessage.operationId);
+//        System.err.println(" i am trying to get the fop from " + this.receiver.getNodeId() + " for the operationid " + lookupMessage.operationId);
         // get corresponding find operation (using the message field operationId)
-        FindOperation fop = this.receiver.getFindOperationsMap().get(lookupMessage.operationId);
+
+        System.err.println(" findoperationsmap looks now like this (before fetching it):  " + this.source.getFindOperationsMap().toString());
+        System.err.println(" The lookupMessage.operationId is : " + lookupMessage.operationId);
+        FindOperation fop = this.source.getFindOperationsMap().get(lookupMessage.operationId);
+
         if(fop != null){
 
             //update the closest set by saving the received neighbour
@@ -64,16 +69,19 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                     fop.nrHops++;
 
                     System.err.println("I have processed the response and I am sending a route message to " + neighbour.getNodeId());
-                    System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId());
+//                    System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId());
                     System.err.println("    request.operationId " + request.operationId);
-                    System.err.println("    request.src " + request.src.getNodeId());
-                    System.err.println("    request.target " + request.target.getNodeId());
-                    System.err.println("    request.receiver " + request.receiver.getNodeId());
-                    System.err.println("    request.sender" + request.sender.getNodeId());
-                    System.err.println("    request.newLookup " + request.newLookup);
+//                    System.err.println("    request.src " + request.src.getNodeId());
+//                    System.err.println("    request.target " + request.target.getNodeId());
+//                    System.err.println("    request.receiver " + request.receiver.getNodeId());
+//                    System.err.println("    request.sender" + request.sender.getNodeId());
+//                    System.err.println("    request.newLookup " + request.newLookup);
                     //send the ROUTE messages
                     messageSender.sendMessage(request);
-
+//                    System.err.println(" KadToKadHandleResponseOperation.src: " + this.source.getNodeId());
+//                    System.err.println(" KadToKadHandleResponseOperation.target: " + this.target.getNodeId());
+//                    System.err.println(" KadToKadHandleResponseOperation.sender: " + this.sender.getNodeId());
+//                    System.err.println(" KadToKadHandleResponseOperation.receiver: " + this.receiver.getNodeId());
                     //SCENARIO 2: no new neighbour and no outstanding requests
                 } else if(fop.available_requests == KademliaCommonConfig.ALPHA){
 

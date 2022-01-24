@@ -162,4 +162,7 @@ public class FindOperation {
     }
 
 
+    public void setOperationId(long id){
+        this.operationId = id;
+    }
 }
