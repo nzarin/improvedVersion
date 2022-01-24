@@ -55,7 +55,12 @@ public class Message extends SimpleEvent {
     /**
      * Recipient address of the message
      */
-    public KademliaNode dest;
+    public KademliaNode receiver;
+
+
+    public KademliaNode sender;
+
+    public boolean newLookup;
 
     /**
      * Source address of the message: has to be filled at application level
@@ -63,9 +68,11 @@ public class Message extends SimpleEvent {
     public KademliaNode src;
 
     /**
-     * Available to count the number of hops the message did.
+     * This is the node we are looking for
      */
-    protected int nrHops = 0;
+    public KademliaNode target;
+
+
 
     // ______________________________________________________________________________________________
 
@@ -112,8 +119,9 @@ public class Message extends SimpleEvent {
 
         //note that the current code simulates that the receiver of a message sends after some latency a timeout to sender
         //this means that the source of this message is the receiver of the timeout request
-        this.src = sender;
-        this.dest = receiver;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.newLookup = false;
     }
 
 
@@ -134,7 +142,7 @@ public class Message extends SimpleEvent {
      * @return The printed message.
      */
     public String toString() {
-        String s = "[ID=" + msgId + "][DEST=" + dest + "]";
+        String s = "[ID=" + msgId + "][DEST=" + receiver + "]";
         return s + "[Type=" + messageTypetoString() + "] BODY=(...)";
     }
 
@@ -146,11 +154,13 @@ public class Message extends SimpleEvent {
     public Message copy() {
         Message dolly = new Message();
         dolly.type = this.type;
+        dolly.target = this.target;
         dolly.src = this.src;
-        dolly.dest = this.dest;
+        dolly.sender = this.sender;
+        dolly.receiver = this.receiver;
         dolly.operationId = this.operationId;
         dolly.body = this.body; // deep cloning?
-
+        dolly.newLookup = this.newLookup;
         return dolly;
     }
 
@@ -175,7 +185,8 @@ public class Message extends SimpleEvent {
     }
 
 
-    public void send(){
-
+    public void setTarget(KademliaNode target){
+        this.target = target;
     }
+
 }

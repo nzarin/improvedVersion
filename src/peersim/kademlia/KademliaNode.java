@@ -2,11 +2,19 @@ package peersim.kademlia;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
-public abstract class KademliaNode {
-    public abstract BigInteger getNodeId();
-    abstract RoutingTable getRoutingTable();
-    abstract int getDomain();
-    abstract ArrayList<BridgeNode> getBridgeNodes();
-    abstract ArrayList<KadNode> getKadNodes();
+public interface KademliaNode {
+    BigInteger getNodeId();
+    RoutingTable getRoutingTable();
+    int getDomain();
+    ArrayList<BridgeNode> getBridgeNodes();
+    ArrayList<KadNode> getKadNodes();
+    LinkedHashMap<Long, FindOperation> getFindOperationsMap();
+    TreeMap<Long, Long> getSentMsgTracker();
+    void setFindOperationsMap(LinkedHashMap<Long, FindOperation> findOperationsMap);
+    void setSentMsgTracker(TreeMap<Long, Long> msgTracker);
+
+
 }

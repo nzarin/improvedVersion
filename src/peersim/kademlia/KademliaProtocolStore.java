@@ -12,7 +12,7 @@ public class KademliaProtocolStore extends DHTProtocolStore{
 
     @Override
     Lookup createLookup(String type, KademliaNode s, KademliaNode r) {
-
+        System.err.println("~KademliaProtocolStore~ createLookup()");
         Lookup lookup = null;
 
         //determine what type of lookup we have and create the correct factory
@@ -23,6 +23,7 @@ public class KademliaProtocolStore extends DHTProtocolStore{
             case "naive":
                 if(s.getDomain() == r.getDomain()){
                     lookup = new NaiveKademliaLookup(intraDomainLookupFactory);
+                    System.err.println(" we created a naive kademlia lookup with intra domain lookup factory");
                 } else {
                     lookup = new NaiveKademliaLookup(interDomainLookupFactory);
                 }

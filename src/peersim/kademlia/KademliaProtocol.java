@@ -25,7 +25,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 	private String typeOfLookup;
 	private Lookup currentLookup = null;
 	private DHTProtocolStore prot;
-
+	private int currentOperationId;
 
 	/**
 	 * allow to call the service initializer only once
@@ -35,15 +35,15 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 
 
-	/**
-	 * trace message sent for timeout purpose
-	 */
-	private TreeMap<Long, Long> sentMsg;
-
-	/**
-	 * find operations set
-	 */
-	private LinkedHashMap<Long, FindOperation> findOps;
+//	/**
+//	 * trace message sent for timeout purpose
+//	 */
+//	private TreeMap<Long, Long> sentMsg;
+//
+//	/**
+//	 * find operations set
+//	 */
+//	private LinkedHashMap<Long, FindOperation> findOps;
 
 	/**
 	 * Replicate this object by returning an identical copy.
@@ -70,10 +70,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 		_init();
 
-		sentMsg = new TreeMap<Long, Long>();
-
-		findOps = new LinkedHashMap<Long, FindOperation>();
-
 		tid = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
 
 		//determine whether the protocol is naive
@@ -85,6 +81,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 		this.prot = new KademliaProtocolStore();
 
+		//set the current operation id to 0
+		this.currentOperationId = -1;
 	}
 
 	/**
@@ -128,46 +126,77 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 			Message m = (Message) ev;
 
-			// if I do not have a lookup object yet, create one.
-			if (this.currentLookup == null){
+			System.err.println(" current lookup is null?: " + (this.currentLookup == null));
+			System.err.println(" newLookup is:  " + m.newLookup);
+
+
+			// if I do not have a lookup object yet OR THIS IS A NEW LOOKUP ->  create new one.
+			if (this.currentLookup == null || m.newLookup){
 				//create the correct lookup object
-				this.currentLookup = prot.orderLookup(this.typeOfLookup, this.me, m.dest, this.kademliaid, m, findOps, sentMsg, this.tid);
+				System.err.println("Since we do not have a new lookup, we create a new lookup object");
+				this.currentLookup = prot.orderLookup(this.typeOfLookup, this.kademliaid, m, this.tid);
+				System.err.println("  -> the source of this new lookup:" + currentLookup.source.getNodeId());
+				System.err.println("  -> the target of this new lookup:  " + currentLookup.target.getNodeId());
+				System.err.println("  -> the sender of this new lookup:  " + currentLookup.sender.getNodeId());
+				System.err.println("  -> the receiver of this new lookup:  " + currentLookup.receiver.getNodeId());
 			}
 
 
 			// check what type of message and handle appropriately
 			switch (m.getType()) {
 				case Message.MSG_FINDNODE:
+					System.err.println("I am node " + this.me.getNodeId() + " and I have received a find message for " + m.target.getNodeId());
+					System.err.println("this.me gives " + this.me.getNodeId());
+					System.err.println("m.source gives " + m.src.getNodeId());
+					System.err.println("m.target gives " + m.target.getNodeId());
+					System.err.println("m.sender gives " + m.sender.getNodeId());
+					System.err.println("m.receiver gives " + m.receiver.getNodeId());
 					currentLookup.performFindOp();
+					this.currentOperationId++;
+					System.err.println("-----------");
 					break;
 				case Message.MSG_ROUTE:
+					System.err.println("I am node " + this.me.getNodeId() + " and I have received a route message from " + m.sender.getNodeId() + " to find node " + m.target.getNodeId());
+					System.err.println("this.me gives " + this.me.getNodeId());
+					System.err.println("m.source gives " + m.src.getNodeId());
+					System.err.println("m.target gives " + m.target.getNodeId());
+					System.err.println("m.sender gives " + m.sender.getNodeId());
+					System.err.println("m.receiver gives " + m.receiver.getNodeId());
 					currentLookup.performRespondOp();
+					System.err.println("-----------");
 					break;
 				case Message.MSG_RESPONSE:
+					System.err.println("I am node " + this.me.getNodeId() + " and I have received response message  from  " +  m.sender.getNodeId() + " and we tried to find " + m.target.getNodeId());
+					System.err.println("this.me gives " + this.me.getNodeId());
+					System.err.println("m.source gives " + m.src.getNodeId());
+					System.err.println("m.target gives " + m.target.getNodeId());
+					System.err.println("m.sender gives " + m.sender.getNodeId());
+					System.err.println("m.receiver gives " + m.receiver.getNodeId());
 					currentLookup.performHandleResponseOp();
+					System.err.println("-----------");
 					break;
 				case Message.TIMEOUT:
 					// the response msg is not arrived
-					if(sentMsg.containsKey(m.msgId)){
+					if(this.me.getSentMsgTracker().containsKey(m.msgId)){
 
 						//remove from the sentMsg
-						sentMsg.remove(m.msgId);
+						this.me.getSentMsgTracker().remove(m.msgId);
 
 						//if it is a KadNode that is not responding
 						if(m.src instanceof KadNode){
 
 							//remove this node from routing table and from the closest set of findOperation
 							this.me.getRoutingTable().removeNeighbour((KadNode) m.src);
-							this.findOps.get(m.operationId).closestSet.remove((KadNode) m.src);
-
+							this.me.getFindOperationsMap().get(m.operationId).closestSet.remove((KadNode) m.src);
+							System.err.println("TIME OUT, we gotta send a new message");
 							//try another node
 							Message m2 = new Message();
 							m2.operationId = m.operationId;
 							m2.src = this.me;
-							m2.dest = this.findOps.get(m.operationId).destNode;
+							m2.receiver = this.me.getFindOperationsMap().get(m.operationId).destNode;
 
-							//because all variables have changed, we need to initialized everything again
-							currentLookup = prot.orderLookup(this.typeOfLookup, this.me, m2.dest, this.kademliaid, m2, findOps, sentMsg, this.tid);
+							//todo: because all variables have changed, we need to initialized everything again???
+//							currentLookup = prot.orderLookup(this.typeOfLookup, this.me, m2.receiver, this.kademliaid, m2, this.tid);
 							currentLookup.performHandleResponseOp();
 
 							//todo: it is a BridgeNode that is not responding
@@ -186,18 +215,16 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
 
 	/**
 	 * Make it clear that this kademlia protocol has an owner that is a kadNode
-	 * @param nid
+	 * @param kadnode
 	 */
-	public void setKadNode(KadNode nid){
-		this.me = nid;
-	}
+	public void setKadNode(KadNode kadnode){ this.me = kadnode;}
 
 	/**
 	 * Make it clear that this kademlia protocol has an owner that is a bridgeNode
-	 * @param nid
+	 * @param bridgenode
 	 */
-	public void setBridgeNode(BridgeNode nid){
-		this.me = nid;
+	public void setBridgeNode(BridgeNode bridgenode){
+		this.me = bridgenode;
 	}
 
 

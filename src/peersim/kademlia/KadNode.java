@@ -2,15 +2,19 @@ package peersim.kademlia;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 
-public class KadNode extends KademliaNode {
+public class KadNode implements KademliaNode {
 
     private BigInteger nodeId;
     private int domain;
     private RoutingTable routingTable;
     private KademliaProtocol kademliaProtocol;
     private ArrayList<BridgeNode> bridgeNodes;
+    private LinkedHashMap<Long, FindOperation> findOperationsMap;
+    private TreeMap<Long, Long> sentMsgTracker;
 
 
     public KadNode(BigInteger id, int domain){
@@ -18,6 +22,8 @@ public class KadNode extends KademliaNode {
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
         this.bridgeNodes = new ArrayList<>();
+        this.findOperationsMap = new LinkedHashMap<>();
+        this.sentMsgTracker = new TreeMap<>();
     }
 
     public KadNode(BigInteger id, int domain, KademliaProtocol kadprotocol){
@@ -26,7 +32,8 @@ public class KadNode extends KademliaNode {
         this.routingTable = new RoutingTable(this);
         this.kademliaProtocol = kadprotocol;
         this.bridgeNodes = new ArrayList<>();
-
+        this.findOperationsMap = new LinkedHashMap<>();
+        this.sentMsgTracker = new TreeMap<>();
     }
 
     public void addBridgeNode(BridgeNode node){
@@ -44,11 +51,30 @@ public class KadNode extends KademliaNode {
         return null;
     }
 
+    @Override
+    public LinkedHashMap<Long, FindOperation> getFindOperationsMap() {
+        return this.findOperationsMap;
+    }
+
+    @Override
+    public TreeMap<Long, Long> getSentMsgTracker() {
+        return this.sentMsgTracker;
+    }
+
+    @Override
+    public void setFindOperationsMap(LinkedHashMap<Long, FindOperation> findOperationsMap) {
+        this.findOperationsMap = findOperationsMap;
+    }
+
+    @Override
+    public void setSentMsgTracker(TreeMap<Long, Long> msgTracker) {
+        this.sentMsgTracker = msgTracker;
+    }
+
     //setters
     public void setDomain(int domain) {
         this.domain = domain;
     }
-
 
     //printers
     @Override

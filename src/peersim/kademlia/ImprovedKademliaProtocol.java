@@ -5,17 +5,25 @@ import java.util.TreeMap;
 
 public class ImprovedKademliaProtocol extends Lookup {
 
-    LookupIngredientFactory2 lookupFactory2;
+    LookupIngredientFactory2 lif2;
 
     public ImprovedKademliaProtocol(LookupIngredientFactory2 lookupFactory2) {
-        this.lookupFactory2 = lookupFactory2;
+        this.lif2 = lookupFactory2;
     }
 
     @Override
-    void prepare( KademliaNode sender, KademliaNode destination, int kademliaid, Message lookupMessage, LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid) {
-        findOp = lookupFactory2.createFindOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
-        resOp = lookupFactory2.createRespondOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
-        handleResOp = lookupFactory2.createHandleResponseOperation(sender, destination, kademliaid, lookupMessage, findOpsMap, sentMsg, tid);
+    void prepare( KademliaNode source, KademliaNode target, KademliaNode sender, KademliaNode receiver, int kid, Message lookupMsg, int tid) {
+        this.lookupMessage = lookupMsg;
+        this.source = source;
+        this.target = target;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.kademliaid = kid;
+        this.transportid = tid;
+        this.findOp = lif2.createFindOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
+        this.resOp = lif2.createRespondOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
+        this.handleResOp = lif2.createHandleResponseOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
+
     }
 
     /**

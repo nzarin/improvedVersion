@@ -2,8 +2,10 @@ package peersim.kademlia;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
-public class BridgeNode extends  KademliaNode{
+public class BridgeNode implements   KademliaNode{
 
     private BigInteger nodeId;
     private int domain;
@@ -12,6 +14,8 @@ public class BridgeNode extends  KademliaNode{
     private ArrayList<KadNode> kadNodes;
     private ArrayList<BridgeNode> bridgeNodes;
     private boolean available;
+    private LinkedHashMap<Long, FindOperation> findOperationsMap;
+    private TreeMap<Long, Long> sentMsgTracker;
 
     public BridgeNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol){
         this.nodeId = id;
@@ -21,6 +25,8 @@ public class BridgeNode extends  KademliaNode{
         this.available = true;
         this.kadNodes = new ArrayList<>();
         this.bridgeNodes = new ArrayList<>();
+        this.findOperationsMap = new LinkedHashMap<>();
+        this.sentMsgTracker = new TreeMap<>();
     }
 
     public void addKadNode(KadNode node){
@@ -42,6 +48,26 @@ public class BridgeNode extends  KademliaNode{
     @Override
     public ArrayList<KadNode> getKadNodes() {
         return this.kadNodes;
+    }
+
+    @Override
+    public LinkedHashMap<Long, FindOperation> getFindOperationsMap() {
+        return this.findOperationsMap;
+    }
+
+    @Override
+    public TreeMap<Long, Long> getSentMsgTracker() {
+        return this.sentMsgTracker;
+    }
+
+    @Override
+    public void setFindOperationsMap(LinkedHashMap<Long, FindOperation> findOperationsMap) {
+        this.findOperationsMap = findOperationsMap;
+    }
+
+    @Override
+    public void setSentMsgTracker(TreeMap<Long, Long> msgTracker) {
+        this.sentMsgTracker = msgTracker;
     }
 
     public RoutingTable getRoutingTable(){ return this.routingTable;}

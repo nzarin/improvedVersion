@@ -37,11 +37,15 @@ public class TrafficGenerator implements Control {
      *
      * @return Message
      */
-    private Message generateFindNodeMessage() {
+    private Message generateFindNodeMessage(KadNode source) {
         Message m = Message.makeEmptyMessage("Automatically Generated Traffic", Message.MSG_FINDNODE);
         m.timestamp = CommonState.getTime();
-        KadNode randomKadNode = selectRandomKadNode();
-        m.dest = randomKadNode;
+        KadNode randomTargetNode = selectRandomKadNode();
+        m.src = source;
+        m.sender = source;
+        m.receiver = source;
+        m.target = randomTargetNode;
+        m.newLookup = true;
         return m;
     }
 
@@ -78,7 +82,7 @@ public class TrafficGenerator implements Control {
 
 
         // send message
-        EDSimulator.add(0, generateFindNodeMessage() , start, pid);
+        EDSimulator.add(0, generateFindNodeMessage((KadNode) kNode) , start, pid);
 
         return false;
     }

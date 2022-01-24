@@ -3,53 +3,55 @@ package peersim.kademlia.RespondOperations;
 import peersim.kademlia.*;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
+
 
 public class KadToKadRespondOperation extends RespondOperation2 {
 
-    private KadNode myself;
-    private KadNode dest;
-    private int kademliaid;
-    private Message m;
-    private LinkedHashMap<Long, FindOperation> findOpsMap;
-    private int tid;
-    private TreeMap<Long, Long> sentMsg;
-    private MessageSender messageSender;
-
-    public KadToKadRespondOperation(KadNode myself, KadNode destination, int kademliaid, Message lookupMessage,  LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid){
-        this.myself = myself;
-        this.dest = destination;
+    public KadToKadRespondOperation(KadNode source, KadNode target, KadNode sender, KadNode receiver, int kademliaid, Message lookupMessage, int tid){
+        this.source = source;
+        this.target = target;
+        this.sender = sender;
+        this.receiver = receiver;
         this.kademliaid = kademliaid;
-        this.m = lookupMessage;
-        this.findOpsMap = findOpsMap;
-        this.sentMsg = sentMsg;
-        this.tid = tid;
-        this.messageSender = new MessageSender(kademliaid, tid);
-    }
-
-    public KadToKadRespondOperation(){
-        //empty constructor
+        this.lookupMessage = lookupMessage;
+        messageSender = new MessageSender(kademliaid, tid);
     }
 
 
     @Override
     public void respond() {
+//
+//        System.err.println("   before we respond: message.operationId : " + this.lookupMessage.operationId);
+//        System.err.println("   before we respond: this.source " + this.source.getNodeId());
+//        System.err.println("   before we respond: this.target " + this.target.getNodeId());
+//        System.err.println("   before we respnod: this.sender " + this.sender.getNodeId());
+//        System.err.println("   before we respond: this.receiver: " + this.receiver.getNodeId());
 
-        // get the k closest nodes to target node
-        KadNode[] neighbours = this.myself.getRoutingTable().getKClosestNeighbours((KadNode) m.dest, (KadNode) m.src);
+        System.err.println("~KadToKadRespondOperation~ respond()");
+
+        // get the k closest nodes to target node -> I AM RECEIVER OF THE MESSAGE
+        KadNode[] neighbours = this.receiver.getRoutingTable().getKClosestNeighbours(this.target, (KadNode) this.sender);
 
         //get the BETA closest nodes from the neighbours
         KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
 
         // create a response message containing the neighbours (with the same id as of the request)
         Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
-        response.operationId = m.operationId;
-        response.dest = m.dest;
-        response.src = this.myself;
-        response.ackId = m.msgId;
-        System.err.println("We are sending a RESPONSE message to " + m.dest.getNodeId() + " which is a KadNode" );
-        messageSender.sendMessage(response, m.src, this.myself, sentMsg);
+        response.operationId = lookupMessage.operationId;
+        response.src = lookupMessage.src;
+        response.target = lookupMessage.target;
+        response.receiver = lookupMessage.sender;
+        response.sender = lookupMessage.receiver;
+        response.newLookup = false;
+        System.err.println("    response.operationId " + response.operationId);
+        System.err.println("    response.src " + response.src.getNodeId());
+        System.err.println("    response.target " + response.target.getNodeId());
+        System.err.println("    response.receiver " + response.receiver.getNodeId());
+        System.err.println("    response.sender " + response.sender.getNodeId());
+        System.err.println("    response.newLookup " + response.newLookup);
+        response.ackId = lookupMessage.msgId;
+        System.err.println("I am sending a RESPONSE message to " + response.receiver.getNodeId() + " with body: " + response.body.toString());
+        messageSender.sendMessage(response);
 
     }
 }

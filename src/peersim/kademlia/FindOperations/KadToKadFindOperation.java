@@ -9,52 +9,61 @@ import java.util.TreeMap;
 public class KadToKadFindOperation extends FindOperation2 {
 
 
-    public KadToKadFindOperation(KadNode me, KadNode destination, int kid, Message lookupMsg,  LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid) {
-        source = me;
-        dest = destination;
+    public KadToKadFindOperation(KadNode source, KadNode target, KadNode sender, KadNode receiver, int kid, Message lookupMsg,  int tid) {
+        System.err.println("~KadToKadFindOperation~ constructor");
+        this.source = source;
+        this.target = target;
+        this.sender = sender;
+        this.receiver = receiver;
         kademliaid = kid;
         lookupMessage = lookupMsg;
-        findOperationsMap = findOpsMap;
-        sentMsgTracker = sentMsg;
         transportid = tid;
         messageSender = new MessageSender(kademliaid, tid);
-        findOp = new FindOperation((KadNode) lookupMsg.dest, lookupMsg.timestamp);
-
-    }
-
-    public KadToKadFindOperation(){
-        //empty constructor
     }
 
 
 
     @Override
     public void find() {
-        Node dst = Util.nodeIdtoNode(lookupMessage.dest.getNodeId(), kademliaid);
-        if((lookupMessage.dest.getNodeId() == this.source.getNodeId()) || (!dst.isUp()))
-            return;
+        System.err.println("~KadToKadFindOperation~ find()");
 
+        Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
+        if((lookupMessage.target.getNodeId() == this.source.getNodeId()) || (!target.isUp()))
+            return;
         KademliaObserver.find_op.add(1);
 
-        findOperationsMap.put(findOp.operationId, findOp);
-
-        KadNode[] neighbours = this.source.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.dest, this.source);
+        FindOperation findOp = new FindOperation(this.target, lookupMessage.timestamp);
+        findOp.body = lookupMessage.body;
+        this.source.getFindOperationsMap().put(findOp.operationId, findOp);
+        System.err.println(" we created a findop for sender " + source.getNodeId() + " with findOp.operationid = " + findOp.operationId);
+        System.err.println(" its findoperationsmap is now " + source.getFindOperationsMap().toString());
+        KadNode[] neighbours = this.source.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, source);
 
         findOp.updateClosestSet(neighbours);
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 
-        //set message operation id
-        lookupMessage.operationId = findOp.operationId;
-        lookupMessage.type = Message.MSG_ROUTE;
-        lookupMessage.src = this.source;
+        //create a request message
+        Message request = new Message(Message.MSG_ROUTE);
+        request.src = lookupMessage.src;
+        request.target = lookupMessage.target;
+        request.sender = lookupMessage.src;
+        request.operationId = findOp.operationId;
+        request.newLookup = lookupMessage.newLookup;
 
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++){
             KadNode nextNode = findOp.getNeighbour();
             if(nextNode != null){
                 findOp.nrHops++;
-                System.err.println("We are sending a ROUTE message to " + nextNode.getNodeId() + " which is a KadNode" );
-                messageSender.sendMessage(lookupMessage.copy(), this.source, lookupMessage.dest, sentMsgTracker);
+                request.receiver = nextNode;
+                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId());
+                System.err.println("    request.operationId " + request.operationId);
+                System.err.println("    request.src " + request.src.getNodeId());
+                System.err.println("    request.target " + request.target.getNodeId());
+                System.err.println("    request.receiver " + request.receiver.getNodeId());
+                System.err.println("    request.sender" + request.sender.getNodeId());
+                System.err.println("    request.newLookup " + request.newLookup);
+                messageSender.sendMessage(request);
             }
         }
     }

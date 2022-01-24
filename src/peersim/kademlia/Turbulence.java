@@ -154,7 +154,7 @@ public class Turbulence implements Control {
         // create auto-search message (search message with destination my own Id)
         Message m = Message.makeEmptyMessage("Bootstrap traffic", Message.MSG_FINDNODE);
         m.timestamp = CommonState.getTime();
-        m.dest = newKadNode;
+        m.receiver = newKadNode;
 
         // perform initialization
         newKadNode.getRoutingTable().addNeighbour((KadNode) ((KademliaProtocol) bootstrapNode.getProtocol(kademliaid)).getCurrentNode());

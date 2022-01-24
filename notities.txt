@@ -276,3 +276,7 @@ test how often a new node is proposed as the closest (in plaats van dat iedereen
         // forward request to kad (inter-domain)
         //scenario 4: sender is bridge and receiver is bridge -->
         //	forward request to bridge (inter-domain)
+
+
+Do statistical significance test to test whether randomness can explain it
+

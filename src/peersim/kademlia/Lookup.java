@@ -14,13 +14,14 @@ public abstract class Lookup {
     HandleResponseOperation2 handleResOp;
     Message lookupMessage;
     KademliaNode source;
-    KademliaNode destination;
+    KademliaNode target;
+    KademliaNode sender;
+    KademliaNode receiver;
     int kademliaid;
     int transportid;
-    LinkedHashMap<Long, FindOperation> findOperationsMap;
-    TreeMap<Long,Long> sentMsgTracker;
 
-    abstract void prepare(KademliaNode sender, KademliaNode destination, int kademliaid, Message lookupMessage, LinkedHashMap<Long, FindOperation> findOpsMap, TreeMap<Long,Long> sentMsg, int tid);
+
+    abstract void prepare(KademliaNode source, KademliaNode target, KademliaNode sender, KademliaNode receiver, int kademliaid, Message lookupMessage, int tid);
     abstract void performFindOp();
     abstract void performRespondOp();
     abstract void performHandleResponseOp();
