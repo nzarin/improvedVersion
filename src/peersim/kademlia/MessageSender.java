@@ -6,32 +6,45 @@ import peersim.edsim.EDSimulator;
 import peersim.transport.Transport;
 import peersim.transport.UnreliableTransport;
 
+/**
+ * This class allows a Kademlia node to send messages.
+ */
 public class MessageSender {
 
+    private final int kademliaid;
+    private final int transportid;
     private Transport transport;
-    private int kademliaid;
-    private int transportid;
 
-
+    /**
+     * Constructs the message sender.
+     *
+     * @param kademliaid
+     * @param transportid
+     */
     public MessageSender(int kademliaid, int transportid) {
         this.kademliaid = kademliaid;
         this.transportid = transportid;
     }
 
 
+    /**
+     * Determines what type of send operation it will be and then sends it.
+     *
+     * @param m
+     */
     public void sendMessage(Message m) {
 
         //determine what type of message and then send it
-        if(m.sender instanceof KadNode){
-            if(m.receiver instanceof KadNode) {
-               sendMessageKadToKad((KadNode) m.sender, (KadNode) m.receiver, m);
-            } else{
+        if (m.sender instanceof KadNode) {
+            if (m.receiver instanceof KadNode) {
+                sendMessageKadToKad((KadNode) m.sender, (KadNode) m.receiver, m);
+            } else {
                 sendMessageKadToBridge((KadNode) m.sender, (BridgeNode) m.receiver, m);
             }
-        } else{
-            if(m.receiver instanceof KadNode){
+        } else {
+            if (m.receiver instanceof KadNode) {
                 sendMessageBridgeToKad((BridgeNode) m.sender, (KadNode) m.receiver, m);
-            } else{
+            } else {
                 sendMessageBridgeToBridge((BridgeNode) m.sender, (BridgeNode) m.receiver, m);
             }
         }
@@ -39,14 +52,22 @@ public class MessageSender {
     }
 
 
-    //todo: fix dat "current node" (dit kan een tussennode zijn, zijn routing table updates (check oude code)
-    public void sendMessageKadToKad(KadNode sender, KadNode receiver, Message m){
+    /**
+     * Send a message from a KadNode to a KadNode
+     *
+     * @param sender
+     * @param receiver
+     * @param m
+     */
+    public void sendMessageKadToKad(KadNode sender, KadNode receiver, Message m) {
 
+        //First, add the receiver to the routing table.
         sender.getRoutingTable().addNeighbour(receiver);
 
         Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
 
+        //Send over transport layer
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
         transport.send(src, dest, m, kademliaid);
 
@@ -57,7 +78,7 @@ public class MessageSender {
 
             // set delay at 2*RTT
             long latency = transport.getLatency(src, dest);
-            long delay = 4*latency;
+            long delay = 4 * latency;
 
             // add to sent msg
             sender.getSentMsgTracker().put(m.msgId, m.timestamp);
@@ -65,7 +86,14 @@ public class MessageSender {
         }
     }
 
-    private void sendMessageKadToBridge(KadNode sender, BridgeNode receiver, Message m){
+    /**
+     * Send a message from a KadNode to a BridgeNode
+     *
+     * @param sender
+     * @param receiver
+     * @param m
+     */
+    private void sendMessageKadToBridge(KadNode sender, BridgeNode receiver, Message m) {
         Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
 
@@ -78,7 +106,7 @@ public class MessageSender {
 
             // set delay at 2*RTT
             long latency = transport.getLatency(src, dest);
-            long delay = 4*latency;
+            long delay = 4 * latency;
 
             // add to sent msg
             sender.getSentMsgTracker().put(m.msgId, m.timestamp);
@@ -86,10 +114,24 @@ public class MessageSender {
         }
     }
 
-    private void sendMessageBridgeToKad(BridgeNode s, KadNode r, Message m){
+    /**
+     * Send a message from a BridgeNode to a KadNode
+     *
+     * @param s
+     * @param r
+     * @param m
+     */
+    private void sendMessageBridgeToKad(BridgeNode s, KadNode r, Message m) {
     }
 
-    private void sendMessageBridgeToBridge(BridgeNode s, BridgeNode r, Message m){
+    /**
+     * Send a message from a BridgeNode to a BridgeNode
+     *
+     * @param s
+     * @param r
+     * @param m
+     */
+    private void sendMessageBridgeToBridge(BridgeNode s, BridgeNode r, Message m) {
 
     }
 

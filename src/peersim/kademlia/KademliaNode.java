@@ -13,8 +13,6 @@ public interface KademliaNode {
     ArrayList<KadNode> getKadNodes();
     LinkedHashMap<Long, FindOperation> getFindOperationsMap();
     TreeMap<Long, Long> getSentMsgTracker();
-    void setFindOperationsMap(LinkedHashMap<Long, FindOperation> findOperationsMap);
-    void setSentMsgTracker(TreeMap<Long, Long> msgTracker);
 
 
 }

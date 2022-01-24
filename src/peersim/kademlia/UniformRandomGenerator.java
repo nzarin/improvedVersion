@@ -3,12 +3,9 @@ package peersim.kademlia;
 import java.math.BigInteger;
 import java.util.Random;
 
-//_________________________________________________________________________________________________
-
 /**
  * This initializator assign to the Nodes a nodeId (stored in the protocol MSPastryProtocol) by using this 128-bit (32 byte)
  * random generator.
- *
  */
 public final class UniformRandomGenerator {
 
@@ -41,14 +38,15 @@ public final class UniformRandomGenerator {
     /**
      * Create the random ID.
      *
-     * @return
+     * @return a random BigInteger for the bit size.
      */
     private final BigInteger nextRand() {
         return new BigInteger(bits, rnd);
     }
 
     /**
-     * Select a random domain to assign an ID to
+     * Select a random domain to assign the ID (node) to.
+     *
      * @return
      */
     public int selectDomain() {

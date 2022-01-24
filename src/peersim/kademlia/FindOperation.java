@@ -78,8 +78,6 @@ public class FindOperation {
      */
     public void updateClosestSet(KadNode[] neighbours) {
 
-        //todo: test this
-
         // update response number because we can send another route message
         available_requests++;
 

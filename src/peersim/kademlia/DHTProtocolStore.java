@@ -1,13 +1,13 @@
 package peersim.kademlia;
 
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
-
+/**
+ * This class represents the general store for all sorts of DHT lookup protocols
+ */
 public abstract class DHTProtocolStore {
 
     public Lookup lookup = null;
 
-    public Lookup orderLookup(String type, int kademliaid, Message lookupMessage, int tid){
+    public Lookup orderLookup(String type, Message lookupMessage) {
 
         System.err.println("~DHTProtocolStore~ orderLookup()");
 

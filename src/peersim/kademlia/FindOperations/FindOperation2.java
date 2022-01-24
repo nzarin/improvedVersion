@@ -2,10 +2,10 @@ package peersim.kademlia.FindOperations;
 
 import peersim.kademlia.*;
 
-
+/**
+ * Abstracts class that generalizes the find operation.
+ */
 public abstract class FindOperation2 {
-
-    long operationId;
     KadNode source;
     KadNode target;
     KademliaNode sender;

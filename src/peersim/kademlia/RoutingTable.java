@@ -18,14 +18,14 @@ public class RoutingTable implements Cloneable {
     /**
      * K-Buckets of this node.
      */
-    public TreeMap<Integer, KBucket> k_buckets = null;
+    public TreeMap<Integer, KBucket> k_buckets;
 
     /**
      * Instantiates a new empty routing table with the specified size
      */
     public RoutingTable(KademliaNode owner) {
         this.owner = owner;
-        k_buckets = new TreeMap<Integer, KBucket>();
+        k_buckets = new TreeMap<>();
         // initialize k-bukets
         for (int i = 0; i <= KademliaCommonConfig.BITS; i++) {
             k_buckets.put(i, new KBucket());
@@ -84,7 +84,7 @@ public class RoutingTable implements Cloneable {
 
         // return the k-bucket if it is full
         if (k_buckets.get(prefix_len).neighbours.size() >= KademliaCommonConfig.K) {
-            return k_buckets.get(prefix_len).neighbours.keySet().toArray(result);   //todo: check what representation
+            return k_buckets.get(prefix_len).neighbours.keySet().toArray(result);
         }
 
         // else get k closest node from all k-buckets

@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
-public class BridgeNode implements   KademliaNode{
+public class BridgeNode implements KademliaNode {
 
-    private BigInteger nodeId;
+    private final BigInteger nodeId;
     private int domain;
-    private RoutingTable routingTable;
-    private KademliaProtocol kademliaProtocol;
-    private ArrayList<KadNode> kadNodes;
-    private ArrayList<BridgeNode> bridgeNodes;
-    private boolean available;
-    private LinkedHashMap<Long, FindOperation> findOperationsMap;
-    private TreeMap<Long, Long> sentMsgTracker;
+    private final RoutingTable routingTable;
+    private final KademliaProtocol kademliaProtocol;
+    private final ArrayList<KadNode> kadNodes;
+    private final ArrayList<BridgeNode> bridgeNodes;
+    private final boolean available;
+    private final LinkedHashMap<Long, FindOperation> findOperationsMap;
+    private final TreeMap<Long, Long> sentMsgTracker;
 
-    public BridgeNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol){
+    public BridgeNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
         this.nodeId = id;
         this.domain = domain;
         this.kademliaProtocol = kademliaProtocol;
@@ -29,16 +29,23 @@ public class BridgeNode implements   KademliaNode{
         this.sentMsgTracker = new TreeMap<>();
     }
 
-    public void addKadNode(KadNode node){
+    public void addKadNode(KadNode node) {
         this.kadNodes.add(node);
     }
 
-    public void addBridgeNode(BridgeNode node){
+    public void addBridgeNode(BridgeNode node) {
         this.bridgeNodes.add(node);
     }
 
     //getters
-    public int getDomain() {return this.domain;}
+    public int getDomain() {
+        return this.domain;
+    }
+
+    //setters
+    public void setDomain(int domain) {
+        this.domain = domain;
+    }
 
     @Override
     public ArrayList<BridgeNode> getBridgeNodes() {
@@ -60,28 +67,11 @@ public class BridgeNode implements   KademliaNode{
         return this.sentMsgTracker;
     }
 
-    @Override
-    public void setFindOperationsMap(LinkedHashMap<Long, FindOperation> findOperationsMap) {
-        this.findOperationsMap = findOperationsMap;
+    public RoutingTable getRoutingTable() {
+        return this.routingTable;
     }
 
-    @Override
-    public void setSentMsgTracker(TreeMap<Long, Long> msgTracker) {
-        this.sentMsgTracker = msgTracker;
-    }
-
-    public RoutingTable getRoutingTable(){ return this.routingTable;}
-
-    //setters
-    public void setDomain(int domain) {
-        this.domain = domain;
-    }
-
-    public void makeBridgeNodeUnavailable(){
-        this.available = false;
-    }
-
-    public boolean isAvailable(){
+    public boolean isAvailable() {
         return this.available;
     }
 

@@ -41,7 +41,6 @@ public class KademliaObserver implements Control {
      * Keep statistics on the number of failed lookups
      */
     public static IncrementalStats failed_lookups = new IncrementalStats();
-    public static IncrementalStats next_node_distance = new IncrementalStats();
     /**
      * Keep statistics on the number of successful lookups
      */
@@ -92,9 +91,6 @@ public class KademliaObserver implements Control {
         String s = String.format("[time=%d]:[N=%d current nodes UP] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%f created findops] [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio]",
                 CommonState.getTime(), sz, hopStore.getMin(), hopStore.getAverage(), hopStore.getMax(), (int) timeStore.getMin(), (int) timeStore.getAverage(), (int) timeStore.getMax(), find_op.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio);
 
-
-        // DO NOT FORGET TO SET THE TURBULENCE PARAM TO TRUE OR FALSE
-
         // create hop file
         try {
             String fileName;
@@ -142,24 +138,6 @@ public class KademliaObserver implements Control {
             out.close();
         } catch (IOException e) {
         }
-
-
-        // create distance convergence file
-        try {
-            String fileName;
-            if (TURBOLENCE) {
-                fileName = "results/distance/avg_distance_with_turbelence.txt";
-            } else {
-                fileName = "results/distance/avg_distance_" + Network.size() + "_no_turbulence.txt";
-            }
-            File f = new File(fileName);
-            f.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
-            out.write(CommonState.getTime() + ", " + next_node_distance.getAverage() + ";\n");
-            out.close();
-        } catch (IOException e) {
-        }
-
 
         System.err.println(s);
 

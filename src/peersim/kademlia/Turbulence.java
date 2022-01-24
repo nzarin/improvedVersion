@@ -137,7 +137,7 @@ public class Turbulence implements Control {
             inits[j].initialize(newNetworkNode);
         Network.add(newNetworkNode);
 
-        // create new kademlia node
+        // create new kad node
         UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS,  CommonState.r);
         KadNode newKadNode = new KadNode(urg.generateID(), urg.selectDomain());
         ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setKadNode(newKadNode);
@@ -173,6 +173,11 @@ public class Turbulence implements Control {
     }
 
 
+    /**
+     * Select a random bootstrap node within the domain of the new KadNode.
+     * @param newKadNode the node for which we are selecting a bootstrap node.
+     * @return
+     */
     private Node selectBootstrapNode(KadNode newKadNode){
         // select one random bootstrap node within this domain
         Node bootstrapNode;

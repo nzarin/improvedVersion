@@ -5,19 +5,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
-
+/**
+ * This class represents a normal (traditional) KadNode
+ */
 public class KadNode implements KademliaNode {
 
-    private BigInteger nodeId;
+    private final BigInteger nodeId;
+    private final RoutingTable routingTable;
+    private final ArrayList<BridgeNode> bridgeNodes;
     private int domain;
-    private RoutingTable routingTable;
     private KademliaProtocol kademliaProtocol;
-    private ArrayList<BridgeNode> bridgeNodes;
-    private LinkedHashMap<Long, FindOperation> findOperationsMap;
-    private TreeMap<Long, Long> sentMsgTracker;
+    private final LinkedHashMap<Long, FindOperation> findOperationsMap;
+    private final TreeMap<Long, Long> sentMsgTracker;
 
-
-    public KadNode(BigInteger id, int domain){
+    /**
+     * Constructs the KadNode
+     *
+     * @param id
+     * @param domain
+     */
+    public KadNode(BigInteger id, int domain) {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
@@ -26,7 +33,14 @@ public class KadNode implements KademliaNode {
         this.sentMsgTracker = new TreeMap<>();
     }
 
-    public KadNode(BigInteger id, int domain, KademliaProtocol kadprotocol){
+    /**
+     * Constructs the KadNode
+     *
+     * @param id
+     * @param domain
+     * @param kadprotocol
+     */
+    public KadNode(BigInteger id, int domain, KademliaProtocol kadprotocol) {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
@@ -36,15 +50,23 @@ public class KadNode implements KademliaNode {
         this.sentMsgTracker = new TreeMap<>();
     }
 
-    public void addBridgeNode(BridgeNode node){
-        this.bridgeNodes.add(node);
+    // GETTERS
+
+    public int getDomain() {
+        return this.domain;
     }
 
-    public int getDomain() {return this.domain;}
+    public void setDomain(int domain) {
+        this.domain = domain;
+    }
 
-    public RoutingTable getRoutingTable(){ return this.routingTable;}
+    public RoutingTable getRoutingTable() {
+        return this.routingTable;
+    }
 
-    public ArrayList<BridgeNode> getBridgeNodes(){ return this.bridgeNodes;}
+    public ArrayList<BridgeNode> getBridgeNodes() {
+        return this.bridgeNodes;
+    }
 
     @Override
     public ArrayList<KadNode> getKadNodes() {
@@ -61,22 +83,9 @@ public class KadNode implements KademliaNode {
         return this.sentMsgTracker;
     }
 
-    @Override
-    public void setFindOperationsMap(LinkedHashMap<Long, FindOperation> findOperationsMap) {
-        this.findOperationsMap = findOperationsMap;
-    }
 
-    @Override
-    public void setSentMsgTracker(TreeMap<Long, Long> msgTracker) {
-        this.sentMsgTracker = msgTracker;
-    }
+    // PRINTERS
 
-    //setters
-    public void setDomain(int domain) {
-        this.domain = domain;
-    }
-
-    //printers
     @Override
     public String toString() {
         return "KadNode{" +

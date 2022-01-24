@@ -61,9 +61,14 @@ public class Message extends SimpleEvent {
      */
     public KademliaNode receiver;
 
-
+    /**
+     * The sender of the message
+     */
     public KademliaNode sender;
 
+    /**
+     * Check whether this lookup is new
+     */
     public boolean newLookup;
 
     /**
@@ -76,9 +81,6 @@ public class Message extends SimpleEvent {
      */
     public KademliaNode target;
 
-
-
-    // ______________________________________________________________________________________________
 
     /**
      * Creates an empty message by using default values (message type = MSG_LOOKUP and <code>new String("")</code> value for the
@@ -113,10 +115,10 @@ public class Message extends SimpleEvent {
 
     /**
      * Constructor for timeout messages
+     *
      * @param messageType
-     * @param operationId
      */
-    public Message(int messageType, long operationId, KademliaNode sender, KademliaNode receiver){
+    public Message(int messageType, long operationId, KademliaNode sender, KademliaNode receiver) {
         super(messageType);
         this.msgId = (ID_GENERATOR++);
         this.operationId = operationId;
@@ -135,7 +137,7 @@ public class Message extends SimpleEvent {
      * @param body Object
      * @return Message
      */
-    public static final Message makeEmptyMessage(Object body, int type) {
+    public static Message makeEmptyMessage(Object body, int type) {
         Message emptyMessage = new Message(type, body);
         emptyMessage.operationId = (FIND_OPERATION_ID++);
         return emptyMessage;
@@ -189,10 +191,4 @@ public class Message extends SimpleEvent {
                 return "UNKNOWN:" + type;
         }
     }
-
-
-    public void setTarget(KademliaNode target){
-        this.target = target;
-    }
-
 }

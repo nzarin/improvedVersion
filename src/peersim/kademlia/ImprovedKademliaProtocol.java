@@ -1,8 +1,8 @@
 package peersim.kademlia;
 
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
-
+/**
+ * This class represents the improved kademlia version
+ */
 public class ImprovedKademliaProtocol extends Lookup {
 
     LookupIngredientFactory2 lif2;
@@ -12,36 +12,37 @@ public class ImprovedKademliaProtocol extends Lookup {
     }
 
     @Override
-    void prepare( KademliaNode source, KademliaNode target, KademliaNode sender, KademliaNode receiver, int kid, Message lookupMsg, int tid) {
+    void prepare(int kid, Message lookupMsg, int tid) {
         this.lookupMessage = lookupMsg;
-        this.source = source;
-        this.target = target;
-        this.sender = sender;
-        this.receiver = receiver;
+        this.source = lookupMsg.src;
+        this.target = lookupMsg.target;
+        this.sender = lookupMsg.sender;
+        this.receiver = lookupMsg.receiver;
         this.kademliaid = kid;
         this.transportid = tid;
-        this.findOp = lif2.createFindOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
-        this.resOp = lif2.createRespondOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
-        this.handleResOp = lif2.createHandleResponseOperation(source, target, sender, receiver, kademliaid, lookupMessage, transportid);
 
     }
 
     /**
-     * Added new shizzle
+     * Perform the find operation for the improved kademlia version.
      */
     @Override
     public void performFindOp() {
+        this.findOp = lif2.createFindOperation(kademliaid, lookupMessage, transportid);
+        findOp.find();
 
     }
 
     @Override
     public void performRespondOp() {
-
+        this.resOp = lif2.createRespondOperation(kademliaid, lookupMessage, transportid);
+        resOp.respond();
     }
 
     @Override
     public void performHandleResponseOp() {
-
+        this.handleResOp = lif2.createHandleResponseOperation(kademliaid, lookupMessage, transportid);
+        handleResOp.handleResponse();
     }
 
 

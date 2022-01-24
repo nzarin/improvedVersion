@@ -19,12 +19,12 @@ public class Util {
      * @param b2 BigInteger
      * @return int
      */
-    public static final int prefixLen(BigInteger b1, BigInteger b2) {
+    public static int prefixLen(BigInteger b1, BigInteger b2) {
 
         String s1 = Util.put0(b1);
         String s2 = Util.put0(b2);
 
-        int i = 0;
+        int i;
         for (i = 0; i < s1.length(); i++) {
             if (s1.charAt(i) != s2.charAt(i))
                 return i;
@@ -34,24 +34,24 @@ public class Util {
     }
 
     /**
-     * return the distance between two number wich is defined as (a XOR b)
+     * Computes the XOR distance between two number wich is defined as (a XOR b)
      *
      * @param a BigInteger
      * @param b BigInteger
      * @return BigInteger
      */
-    public static final BigInteger distance(BigInteger a, BigInteger b) {
+    public static BigInteger distance(BigInteger a, BigInteger b) {
         return a.xor(b);
     }
 
     /**
-     * convert a BigInteger into a String (base 2) and lead all needed non-significative zeroes in order to reach the canonical
+     * Convert a BigInteger into a String (base 2) and lead all needed non-significative zeroes in order to reach the canonical
      * length of a nodeid
      *
      * @param b BigInteger
      * @return String
      */
-    public static final String put0(BigInteger b) {
+    public static String put0(BigInteger b) {
         if (b == null)
             return null;
         String s = b.toString(2); // base 2
@@ -65,8 +65,7 @@ public class Util {
      * Search through the network the Node having a specific node Id, by performing binary search (we concern about the ordering
      * of the network).
      *
-     * @param searchNodeId
-     *            BigInteger
+     * @param searchNodeId BigInteger
      * @return Node
      */
     public static Node nodeIdtoNode(BigInteger searchNodeId, int kademliaid) {
@@ -105,10 +104,17 @@ public class Util {
     }
 
 
-    public static void updateLookupStatistics(KadNode currentNode, FindOperation fop, int kademliaid){
+    /**
+     * This method updates the statistics to the kademlia observer
+     *
+     * @param currentNode The node that initiated the lookup
+     * @param fop         The find operation we are discussing now
+     * @param kademliaid  The corresponding kademlia identifier
+     */
+    public static void updateLookupStatistics(KadNode currentNode, FindOperation fop, int kademliaid) {
 
         //if the target is found -> successful lookup
-        if(fop.closestSet.containsKey(fop.destNode)){
+        if (fop.closestSet.containsKey(fop.destNode)) {
 
             //update stats
             long duration = (CommonState.getTime() - (fop.timestamp));
@@ -119,10 +125,10 @@ public class Util {
             System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
             // if I and the destination node are up -> failed lookup
-        } else if(Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() & Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()){
+        } else if (Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() & Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
             KademliaObserver.finished_lookups.add(1);
             KademliaObserver.failed_lookups.add(1);
-            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
         }
     }
