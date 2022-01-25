@@ -118,10 +118,9 @@ public class Message extends SimpleEvent {
      *
      * @param messageType
      */
-    public Message(int messageType, long operationId, KademliaNode sender, KademliaNode receiver) {
+    public Message(int messageType, long msgId, KademliaNode sender, KademliaNode receiver) {
         super(messageType);
-        this.msgId = (ID_GENERATOR++);
-        this.operationId = operationId;
+        this.msgId = msgId;
 
         //note that the current code simulates that the receiver of a message sends after some latency a timeout to sender
         //this means that the source of this message is the receiver of the timeout request

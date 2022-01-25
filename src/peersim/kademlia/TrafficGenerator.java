@@ -46,8 +46,6 @@ public class TrafficGenerator implements Control {
         m.receiver = source;
         m.target = randomTargetNode;
         m.newLookup = true;
-        System.err.println("we created a new findnode message in traffic  generator");
-        System.err.println("the operationId of this message is: " + m.operationId);
         return m;
     }
 

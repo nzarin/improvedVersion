@@ -9,8 +9,6 @@ public abstract class DHTProtocolStore {
 
     public Lookup orderLookup(String type, Message lookupMessage) {
 
-        System.err.println("~DHTProtocolStore~ orderLookup()");
-
         //create either the correct protocol (naive or improved) and the corresponding intra or inter-domain factory
         this.lookup = createLookup(type, lookupMessage.src, lookupMessage.target);
 

@@ -61,10 +61,10 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                     //increment hop count for bookkeeping
                     fop.nrHops++;
-
                     //send the ROUTE messages
-                    System.err.println("I have processed the response and I am sending a route message to " + neighbour.getNodeId());
+                    System.err.println("I have processed the response and I am sending a route message to " + neighbour.getNodeId() + " with msgId is " + request.msgId);
                     messageSender.sendMessage(request);
+                    System.err.println(" after sending this route message, fop.nrHops: " + fop.nrHops);
 
                     //SCENARIO 2: no new neighbour and no outstanding requests
                 } else if (fop.available_requests == KademliaCommonConfig.ALPHA) {

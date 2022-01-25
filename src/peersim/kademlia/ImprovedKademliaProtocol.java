@@ -14,10 +14,6 @@ public class ImprovedKademliaProtocol extends Lookup {
     @Override
     void prepare(int kid, Message lookupMsg, int tid) {
         this.lookupMessage = lookupMsg;
-        this.source = lookupMsg.src;
-        this.target = lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         this.kademliaid = kid;
         this.transportid = tid;
 

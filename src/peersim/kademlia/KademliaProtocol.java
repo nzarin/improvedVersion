@@ -124,26 +124,33 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
                     currentLookup.performHandleResponseOp();
                     break;
                 case Message.TIMEOUT:
+                    System.err.println(  m.receiver.getNodeId() + "  RECEIVES A TIME-OUT WITH MSID IS " + m.msgId + " FOR THE MESSAGE IT SENT TO  " + m.sender.getNodeId());
+//                    System.err.println(" THE SIZE OF " + m.receiver.getNodeId() + "'s MSGTRACKER IS : " + m.receiver.getSentMsgTracker().size());
+//                    System.err.println(" THE MSGID OF THIS MESSAGE IS " + m.msgId);
+//                    System.err.println(" THE MSGTRACKERS IS AS FOLLOWS: " + m.receiver.getSentMsgTracker().toString());
+//                    System.err.println(" THE OPERATION ID OF THIS TIMEOUT MESSAGE IS: " + m.operationId);
+
                     // the response msg is not arrived
-                    if (this.me.getSentMsgTracker().containsKey(m.msgId)) {
+                    if (m.receiver.getSentMsgTracker().containsKey(m.msgId)) {
 
                         //remove from the sentMsg
-                        this.me.getSentMsgTracker().remove(m.msgId);
+                        m.receiver.getSentMsgTracker().remove(m.msgId);
 
                         //if it is a KadNode that is not responding
                         if (m.src instanceof KadNode) {
 
                             //remove this node from routing table and from the closest set of findOperation
-                            this.me.getRoutingTable().removeNeighbour((KadNode) m.src);
-                            this.me.getFindOperationsMap().get(m.operationId).closestSet.remove((KadNode) m.src);
-                            System.err.println("TIME OUT, we gotta send a new message");
+                            m.receiver.getRoutingTable().removeNeighbour((KadNode) m.src);
+                            m.receiver.getFindOperationsMap().get(m.operationId).closestSet.remove((KadNode) m.src);
+                            System.err.println("\n\n\n\nTIME OUT, we gotta send a new message\n\n\n\n");
                             //try another node
                             Message m2 = new Message();
                             m2.operationId = m.operationId;
-                            m2.src = this.me;
-                            m2.receiver = this.me.getFindOperationsMap().get(m.operationId).destNode;
-
-                            currentLookup.prepare(kademliaid, m, tid);
+                            m2.src = m.src;
+                            m2.target = m.target;
+                            m2.sender = m.receiver;
+                            m2.receiver = m.receiver.getFindOperationsMap().get(m.operationId).destNode;
+                            currentLookup.prepare(kademliaid, m2, tid);
                             currentLookup.performHandleResponseOp();
 
                             //todo: it is a BridgeNode that is not responding

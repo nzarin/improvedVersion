@@ -74,7 +74,7 @@ public class MessageSender {
         //if it is a ROUTE message, we also set a timeout
         if (m.getType() == Message.MSG_ROUTE) {
 
-            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
+            Message timeout = new Message(Message.TIMEOUT, m.msgId, receiver, sender);
 
             // set delay at 2*RTT
             long latency = transport.getLatency(src, dest);

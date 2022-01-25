@@ -72,7 +72,6 @@ public class RoutingTable implements Cloneable {
      */
     public KadNode[] getKClosestNeighbours(final KadNode searchkey, final KadNode src) {
 
-        System.err.println("this.owner in routing table : " + this.owner.getNodeId());
         // resulting neighbors
         KadNode[] result = new KadNode[KademliaCommonConfig.K];
 

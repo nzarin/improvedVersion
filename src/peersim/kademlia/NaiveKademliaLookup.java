@@ -20,10 +20,6 @@ public class NaiveKademliaLookup extends Lookup {
     @Override
     void prepare(int kid, Message lookupMsg, int tid) {
         this.lookupMessage = lookupMsg;
-        this.source = lookupMsg.src;
-        this.target = lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         this.kademliaid = kid;
         this.transportid = tid;
 
@@ -36,7 +32,6 @@ public class NaiveKademliaLookup extends Lookup {
     public void performFindOp() {
         findOp = lif2.createFindOperation(kademliaid, lookupMessage, transportid);
         findOp.find();
-
     }
 
     /**

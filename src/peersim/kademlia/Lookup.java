@@ -13,10 +13,6 @@ public abstract class Lookup {
     RespondOperation2 resOp;
     HandleResponseOperation2 handleResOp;
     Message lookupMessage;
-    KademliaNode source;
-    KademliaNode target;
-    KademliaNode sender;
-    KademliaNode receiver;
     int kademliaid;
     int transportid;
 

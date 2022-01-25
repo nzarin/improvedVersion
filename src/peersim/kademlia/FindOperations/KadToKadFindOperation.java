@@ -63,10 +63,11 @@ public class KadToKadFindOperation extends FindOperation2 {
                 request.operationId = findOp.operationId;
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
-                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId());
+                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
                 messageSender.sendMessage(request);
             }
         }
+        System.err.println(" after sending these route messages, findOp.nrHops: " + findOp.nrHops);
 
     }
 }
