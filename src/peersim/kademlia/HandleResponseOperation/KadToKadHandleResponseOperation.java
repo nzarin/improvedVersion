@@ -1,5 +1,6 @@
 package peersim.kademlia.HandleResponseOperation;
 
+import peersim.core.CommonState;
 import peersim.kademlia.*;
 
 /**
@@ -23,15 +24,15 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
     @Override
     public void handleResponse() {
         // remove the timer for the deadline because we already received a response on time
-        lookupMessage.src.getSentMsgTracker().remove(lookupMessage.ackId);
+        lookupMessage.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
 
         // add message sender to my routing table
         if (lookupMessage.sender != null) {
-            lookupMessage.src.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
+            lookupMessage.receiver.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
         }
 
         // get corresponding find operation (using the message field operationId)
-        FindOperation fop = lookupMessage.src.getFindOperationsMap().get(lookupMessage.operationId);
+        FindOperation fop = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
 
         if (fop != null) {
 
@@ -56,8 +57,8 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                     request.sender = lookupMessage.receiver;
                     request.receiver = neighbour;
                     request.operationId = fop.operationId;
-
                     request.newLookup = false;
+
                     //increment hop count for bookkeeping
                     fop.nrHops++;
 
@@ -73,7 +74,29 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                     // if the lookup operation was not for bootstrapping purposes
                     if (fop.body.equals("Automatically Generated Traffic")) {
-                        Util.updateLookupStatistics((KadNode) this.receiver, fop, this.kademliaid);
+
+                        // if the source of the lookup is the same as this receiver -> it was an intradomain lookup
+                        if (lookupMessage.src == lookupMessage.receiver){
+                            Util.updateLookupStatistics((KadNode) lookupMessage.receiver, fop, this.kademliaid);
+                        } else {
+
+                            // find the correct bridge node of the domain of the target node
+                            BridgeNode randomBridgeNodeThisDomain;
+                            do{
+                                randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));
+                            } while (randomBridgeNodeThisDomain == null);
+
+                            //create reply message to send it to the bridge node of this domain we got the request from
+                            Message response = new Message(Message.MSG_RESPONSE);
+                            response.body = fop;
+                            response.src = lookupMessage.src;
+                            response.target = lookupMessage.target;
+                            response.sender = lookupMessage.receiver;
+                            response.receiver = randomBridgeNodeThisDomain;
+                            response.operationId = lookupMessage.operationId;
+                            messageSender.sendMessage(response);
+                        }
+
                     } else {
                         System.err.println("This is a bootstrap message. Let it be. ");
                     }

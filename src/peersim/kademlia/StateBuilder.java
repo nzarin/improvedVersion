@@ -210,13 +210,15 @@ public class StateBuilder implements peersim.core.Control {
 
                 //if this kadNode is in the same domain -> add to list of kad nodes. Otherwise, ignore it.
                 if(jNode.getDomain() == iNode.getDomain()) {
-                    iNode.addKadNode((KadNode) jNode);
+                    iNode.getKadNodes().add((KadNode) jNode);
                 }
 
                 // This j node must be a bridge node -> add to the list of bridge nodes
             } else {
                 jNode = jKad.getCurrentNode();
-                jNode.getBridgeNodes().add((BridgeNode) jNode);
+                if(iNode.getNodeId() != jNode.getNodeId()){
+                    iNode.getBridgeNodes().add((BridgeNode) jNode);
+                }
             }
 
         }

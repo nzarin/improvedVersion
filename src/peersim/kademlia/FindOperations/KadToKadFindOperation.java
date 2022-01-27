@@ -35,14 +35,14 @@ public class KadToKadFindOperation extends FindOperation2 {
         if (!target.isUp())
             return;
 
-        // create find operation and add to operations array for bookkeeping
+        // create a new find operation and add to operations array for bookkeeping
         FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
         KademliaObserver.find_op.add(1);
         findOp.body = lookupMessage.body;
-        lookupMessage.src.getFindOperationsMap().put(findOp.operationId, findOp);
+        lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
         // get the K closest node to search key
-        KadNode[] neighbours = lookupMessage.src.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.src);
+        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver);
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);
         findOp.available_requests = KademliaCommonConfig.ALPHA;
@@ -60,11 +60,10 @@ public class KadToKadFindOperation extends FindOperation2 {
                 request.operationId = findOp.operationId;
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
-//                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
                 request.sender.getRoutingTable().addNeighbour(nextNode);
+//                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
                 messageSender.sendMessage(request);
             }
         }
-
     }
 }

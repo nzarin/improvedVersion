@@ -67,6 +67,11 @@ public class BridgeNode implements KademliaNode {
         return this.sentMsgTracker;
     }
 
+    @Override
+    public String getType() {
+        return "BridgeNode";
+    }
+
     public RoutingTable getRoutingTable() {
         return this.routingTable;
     }

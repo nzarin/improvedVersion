@@ -59,7 +59,7 @@ public class MessageSender {
      * @param receiver
      * @param m
      */
-    public void sendMessageKadToKad(KadNode sender, KadNode receiver, Message m) {
+    private void sendMessageKadToKad(KadNode sender, KadNode receiver, Message m) {
 
         Node s = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node r = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
@@ -97,13 +97,13 @@ public class MessageSender {
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
         transport.send(src, dest, m, kademliaid);
 
-        if (m.getType() == Message.MSG_REQUEST) { // is a request
+        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
 
             Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
 
-            // set delay at 2*RTT
+            // set delay at 4*RTT because this will probably take longer
             long latency = transport.getLatency(src, dest);
-            long delay = 4 * latency;
+            long delay = 12 * latency;
 
             // add to sent msg
             sender.getSentMsgTracker().put(m.msgId, m.timestamp);
@@ -114,22 +114,57 @@ public class MessageSender {
     /**
      * Send a message from a BridgeNode to a KadNode
      *
-     * @param s
-     * @param r
+     * @param sender
+     * @param receiver
      * @param m
      */
-    private void sendMessageBridgeToKad(BridgeNode s, KadNode r, Message m) {
+    private void sendMessageBridgeToKad(BridgeNode sender, KadNode receiver, Message m) {
+        Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
+        Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
+
+        transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
+        transport.send(src, dest, m, kademliaid);
+
+        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
+
+//            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
+//
+//            // set delay at 4*RTT
+//            long latency = transport.getLatency(src, dest);
+//            long delay = 10 * latency;
+//
+//            // add to sent msg
+//            sender.getSentMsgTracker().put(m.msgId, m.timestamp);
+//            EDSimulator.add(delay, timeout, src, this.kademliaid);
+        }
     }
 
     /**
      * Send a message from a BridgeNode to a BridgeNode
      *
-     * @param s
-     * @param r
+     * @param sender
+     * @param receiver
      * @param m
      */
-    private void sendMessageBridgeToBridge(BridgeNode s, BridgeNode r, Message m) {
+    private void sendMessageBridgeToBridge(BridgeNode sender, BridgeNode receiver, Message m) {
+        Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
+        Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
 
+        transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
+        transport.send(src, dest, m, kademliaid);
+
+        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
+
+//            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
+//
+//            // set delay at 2*RTT
+//            long latency = transport.getLatency(src, dest);
+//            long delay = 4 * latency;
+//
+//            // add to sent msg
+//            sender.getSentMsgTracker().put(m.msgId, m.timestamp);
+//            EDSimulator.add(delay, timeout, src, this.kademliaid);
+        }
     }
 
 }

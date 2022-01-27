@@ -83,6 +83,11 @@ public class KadNode implements KademliaNode {
         return this.sentMsgTracker;
     }
 
+    @Override
+    public String getType() {
+        return "KadNode";
+    }
+
 
     // PRINTERS
 

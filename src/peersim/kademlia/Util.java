@@ -133,5 +133,39 @@ public class Util {
         }
     }
 
+//    /**
+//     * This method updates the statistics to the kademlia observer
+//     *
+//     * @param currentNode The node that initiated the lookup
+//     * @param fop         The find operation we are discussing now
+//     * @param kademliaid  The corresponding kademlia identifier
+//     */
+//    public static void updateLookupStatistics2(Message lookupMessage, int kademliaid) {
+//
+//        FindOperation findOpReceiver = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
+//        FindOperation findOpSource = lookupMessage.src.getFindOperationsMap().get(lookupMessage.operationId);
+//
+//
+//        //if the target is found -> successful lookup
+//        if (fop.closestSet.containsKey(fop.destNode)) {
+//
+//            //update stats
+//            long duration = (CommonState.getTime() - (fop.timestamp));
+//            KademliaObserver.timeStore.add(duration);
+//            KademliaObserver.hopStore.add(fop.nrHops);
+//            KademliaObserver.finished_lookups.add(1);
+//            KademliaObserver.successful_lookups.add(1);
+//            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//
+//            // if I and the destination node are up -> failed lookup
+//        } else if (Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() & Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
+//            KademliaObserver.finished_lookups.add(1);
+//            KademliaObserver.failed_lookups.add(1);
+//            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//
+//        }
+//    }
+
+
 
 }

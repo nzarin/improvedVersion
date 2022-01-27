@@ -13,6 +13,7 @@ public interface KademliaNode {
     ArrayList<KadNode> getKadNodes();
     LinkedHashMap<Long, FindOperation> getFindOperationsMap();
     TreeMap<Long, Long> getSentMsgTracker();
+    String getType();
 
 
 }
