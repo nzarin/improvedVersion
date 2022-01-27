@@ -123,13 +123,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performHandleResponseOp();
                     break;
-                case Message.TIMEOUT:
-                    System.err.println(  m.receiver.getNodeId() + "  RECEIVES A TIME-OUT WITH MSID IS " + m.msgId + " FOR THE MESSAGE IT SENT TO  " + m.sender.getNodeId());
-//                    System.err.println(" THE SIZE OF " + m.receiver.getNodeId() + "'s MSGTRACKER IS : " + m.receiver.getSentMsgTracker().size());
-//                    System.err.println(" THE MSGID OF THIS MESSAGE IS " + m.msgId);
-//                    System.err.println(" THE MSGTRACKERS IS AS FOLLOWS: " + m.receiver.getSentMsgTracker().toString());
-//                    System.err.println(" THE OPERATION ID OF THIS TIMEOUT MESSAGE IS: " + m.operationId);
-
+                case Message.TIMEOUT: ;
                     // the response msg is not arrived
                     if (m.receiver.getSentMsgTracker().containsKey(m.msgId)) {
 
@@ -142,7 +136,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
                             //remove this node from routing table and from the closest set of findOperation
                             m.receiver.getRoutingTable().removeNeighbour((KadNode) m.src);
                             m.receiver.getFindOperationsMap().get(m.operationId).closestSet.remove((KadNode) m.src);
-                            System.err.println("\n\n\n\nTIME OUT, we gotta send a new message\n\n\n\n");
                             //try another node
                             Message m2 = new Message();
                             m2.operationId = m.operationId;

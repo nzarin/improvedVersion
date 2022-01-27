@@ -90,37 +90,27 @@ public class KademliaObserver implements Control {
         String s = String.format("[time=%d]:[N=%d current nodes UP] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%f created findops] [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio]",
                 CommonState.getTime(), sz, hopStore.getMin(), hopStore.getAverage(), hopStore.getMax(), (int) timeStore.getMin(), (int) timeStore.getAverage(), (int) timeStore.getMax(), find_op.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio);
 
-        // create hop file
+        // create files
         try {
-            String fileName = "results/hops/avgHops.txt";
-            File f = new File(fileName);
-            f.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
-            out.write(String.valueOf(hopStore.getAverage()).replace(".", ",") + ";\n");
-            out.close();
-        } catch (IOException e) {
-        }
+            File hopFile = new File("results/hops/avgHops.txt");
+            File latencyFile = new File("results/latency/avgLatency.txt");
+            File succesFile = new File("results/sucessratio/avgSR.txt");
+            hopFile.createNewFile();
+            latencyFile.createNewFile();
+            succesFile.createNewFile();
+            BufferedWriter outH = new BufferedWriter(new FileWriter(hopFile, true));
+            BufferedWriter outL = new BufferedWriter(new FileWriter(latencyFile, true));
+            BufferedWriter outS = new BufferedWriter(new FileWriter(succesFile, true));
 
-        // create latency file
-        try {
-            String fileName = "results/latency/avgLatency";
-            File f = new File(fileName);
-            f.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
-            out.write(String.valueOf(timeStore.getAverage()).replace(".", ",") + ";\n");
-            out.close();
-        } catch (IOException e) {
-        }
+            outH.write(String.valueOf(hopStore.getAverage()).replace(".", ",") + ";\n");
+            outL.write(String.valueOf(timeStore.getAverage()).replace(".", ",") + ";\n");
+            outS.write(success_ratio + ";\n");
 
-        // create success and failure file
-        try {
-            String fileName = "results/successratio/avgSR";
-            File f = new File(fileName);
-            f.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
-            out.write(success_ratio + ";\n");
-            out.close();
+            outH.close();
+            outL.close();
+            outS.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
         System.err.println(s);

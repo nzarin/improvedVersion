@@ -30,8 +30,6 @@ public class KadToKadFindOperation extends FindOperation2 {
 
     @Override
     public void find() {
-        System.err.println(" ----------------------------");
-
         //If I searched node is down, do nothing
         Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
         if (!target.isUp())
@@ -44,28 +42,9 @@ public class KadToKadFindOperation extends FindOperation2 {
         lookupMessage.src.getFindOperationsMap().put(findOp.operationId, findOp);
 
         // get the K closest node to search key
-//        System.err.println("    my current routing table: " + lookupMessage.src.getRoutingTable().toString());
         KadNode[] neighbours = lookupMessage.src.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.src);
-        System.err.print("my k closest neighbours are: ");
-        for(KadNode n : neighbours){
-            System.err.print(n.getNodeId() + ", ");
-        }
-        System.err.println();
-
-        System.err.print("the closest set of this findOp before the update: ");
-        for(KadNode closestN : findOp.getClosestSet().keySet()){
-            System.err.print("(" + closestN.getNodeId() + ", " + findOp.getClosestSet().get(closestN) + ") ");
-        }
-        System.err.println();
-
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);
-        System.err.print("the closest set of this findOp after the update: ");
-        for(KadNode closestN : findOp.getClosestSet().keySet()){
-            System.err.print("(" + closestN.getNodeId() + ", " + findOp.getClosestSet().get(closestN) + ") ");
-        }
-        System.err.println();
-
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 
         //send ALPHA route messages
@@ -81,12 +60,11 @@ public class KadToKadFindOperation extends FindOperation2 {
                 request.operationId = findOp.operationId;
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
-                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
+//                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
                 request.sender.getRoutingTable().addNeighbour(nextNode);
                 messageSender.sendMessage(request);
             }
         }
 
-//        System.err.println("    my routing table after I have sent the ROUTE mesages: " + lookupMessage.src.getRoutingTable().toString());
     }
 }
