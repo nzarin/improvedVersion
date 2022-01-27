@@ -59,7 +59,6 @@ public class KBucket implements Cloneable {
         KBucket dolly = new KBucket();
         for (KadNode node : neighbours.keySet()) {
             KadNode dupl = new KadNode(new BigInteger(node.getNodeId().toByteArray()), node.getDomain());
-//            dupl.setNodeId(new BigInteger(node.getNodeId().toByteArray()), 0l);
             dolly.neighbours.put(dupl, 0l);
         }
         return dolly;
@@ -83,7 +82,7 @@ public class KBucket implements Cloneable {
         String res = "{\n";
 
         for (KadNode node : neighbours.keySet()) {
-            res += node.toString2() + "\n";
+            res += node.toString3() + "\n";
         }
 
         return res + "}";

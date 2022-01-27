@@ -61,28 +61,25 @@ public class MessageSender {
      */
     public void sendMessageKadToKad(KadNode sender, KadNode receiver, Message m) {
 
-        //First, add the receiver to the routing table.
-        sender.getRoutingTable().addNeighbour(receiver);
-
-        Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
-        Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
+        Node s = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
+        Node r = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
 
         //Send over transport layer
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
-        transport.send(src, dest, m, kademliaid);
+        transport.send(s, r, m, kademliaid);
 
         //if it is a ROUTE message, we also set a timeout
-        if (m.getType() == Message.MSG_ROUTE) {
+        if (m.getType() == Message.MSG_REQUEST) {
 
             Message timeout = new Message(Message.TIMEOUT, m.msgId, receiver, sender);
 
             // set delay at 2*RTT
-            long latency = transport.getLatency(src, dest);
+            long latency = transport.getLatency(s, r);
             long delay = 4 * latency;
 
             // add to sent msg
             sender.getSentMsgTracker().put(m.msgId, m.timestamp);
-            EDSimulator.add(delay, timeout, src, this.kademliaid);
+            EDSimulator.add(delay, timeout, s, this.kademliaid);
         }
     }
 
@@ -100,7 +97,7 @@ public class MessageSender {
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
         transport.send(src, dest, m, kademliaid);
 
-        if (m.getType() == Message.MSG_ROUTE) { // is a request
+        if (m.getType() == Message.MSG_REQUEST) { // is a request
 
             Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
 

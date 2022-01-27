@@ -30,24 +30,42 @@ public class KadToKadFindOperation extends FindOperation2 {
 
     @Override
     public void find() {
+        System.err.println(" ----------------------------");
 
-        //If I am the searcher and searched node or the searched node is down, do thing
+        //If I searched node is down, do nothing
         Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
-        if ((lookupMessage.target.getNodeId() == this.source.getNodeId()) || (!target.isUp()))
+        if (!target.isUp())
             return;
 
-        KademliaObserver.find_op.add(1);
-
         // create find operation and add to operations array for bookkeeping
-        FindOperation findOp = new FindOperation(this.target, lookupMessage.timestamp);
+        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
+        KademliaObserver.find_op.add(1);
         findOp.body = lookupMessage.body;
-        this.source.getFindOperationsMap().put(findOp.operationId, findOp);
+        lookupMessage.src.getFindOperationsMap().put(findOp.operationId, findOp);
 
         // get the K closest node to search key
-        KadNode[] neighbours = this.source.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, source);
+//        System.err.println("    my current routing table: " + lookupMessage.src.getRoutingTable().toString());
+        KadNode[] neighbours = lookupMessage.src.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.src);
+        System.err.print("my k closest neighbours are: ");
+        for(KadNode n : neighbours){
+            System.err.print(n.getNodeId() + ", ");
+        }
+        System.err.println();
+
+        System.err.print("the closest set of this findOp before the update: ");
+        for(KadNode closestN : findOp.getClosestSet().keySet()){
+            System.err.print("(" + closestN.getNodeId() + ", " + findOp.getClosestSet().get(closestN) + ") ");
+        }
+        System.err.println();
 
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);
+        System.err.print("the closest set of this findOp after the update: ");
+        for(KadNode closestN : findOp.getClosestSet().keySet()){
+            System.err.print("(" + closestN.getNodeId() + ", " + findOp.getClosestSet().get(closestN) + ") ");
+        }
+        System.err.println();
+
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 
         //send ALPHA route messages
@@ -56,7 +74,7 @@ public class KadToKadFindOperation extends FindOperation2 {
             if (nextNode != null) {
                 findOp.nrHops++;
                 //create a request message
-                Message request = new Message(Message.MSG_ROUTE);
+                Message request = new Message(Message.MSG_REQUEST);
                 request.src = lookupMessage.src;
                 request.target = lookupMessage.target;
                 request.sender = lookupMessage.src;
@@ -64,10 +82,11 @@ public class KadToKadFindOperation extends FindOperation2 {
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
                 System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
+                request.sender.getRoutingTable().addNeighbour(nextNode);
                 messageSender.sendMessage(request);
             }
         }
-        System.err.println(" after sending these route messages, findOp.nrHops: " + findOp.nrHops);
 
+//        System.err.println("    my routing table after I have sent the ROUTE mesages: " + lookupMessage.src.getRoutingTable().toString());
     }
 }

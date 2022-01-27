@@ -18,7 +18,7 @@ public class Message extends SimpleEvent {
     /**
      * Message Type: ROUTE (message during lookup)
      */
-    public static final int MSG_ROUTE = 2;
+    public static final int MSG_REQUEST = 2;
     /**
      * Message Type: RESPONSE (response message to a findvalue or findnode)
      */
@@ -153,23 +153,6 @@ public class Message extends SimpleEvent {
         return s + "[Type=" + messageTypetoString() + "] BODY=(...)";
     }
 
-    /**
-     * Copy the message.
-     *
-     * @return The copy message.
-     */
-    public Message copy() {
-        Message dolly = new Message();
-        dolly.type = this.type;
-        dolly.target = this.target;
-        dolly.src = this.src;
-        dolly.sender = this.sender;
-        dolly.receiver = this.receiver;
-        dolly.operationId = this.operationId;
-        dolly.body = this.body; // deep cloning?
-        dolly.newLookup = this.newLookup;
-        return dolly;
-    }
 
     /**
      * Translates the type of message to a string.
@@ -182,7 +165,7 @@ public class Message extends SimpleEvent {
                 return "MSG_EMPTY";
             case MSG_FINDNODE:
                 return "MSG_FINDNODE";
-            case MSG_ROUTE:
+            case MSG_REQUEST:
                 return "MSG_ROUTE";
             case MSG_RESPONSE:
                 return "MSG_RESPONSE";

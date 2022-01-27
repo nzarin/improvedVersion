@@ -37,14 +37,13 @@ public class TrafficGenerator implements Control {
      *
      * @return Message
      */
-    private Message generateFindNodeMessage(KadNode source) {
+    private Message generateFindNodeMessage(KadNode source, KadNode target) {
         Message m = Message.makeEmptyMessage("Automatically Generated Traffic", Message.MSG_FINDNODE);
         m.timestamp = CommonState.getTime();
-        KadNode randomTargetNode = selectRandomKadNode();
         m.src = source;
         m.sender = source;
         m.receiver = source;
-        m.target = randomTargetNode;
+        m.target = target;
         m.newLookup = true;
         return m;
     }
@@ -72,16 +71,22 @@ public class TrafficGenerator implements Control {
      * @return boolean
      */
     public boolean execute() {
-        Node start;
-        KademliaNode kNode;
+        Node source;
+        Node target;
+        KademliaNode sourceKadNode;
+        KademliaNode targetKadNode;
+
         do {
-            start = Network.get(CommonState.r.nextInt(Network.size()));
-            KademliaProtocol kademliaProtocol = (KademliaProtocol) start.getProtocol(pid);
-            kNode = kademliaProtocol.getCurrentNode();
-        } while ((start == null) || (!start.isUp()) || kNode instanceof BridgeNode);
+            source = Network.get(CommonState.r.nextInt(Network.size()));
+            target = Network.get(CommonState.r.nextInt(Network.size()));
+            KademliaProtocol kadProtocolSource = (KademliaProtocol) source.getProtocol(pid);
+            KademliaProtocol kadProtocolTarget = (KademliaProtocol) target.getProtocol(pid);
+            sourceKadNode = kadProtocolSource.getCurrentNode();
+            targetKadNode = kadProtocolTarget.getCurrentNode();
+        } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode || sourceKadNode.getNodeId() == targetKadNode.getNodeId()));
 
         // send message
-        EDSimulator.add(0, generateFindNodeMessage((KadNode) kNode), start, pid);
+        EDSimulator.add(0, generateFindNodeMessage((KadNode) sourceKadNode, (KadNode) targetKadNode), source, pid);
 
         return false;
     }

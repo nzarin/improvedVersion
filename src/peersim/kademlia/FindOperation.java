@@ -77,7 +77,7 @@ public class FindOperation {
      * @param neighbours
      */
     public void updateClosestSet(KadNode[] neighbours) {
-
+        System.err.println("before updating the closest set, our responseNumber is " + available_requests);
         // update response number because we can send another route message
         available_requests++;
 
@@ -100,25 +100,30 @@ public class FindOperation {
 
                         // find the node with max distance
                         BigInteger maxdist = newdist;
-                        BigInteger nodemaxdist = n.getNodeId();
+                        KadNode nodemaxdist = n;
                         for (KadNode i : closestSet.keySet()) {
                             BigInteger dist = Util.distance(i.getNodeId(), destNode.getNodeId());
 
                             if (dist.compareTo(maxdist) > 0) {
                                 maxdist = dist;
-                                nodemaxdist = i.getNodeId();
+                                nodemaxdist = i;
                             }
                         }
 
                         // replace the node with larger distance with n
-                        if (nodemaxdist.compareTo(n.getNodeId()) != 0) {
+                        if (nodemaxdist.getNodeId().compareTo(n.getNodeId()) != 0) {
+                            System.err.println("the node which is about to be removed is nodemaxdist: " + nodemaxdist.getNodeId());
                             closestSet.remove(nodemaxdist);
                             closestSet.put(n, false);
+                            System.err.println("instead, we added: " + n.getNodeId());
                         }
                     }
                 }
             }
         }
+
+        System.err.println("after updating the closest set, our responseNumber is " + available_requests);
+
     }
 
     /**

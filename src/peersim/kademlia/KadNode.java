@@ -103,6 +103,11 @@ public class KadNode implements KademliaNode {
                 '}';
     }
 
+
+    public String toString3(){
+        return "nodeId=" + nodeId + ", ";
+    }
+
     @Override
     public BigInteger getNodeId() {
         return this.nodeId;

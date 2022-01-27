@@ -22,12 +22,19 @@ public class KadToKadRespondOperation extends RespondOperation2 {
 
     @Override
     public void respond() {
+        System.err.println(" ----------------------------");
 
         // get the k closest nodes to target node -> I AM RECEIVER OF THE MESSAGE
-        KadNode[] neighbours = this.receiver.getRoutingTable().getKClosestNeighbours(this.target, (KadNode) this.sender);
+        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.sender);
 
         //get the BETA closest nodes from the neighbours
         KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
+
+        System.err.print("    the beta closest neighbours to the lookup target as far as I know are: ");
+        for(KadNode n : betaNeighbours){
+            System.err.print(n.getNodeId() + ", ");
+        }
+        System.err.println();
 
         // create a response message containing the neighbours (with the same id as of the request)
         Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
@@ -38,7 +45,7 @@ public class KadToKadRespondOperation extends RespondOperation2 {
         response.sender = lookupMessage.receiver;
         response.newLookup = false;
         response.ackId = lookupMessage.msgId;
-        System.err.println("I am sending a RESPONSE message to " + response.receiver.getNodeId() + " with msgId is " + response.msgId);
+        System.err.println("    I am sending a RESPONSE message to " + response.receiver.getNodeId() + " with msgId is " + response.msgId);
         messageSender.sendMessage(response);
 
     }

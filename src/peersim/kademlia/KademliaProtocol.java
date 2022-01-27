@@ -115,7 +115,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performFindOp();
                     break;
-                case Message.MSG_ROUTE:
+                case Message.MSG_REQUEST:
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performRespondOp();
                     break;

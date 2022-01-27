@@ -90,11 +90,11 @@ public class RoutingTable implements Cloneable {
         prefix_len = 0;
         while (prefix_len < KademliaCommonConfig.BITS) {
             neighbour_candidates.addAll(k_buckets.get(prefix_len).neighbours.keySet());
+            // remove source id since it is the requester and cannot be in result
+            neighbour_candidates.remove(src);
             prefix_len++;
         }
 
-        // remove source id since it is the requester and cannot be in result
-        neighbour_candidates.remove(src);
 
         // create a map (distance, node)
         TreeMap<BigInteger, KadNode> distance_map = new TreeMap<BigInteger, KadNode>();

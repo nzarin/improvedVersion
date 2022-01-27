@@ -16,7 +16,6 @@ import java.io.IOException;
  */
 public class KademliaObserver implements Control {
 
-    private static final boolean TURBOLENCE = true;
     /**
      * Parameter of the protocol we want to observe
      */
@@ -93,12 +92,7 @@ public class KademliaObserver implements Control {
 
         // create hop file
         try {
-            String fileName;
-            if (TURBOLENCE) {
-                fileName = "results/hops/avgHops_with_turbulence.txt";
-            } else {
-                fileName = "results/hops/avgHops_" + Network.size() + "_no_turbulence.txt";
-            }
+            String fileName = "results/hops/avgHops.txt";
             File f = new File(fileName);
             f.createNewFile();
             BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
@@ -109,12 +103,7 @@ public class KademliaObserver implements Control {
 
         // create latency file
         try {
-            String fileName;
-            if (TURBOLENCE) {
-                fileName = "results/latency/avgLatency_with_turbulence.txt";
-            } else {
-                fileName = "results/latency/avgLatency_" + Network.size() + "_no_turbulence.txt";
-            }
+            String fileName = "results/latency/avgLatency";
             File f = new File(fileName);
             f.createNewFile();
             BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
@@ -125,12 +114,7 @@ public class KademliaObserver implements Control {
 
         // create success and failure file
         try {
-            String fileName;
-            if (TURBOLENCE) {
-                fileName = "results/successratio/avgSR_with_turbelence.txt";
-            } else {
-                fileName = "results/successratio/avgSR_" + Network.size() + "_no_turbulence.txt";
-            }
+            String fileName = "results/successratio/avgSR";
             File f = new File(fileName);
             f.createNewFile();
             BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
