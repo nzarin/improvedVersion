@@ -41,6 +41,7 @@ public class KadToKadFindOperation extends FindOperation2 {
         findOp.body = lookupMessage.body;
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
+
         // get the K closest node to search key
         KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver);
         // update the list of closest nodes and re-initialize available requests
@@ -54,14 +55,15 @@ public class KadToKadFindOperation extends FindOperation2 {
                 findOp.nrHops++;
                 //create a request message
                 Message request = new Message(Message.MSG_REQUEST);
+                request.body = lookupMessage.body;
                 request.src = lookupMessage.src;
                 request.target = lookupMessage.target;
-                request.sender = lookupMessage.src;
+                request.sender = lookupMessage.receiver;
                 request.operationId = findOp.operationId;
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
                 request.sender.getRoutingTable().addNeighbour(nextNode);
-//                System.err.println("I am sending a ROUTE message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
+                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain() + ") with msgId is " + request.msgId);
                 messageSender.sendMessage(request);
             }
         }

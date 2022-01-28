@@ -94,6 +94,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
      */
     public void processEvent(Node myNode, int myProtocolID, Object event) {
 
+        System.err.println(" ---------------------------------------- ");
         // Parse message content Activate the correct event manager for the particular event
         this.kademliaid = myProtocolID;
         SimpleEvent ev = (SimpleEvent) event;
@@ -112,17 +113,17 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
             // Check what type of message and handle appropriately
             switch (m.getType()) {
                 case Message.MSG_FINDNODE:
-                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a FIND message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ") to find node ("+ m.target.getNodeId() + "," + m.target.getDomain() + ") of type " + m.target.getType());
+                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a FIND message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ") to find node ("+ m.target.getNodeId() + "," + m.target.getDomain() + ")");
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performFindOp();
                     break;
                 case Message.MSG_REQUEST:
-                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a REQUEST message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ")");
+                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a REQUEST message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ") of type " + m.sender.getType());
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performRespondOp();
                     break;
                 case Message.MSG_RESPONSE:
-                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a RESPONSE message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ")");
+                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a RESPONSE message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ") of type " + m.sender.getType());
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performHandleResponseOp();
                     break;

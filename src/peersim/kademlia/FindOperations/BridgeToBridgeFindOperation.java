@@ -31,12 +31,13 @@ public class BridgeToBridgeFindOperation extends FindOperation2 {
         }
 
         // update statistics of the findOp object
-        FindOperation findOp = lookupMessage.src.getFindOperationsMap().get(lookupMessage.operationId);
-        findOp.nrHops++;
+//        FindOperation findOp = lookupMessage.src.getFindOperationsMap().get(lookupMessage.operationId);
+//        findOp.nrHops++;
 
         //create FINDNODE message to send it to kad node
-        System.err.println(" I am forwarding the FIND message to " + randomBridgeNodeOtherDomain.getNodeId());
+        System.err.println(" I am forwarding the FIND message to a bridge node (" + randomBridgeNodeOtherDomain.getNodeId() + "," + randomBridgeNodeOtherDomain.getDomain() + ")");
         Message forward = new Message(Message.MSG_FINDNODE);
+        forward.body = lookupMessage.body;
         forward.src = lookupMessage.src;
         forward.target = lookupMessage.target;
         forward.sender = lookupMessage.receiver;

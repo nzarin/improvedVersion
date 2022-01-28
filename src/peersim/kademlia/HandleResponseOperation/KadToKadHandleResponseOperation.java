@@ -35,7 +35,6 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
         FindOperation fop = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
 
         if (fop != null) {
-
             //Step 1: update the closest set by saving the received neighbour
             try {
                 fop.updateClosestSet((KadNode[]) lookupMessage.body);
@@ -49,6 +48,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                 //SCENARIO 1: there exists some neighbour we can visit.
                 if (neighbour != null) {
+                    System.err.println(" SCENARIO 1: THERE EXIST SOME NEIGHBOUR WE CAN VISIT");
 
                     //create new request to send to this neighbour
                     Message request = new Message(Message.MSG_REQUEST);
@@ -58,7 +58,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                     request.receiver = neighbour;
                     request.operationId = fop.operationId;
                     request.newLookup = false;
-
+                    System.err.println("I am sending a REQUEST message to " + request.receiver.getNodeId() + " with msgId is " + request.msgId);
                     //increment hop count for bookkeeping
                     fop.nrHops++;
 
@@ -67,10 +67,12 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                     //SCENARIO 2: no new neighbour and no outstanding requests
                 } else if (fop.available_requests == KademliaCommonConfig.ALPHA) {
+                    System.err.println(" SCENARIO 2: NO NEW NEIGHBOUR AND NO OUTSTANDING REQUESTS");
 
                     // Search operation finished. The lookup terminates when the initiator has queried and gotten responses
                     // from the k closest nodes (from the closest set) it has seen.
                     this.receiver.getFindOperationsMap().remove(fop.operationId);
+                    System.err.println("fop.body: " + fop.body.toString());
 
                     // if the lookup operation was not for bootstrapping purposes
                     if (fop.body.equals("Automatically Generated Traffic")) {
@@ -94,16 +96,19 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                             response.sender = lookupMessage.receiver;
                             response.receiver = randomBridgeNodeThisDomain;
                             response.operationId = lookupMessage.operationId;
+                            System.err.println("I am sending a RESPONSE message to " + response.receiver.getNodeId() + " of type " + response.receiver.getType() + " with msgId is " + response.msgId);
                             messageSender.sendMessage(response);
                         }
 
                     } else {
                         System.err.println("This is a bootstrap message. Let it be. ");
                     }
+
                     return;
 
                     //SCENARIO 3: no neighbour available, but there are some open outstanding requests so just wait.
                 } else {
+                    System.err.println("SCENARIO 3: NO NEW NEIGHBOUR BUT THERE ARE SOME OUTSTANDING REQUESTS ");
                     return;
                 }
             }

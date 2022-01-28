@@ -38,7 +38,7 @@ public class KadToKadRespondOperation extends RespondOperation2 {
         response.sender = lookupMessage.receiver;
         response.newLookup = false;
         response.ackId = lookupMessage.msgId;
-//        System.err.println("    I am sending a RESPONSE message to " + response.receiver.getNodeId() + " with msgId is " + response.msgId);
+        System.err.println("    I am sending a RESPONSE message to " + response.receiver.getNodeId() + " with msgId is " + response.msgId);
         messageSender.sendMessage(response);
 
     }

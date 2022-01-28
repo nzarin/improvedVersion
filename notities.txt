@@ -280,3 +280,17 @@ test how often a new node is proposed as the closest (in plaats van dat iedereen
 
 Do statistical significance test to test whether randomness can explain it
 
+
+
+
+Sender          Receiver        Message                 Operation
+-----------------------------------------------------------------------------------
+KadNode         BridgeNode      MSG_FINDNODE            KadToBridgeFindOperation
+BridgeNode      BridgeNode      MSG_FINDNODE            BridgeToBridgeFindOperation
+BridgeNode      KadNode         MSG_FINDNODE            BridgeToKadFindOperation
+KadNode         KadNode         MSG_FINDNODE            KadToKadFindOperation
+
+KadNode         KadNode         MSG_RESPONSE            KadToKadHandleResponse
+KadNode         BridgeNode      MSG_RESPONSE            KadToBridgeHandleResponse
+BridgeNode      BridgeNode      MSG_RESPONSE            BridgeToBridgeHandleRespones
+BridgeNode      KadNode         MSG_RESPONSE            BridgeToKadHandleResponse

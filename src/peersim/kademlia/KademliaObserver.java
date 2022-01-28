@@ -24,6 +24,17 @@ public class KademliaObserver implements Control {
      * Keep statistics of the number of hops of every message delivered.
      */
     public static IncrementalStats hopStore = new IncrementalStats();
+
+    /**
+     * Keep statistics of the number of messages total sent during the entire lookup operation
+     */
+    public static IncrementalStats messageStore = new IncrementalStats();
+
+    /**
+     * Keep statistics on the shortest amount of hops required to find the node for the first time
+     */
+    public static IncrementalStats shortestAmountHops = new IncrementalStats();
+
     /**
      * Keep statistics of the time every message delivered.
      */

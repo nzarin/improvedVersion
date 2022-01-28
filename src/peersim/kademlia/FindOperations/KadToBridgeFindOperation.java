@@ -25,14 +25,15 @@ public class KadToBridgeFindOperation extends FindOperation2 {
             return;
 
         // create find operation
-        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
-        KademliaObserver.find_op.add(1);
-        findOp.body = lookupMessage.body;
-        lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
-        findOp.available_requests = KademliaCommonConfig.ALPHA;
-        findOp.nrHops++;
+//        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
+//        KademliaObserver.find_op.add(1);
+//        findOp.body = lookupMessage.body;
+//        lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
+//        findOp.available_requests = KademliaCommonConfig.ALPHA;
+//        findOp.nrHops++;
+//        System.err.println("I have created a findOp with operationId : " + findOp.operationId + " and the size of my findOpMap is: " + lookupMessage.receiver.getFindOperationsMap().size());
 
-        System.err.println(" My list of bridge is as follows: ");
+        System.err.print("My list of bridge is as follows: ");
         for(BridgeNode b:  lookupMessage.receiver.getBridgeNodes()){
             System.err.print(b.getNodeId() + ", ");
         }
@@ -44,9 +45,10 @@ public class KadToBridgeFindOperation extends FindOperation2 {
             randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));
         } while (randomBridgeNodeThisDomain == null);
 
-        System.err.println(" i am forwarding the FIND message to " + randomBridgeNodeThisDomain.getNodeId() + " which is in this domain");
+        System.err.println("I am forwarding the FIND message to " + randomBridgeNodeThisDomain.getNodeId());
         // create FINDNODE message to send it to this bridge node
         Message forward = new Message(Message.MSG_FINDNODE);
+        forward.body = lookupMessage.body;
         forward.src = lookupMessage.src;
         forward.target = lookupMessage.target;
         forward.sender = lookupMessage.receiver;

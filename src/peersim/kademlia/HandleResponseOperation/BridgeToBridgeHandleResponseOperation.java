@@ -28,6 +28,7 @@ public class BridgeToBridgeHandleResponseOperation extends HandleResponseOperati
         response.sender = lookupMessage.receiver;
         response.receiver = lookupMessage.src;
         response.ackId = lookupMessage.msgId;       //todo check of dit nog klopt
+        System.err.println("I am sending a RESPONSE message to " + response.receiver.getNodeId() + " of type " + response.receiver.getType() + " with msgId is " + response.msgId);
         messageSender.sendMessage(response);
 
     }
