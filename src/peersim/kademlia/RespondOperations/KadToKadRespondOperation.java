@@ -29,6 +29,10 @@ public class KadToKadRespondOperation extends RespondOperation2 {
         //get the BETA closest nodes from the neighbours
         KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
 
+        //update statistics
+        FindOperation findOp = lookupMessage.sender.getFindOperationsMap().get(lookupMessage.operationId);
+        findOp.nrMessages++;
+
         // create a response message containing the neighbours (with the same id as of the request)
         Message response = new Message(Message.MSG_RESPONSE, betaNeighbours);
         response.operationId = lookupMessage.operationId;
@@ -38,7 +42,7 @@ public class KadToKadRespondOperation extends RespondOperation2 {
         response.sender = lookupMessage.receiver;
         response.newLookup = false;
         response.ackId = lookupMessage.msgId;
-        System.err.println("    I am sending a RESPONSE message to " + response.receiver.getNodeId() + " with msgId is " + response.msgId);
+//        System.err.println(" I am sending a RESPONSE message to (" + response.receiver.getNodeId() + "," + response.receiver.getDomain() +  ") of type " + response.receiver.getType() + " with msgId is " + response.msgId);
         messageSender.sendMessage(response);
 
     }

@@ -116,19 +116,26 @@ public class Util {
         //if the target is found -> successful lookup
         if (fop.closestSet.containsKey(fop.destNode)) {
 
-            //update stats
+//            System.err.println(" the target node is in the list of closest set! ");
+//            System.err.println(" the total nmr messages that were sent is : " + fop.nrMessages);
+//            System.err.println(" the total nmr of REQUEST messages were: " + fop.nrHops);
+//            System.err.println(" the shortestNrHops is " + fop.shortestNrHops);
+
+            //update statistics
             long duration = (CommonState.getTime() - (fop.timestamp));
-            KademliaObserver.timeStore.add(duration);
-            KademliaObserver.hopStore.add(fop.nrHops);
-            KademliaObserver.finished_lookups.add(1);
-            KademliaObserver.successful_lookups.add(1);
-            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            KademliaObserver.messageStore_OVERALL.add(fop.nrMessages);
+            KademliaObserver.shortestAmountHops_OVERALL.add(fop.shortestNrHops);
+            KademliaObserver.timeStore_OVERALL.add(duration);
+            KademliaObserver.hopStore_OVERALL.add(fop.nrHops);
+            KademliaObserver.finished_lookups_OVERALL.add(1);
+            KademliaObserver.successful_lookups_OVERALL.add(1);
+//            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
             // if I and the destination node are up -> failed lookup
-        } else if (Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() & Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
-            KademliaObserver.finished_lookups.add(1);
-            KademliaObserver.failed_lookups.add(1);
-            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        } else if (Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() && Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
+            KademliaObserver.finished_lookups_OVERALL.add(1);
+            KademliaObserver.failed_lookups_OVERALL.add(1);
+//            System.err.println("\n!!!!!!!!!!!!!!!!! ATTENTION: THIS LOOKUP FAILED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
         }
     }

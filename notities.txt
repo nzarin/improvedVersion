@@ -294,3 +294,27 @@ KadNode         KadNode         MSG_RESPONSE            KadToKadHandleResponse
 KadNode         BridgeNode      MSG_RESPONSE            KadToBridgeHandleResponse
 BridgeNode      BridgeNode      MSG_RESPONSE            BridgeToBridgeHandleRespones
 BridgeNode      KadNode         MSG_RESPONSE            BridgeToKadHandleResponse
+
+
+
+
+node (211659866918914682561010382866766392097,0) of type KadNode gets a RESPONSE message from (110767822359843855095633697831295110642,0) of type KadNode
+it is a kad to kad handleresponse operation
+We have found the target node! The shortestNrHops required was in the intra-domain 1
+SCENARIO 3: NO NEW NEIGHBOUR BUT THERE ARE SOME OUTSTANDING REQUEST
+-------------------
+node (211659866918914682561010382866766392097,0) of type KadNode gets a RESPONSE message from (112346762479240570712344582053346361332,0) of type KadNode
+it is a kad to kad handleresponse operation
+We have found the target node! The shortestNrHops required was in the intra-domain 1
+ SCENARIO 2: NO NEW NEIGHBOUR AND NO OUTSTANDING REQUESTS
+I am sending a RESPONSE message to (298121007196578492624594969408394965543,0) of type BridgeNode with msgId is 87540
+----------------
+node (298121007196578492624594969408394965543,0) of type BridgeNode gets a RESPONSE message from (211659866918914682561010382866766392097,0) of type KadNode
+it is a kad to bridge handleresponse operation
+I am sending a RESPONSE message to (7826019252350479054756722122068078817,1) of type BridgeNode with msgId is 87545
+------------------
+node (7826019252350479054756722122068078817,1) of type BridgeNode gets a RESPONSE message from (298121007196578492624594969408394965543,0) of type BridgeNode
+it is a bridge to bridge handleresponse operation
+I am sending a RESPONSE message to (67915400961302481757899662331872559545,1) of type KadNode with msgId is 87546
+-----------------
+node (67915400961302481757899662331872559545,1) of type KadNode gets a RESPONSE message from (7826019252350479054756722122068078817,1) of type BridgeNode

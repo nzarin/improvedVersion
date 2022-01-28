@@ -25,17 +25,13 @@ public class BridgeToBridgeFindOperation extends FindOperation2 {
         // find the correct bridge node of the domain of the target node
         BridgeNode randomBridgeNodeOtherDomain = null;
         for(BridgeNode b : lookupMessage.receiver.getBridgeNodes()){
-            if(lookupMessage.target.getDomain() == b.getDomain()){
+            if(lookupMessage.target.getDomain() == b.getDomain() && b != lookupMessage.target){
                 randomBridgeNodeOtherDomain = b;
             }
         }
 
-        // update statistics of the findOp object
-//        FindOperation findOp = lookupMessage.src.getFindOperationsMap().get(lookupMessage.operationId);
-//        findOp.nrHops++;
 
         //create FINDNODE message to send it to kad node
-        System.err.println(" I am forwarding the FIND message to a bridge node (" + randomBridgeNodeOtherDomain.getNodeId() + "," + randomBridgeNodeOtherDomain.getDomain() + ")");
         Message forward = new Message(Message.MSG_FINDNODE);
         forward.body = lookupMessage.body;
         forward.src = lookupMessage.src;
@@ -44,6 +40,7 @@ public class BridgeToBridgeFindOperation extends FindOperation2 {
         forward.receiver = randomBridgeNodeOtherDomain;
         forward.operationId = lookupMessage.operationId;
         forward.newLookup = lookupMessage.newLookup;
+//        System.err.println(" I am forwarding the FIND message to (" + randomBridgeNodeOtherDomain.getNodeId() + "," + randomBridgeNodeOtherDomain.getDomain() + ") of type " + randomBridgeNodeOtherDomain.getType());
         messageSender.sendMessage(forward);
 
     }

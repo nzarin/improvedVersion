@@ -20,12 +20,15 @@ public class BridgeToKadHandleResponseOperation extends HandleResponseOperation2
     public void handleResponse() {
         lookupMessage.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
 
+        //update statistics (also the other direction)
         FindOperation fop = (FindOperation) lookupMessage.body;
+        fop.nrMessages = fop.nrMessages + 2;
+        fop.shortestNrHops++;
 
         if(fop != null){
 
             this.receiver.getFindOperationsMap().remove(fop.operationId);
-            System.err.println("I have received the result of the lookup and I am going to update the statistics!");
+//            System.err.println("I have received the result of the lookup and I am going to update the statistics!");
 
             Util.updateLookupStatistics((KadNode) lookupMessage.receiver, fop, kademliaid);
         }

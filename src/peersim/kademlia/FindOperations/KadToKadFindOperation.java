@@ -37,10 +37,11 @@ public class KadToKadFindOperation extends FindOperation2 {
 
         // create a new find operation and add to operations array for bookkeeping
         FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
-        KademliaObserver.find_op.add(1);
         findOp.body = lookupMessage.body;
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
+        //update statistics
+        KademliaObserver.find_op_OVERALL.add(1);
 
         // get the K closest node to search key
         KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver);
@@ -48,11 +49,15 @@ public class KadToKadFindOperation extends FindOperation2 {
         findOp.updateClosestSet(neighbours);
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 
+        //we are going to have at least one extra hop
+        findOp.shortestNrHops++;
+
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
             KadNode nextNode = findOp.getNeighbour();
             if (nextNode != null) {
                 findOp.nrHops++;
+                findOp.nrMessages++;
                 //create a request message
                 Message request = new Message(Message.MSG_REQUEST);
                 request.body = lookupMessage.body;
@@ -63,7 +68,7 @@ public class KadToKadFindOperation extends FindOperation2 {
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
                 request.sender.getRoutingTable().addNeighbour(nextNode);
-                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain() + ") with msgId is " + request.msgId);
+//                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain() + ") of type " + request.receiver.getType() + "with msgId is " + request.msgId);
                 messageSender.sendMessage(request);
             }
         }

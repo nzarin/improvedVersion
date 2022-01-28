@@ -97,18 +97,18 @@ public class MessageSender {
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
         transport.send(src, dest, m, kademliaid);
 
-        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
-
-            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
-
-            // set delay at 4*RTT because this will probably take longer
-            long latency = transport.getLatency(src, dest);
-            long delay = 12 * latency;
-
-            // add to sent msg
-            sender.getSentMsgTracker().put(m.msgId, m.timestamp);
-            EDSimulator.add(delay, timeout, src, this.kademliaid);
-        }
+//        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
+//
+//            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
+//
+//            // set delay at 4*RTT because this will probably take longer
+//            long latency = transport.getLatency(src, dest);
+//            long delay = 12 * latency;
+//
+//            // add to sent msg
+//            sender.getSentMsgTracker().put(m.msgId, m.timestamp);
+//            EDSimulator.add(delay, timeout, src, this.kademliaid);
+//        }
     }
 
     /**
@@ -125,7 +125,7 @@ public class MessageSender {
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
         transport.send(src, dest, m, kademliaid);
 
-        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
+//        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
 
 //            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
 //
@@ -136,7 +136,7 @@ public class MessageSender {
 //            // add to sent msg
 //            sender.getSentMsgTracker().put(m.msgId, m.timestamp);
 //            EDSimulator.add(delay, timeout, src, this.kademliaid);
-        }
+//        }
     }
 
     /**
@@ -153,8 +153,7 @@ public class MessageSender {
         transport = (UnreliableTransport) (Network.prototype).getProtocol(transportid);
         transport.send(src, dest, m, kademliaid);
 
-        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
-
+//        if (m.getType() == Message.MSG_FINDNODE) { // is a find node
 //            Message timeout = new Message(Message.TIMEOUT, m.operationId, receiver, sender);
 //
 //            // set delay at 2*RTT
@@ -164,7 +163,7 @@ public class MessageSender {
 //            // add to sent msg
 //            sender.getSentMsgTracker().put(m.msgId, m.timestamp);
 //            EDSimulator.add(delay, timeout, src, this.kademliaid);
-        }
+//        }
     }
 
 }

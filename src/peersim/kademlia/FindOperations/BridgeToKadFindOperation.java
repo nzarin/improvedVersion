@@ -16,6 +16,7 @@ public class BridgeToKadFindOperation extends FindOperation2 {
         transportid = tid;
         messageSender = new MessageSender(kademliaid, tid);
     }
+
     @Override
     public void find() {
         //If I searched node is down, do nothing
@@ -27,14 +28,10 @@ public class BridgeToKadFindOperation extends FindOperation2 {
         KadNode randomKadNodeThisDomain = null;
         do{
             randomKadNodeThisDomain = lookupMessage.receiver.getKadNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getKadNodes().size()));
-        } while (randomKadNodeThisDomain == null);
+        } while (randomKadNodeThisDomain == null || randomKadNodeThisDomain == lookupMessage.target);
 
-        // update statistics of the findOp object
-//        FindOperation findOp = lookupMessage.src.getFindOperationsMap().get(lookupMessage.operationId);
-//        findOp.nrHops++;
 
         // create FINDNODE message to send it to this bridge node
-        System.err.println(" I am forwarding the FIND message to a random KadNode ( " + randomKadNodeThisDomain.getNodeId() + "," + randomKadNodeThisDomain.getDomain() + ")");
         Message forward = new Message(Message.MSG_FINDNODE);
         forward.body = lookupMessage.body;
         forward.src = lookupMessage.src;
@@ -43,6 +40,7 @@ public class BridgeToKadFindOperation extends FindOperation2 {
         forward.receiver = randomKadNodeThisDomain;
         forward.operationId = lookupMessage.operationId;
         forward.newLookup = lookupMessage.newLookup;
+//        System.err.println(" I am forwarding the FIND message to (" + randomKadNodeThisDomain.getNodeId() + "," + randomKadNodeThisDomain.getDomain() + ") of type " + randomKadNodeThisDomain.getType());
         messageSender.sendMessage(forward);
 
     }

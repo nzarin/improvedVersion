@@ -44,6 +44,8 @@ public class FindOperation {
      */
     public int nrHops = 0;
 
+    public int shortestNrHops = 0;
+
     public int nrMessages = 0;
 
     /**

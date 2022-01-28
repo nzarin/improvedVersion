@@ -8,7 +8,7 @@ public class KademliaCommonConfig {
 	/**
 	 * Length of identifiers (default is 160).
 	 */
-	public static int BITS = 9;
+	public static int BITS = 128;
 
     /**
      * Number of simultaneous lookup, so degree of parallelism (default is 3).
@@ -23,7 +23,7 @@ public class KademliaCommonConfig {
     /**
      * Dimension of k-buckets (default is 20)
      */
-    public static int K = 5;
+    public static int K = 20;
 
     /**
      * Number of domains (overlays)
@@ -33,7 +33,7 @@ public class KademliaCommonConfig {
     /**
      * Number of bridge nodes per domain.
      */
-    public static int NUMBER_OF_BRIDGES_PER_DOMAIN = 2;
+    public static int NUMBER_OF_BRIDGES_PER_DOMAIN = 6;
 
     /**
      * The version of the protocol: either naive or improved

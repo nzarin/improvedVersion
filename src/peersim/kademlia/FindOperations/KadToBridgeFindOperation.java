@@ -24,28 +24,13 @@ public class KadToBridgeFindOperation extends FindOperation2 {
         if (!target.isUp())
             return;
 
-        // create find operation
-//        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
-//        KademliaObserver.find_op.add(1);
-//        findOp.body = lookupMessage.body;
-//        lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
-//        findOp.available_requests = KademliaCommonConfig.ALPHA;
-//        findOp.nrHops++;
-//        System.err.println("I have created a findOp with operationId : " + findOp.operationId + " and the size of my findOpMap is: " + lookupMessage.receiver.getFindOperationsMap().size());
-
-        System.err.print("My list of bridge is as follows: ");
-        for(BridgeNode b:  lookupMessage.receiver.getBridgeNodes()){
-            System.err.print(b.getNodeId() + ", ");
-        }
-        System.err.println();
-
         // find a random bridge of our domain and other domain and send it the route message
         BridgeNode randomBridgeNodeThisDomain;
         do{
             randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));
         } while (randomBridgeNodeThisDomain == null);
 
-        System.err.println("I am forwarding the FIND message to " + randomBridgeNodeThisDomain.getNodeId());
+
         // create FINDNODE message to send it to this bridge node
         Message forward = new Message(Message.MSG_FINDNODE);
         forward.body = lookupMessage.body;
@@ -55,6 +40,7 @@ public class KadToBridgeFindOperation extends FindOperation2 {
         forward.receiver = randomBridgeNodeThisDomain;
         forward.operationId = lookupMessage.operationId;
         forward.newLookup = lookupMessage.newLookup;
+//        System.err.println("I am forwarding the FIND message to (" + randomBridgeNodeThisDomain.getNodeId() + "," + randomBridgeNodeThisDomain.getDomain() + ") of type " + randomBridgeNodeThisDomain.getType());
         messageSender.sendMessage(forward);
     }
 }

@@ -12,7 +12,6 @@ public abstract class HandleResponseOperation2 {
     Message lookupMessage;
     int transportid;
     MessageSender messageSender;
-    FindOperation findOp;
 
     public abstract void handleResponse();
 
