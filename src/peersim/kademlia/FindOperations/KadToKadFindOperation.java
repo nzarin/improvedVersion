@@ -42,6 +42,11 @@ public class KadToKadFindOperation extends FindOperation2 {
 
         //update statistics
         KademliaObserver.find_op_OVERALL.add(1);
+        if(lookupMessage.src.getDomain() == lookupMessage.target.getDomain()){
+            KademliaObserver.find_op_INTRA.add(1);
+        } else {
+            KademliaObserver.find_op_INTER.add(1);
+        }
 
         // get the K closest node to search key
         KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver);
