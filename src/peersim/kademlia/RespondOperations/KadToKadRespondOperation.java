@@ -10,10 +10,6 @@ import java.util.Arrays;
 public class KadToKadRespondOperation extends RespondOperation2 {
 
     public KadToKadRespondOperation(int kademliaid, Message lookupMessage, int tid){
-        this.source = (KadNode) lookupMessage.src;
-        this.target = (KadNode) lookupMessage.target;
-        this.sender = lookupMessage.sender;
-        this.receiver = lookupMessage.receiver;
         this.kademliaid = kademliaid;
         this.lookupMessage = lookupMessage;
         messageSender = new MessageSender(kademliaid, tid);

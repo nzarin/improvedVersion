@@ -118,8 +118,9 @@ public class Util {
 
             long duration = (CommonState.getTime() - (fop.timestamp));
 
-            //update statistics INTRA
             if(currentNode.getDomain() == fop.destNode.getDomain()){
+
+                //update statistics INTRA
                 KademliaObserver.messageStore_INTRA.add(fop.nrMessages);
                 KademliaObserver.shortestAmountHops_INTRA.add(fop.shortestNrHops);
                 KademliaObserver.timeStore_INTRA.add(duration);

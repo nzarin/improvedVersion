@@ -8,10 +8,6 @@ import peersim.kademlia.MessageSender;
 public class BridgeToBridgeHandleResponseOperation extends HandleResponseOperation2 {
 
     public BridgeToBridgeHandleResponseOperation(int kid, Message lookupMsg, int tid){
-        this.source = (KadNode) lookupMsg.src;
-        this.target = (KadNode) lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;

@@ -85,25 +85,38 @@ public class KademliaObserver implements Control {
             if (!Network.get(i).isUp())
                 sz--;
 
-        // calculate success ratio
+        // calculate overall success ratio
         double success_lookups = successful_lookups_OVERALL.getSum();
         double failure_lookups = failed_lookups_OVERALL.getSum();
         double no_btstrp_completed_lookups = success_lookups + failure_lookups;
         double success_ratio = success_lookups / no_btstrp_completed_lookups;
 
+        //calculate intra-domain success ratio
+        double success_lookups_intra = successful_lookups_INTRA.getSum();
+        double failure_lookups_intra = failed_lookups_INTRA.getSum();
+        double completed_lookups_intra = success_lookups_intra + failure_lookups_intra;
+        double success_ratio_intra = success_lookups_intra / completed_lookups_intra;
+
+        //calculate inter-domain success ratio
+        double success_lookups_inter = successful_lookups_INTER.getSum();
+        double failure_lookups_inter = failed_lookups_INTER.getSum();
+        double completed_lookups_inter = success_lookups_inter + failure_lookups_inter;
+        double success_ratio_inter = success_lookups_inter / completed_lookups_inter;
+
+
 
         //format print result
         String s = String.format("[time=%d]:[N=%d current nodes UP] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%f created findops] [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio] [%f shortest amount of hops] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
-                CommonState.getTime(), sz, hopStore_OVERALL.getMin(), hopStore_OVERALL.getAverage(), hopStore_OVERALL.getMax(), (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), find_op_OVERALL.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), find_op_INTRA.getSum(), find_op_INTER.getSum());
+                CommonState.getTime(), sz, hopStore_OVERALL.getMin(), hopStore_OVERALL.getAverage(), hopStore_OVERALL.getMax(), (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), find_op_OVERALL.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
 
         // create files
         try {
 
             //create OVERALL files
-            File hop_file_OVERALL = new File("results/hops/avgHops-OVERALL.txt");
+            File hop_file_OVERALL = new File("results/hops/shortestHops-OVERALL.txt");
             hop_file_OVERALL.createNewFile();
             BufferedWriter outH_OVERALL = new BufferedWriter(new FileWriter(hop_file_OVERALL, true));
-            outH_OVERALL.write(hopStore_OVERALL.getAverage() + "\n");
+            outH_OVERALL.write(shortestAmountHops_OVERALL.getAverage() + "\n");
             outH_OVERALL.close();
 
             File latency_file_OVERALL = new File("results/latency/avgLatency-OVERALL.txt");
@@ -125,10 +138,10 @@ public class KademliaObserver implements Control {
             outM_OVERALL.close();
 
             //create INTRA-DOMAIN LOOKUP files
-            File hop_file_INTRA = new File("results/hops/avgHops-INTRA.txt");
+            File hop_file_INTRA = new File("results/hops/shortestHops-INTRA.txt");
             hop_file_INTRA.createNewFile();
             BufferedWriter outH_INTRA = new BufferedWriter(new FileWriter(hop_file_INTRA, true));
-            outH_INTRA.write(hopStore_INTRA.getAverage() + "\n");
+            outH_INTRA.write(shortestAmountHops_INTRA.getAverage() + "\n");
             outH_INTRA.close();
 
             File latency_file_INTRA = new File("results/latency/avgLatency-INTRA.txt");
@@ -140,7 +153,7 @@ public class KademliaObserver implements Control {
             File success_file_INTRA = new File("results/successratio/avgSR-INTRA.txt");
             success_file_INTRA.createNewFile();
             BufferedWriter outS_INTRA = new BufferedWriter(new FileWriter(success_file_INTRA, true));
-            outS_INTRA.write(success_ratio + "\n");
+            outS_INTRA.write(success_ratio_intra + "\n");
             outS_INTRA.close();
 
             File message_file_INTRA = new File("results/messages/avgMessages-INTRA.txt");
@@ -151,10 +164,10 @@ public class KademliaObserver implements Control {
 
 
             //create INTER-DOMAIN LOOKUP files
-            File hop_file_INTER = new File("results/hops/avgHops-INTER.txt");
+            File hop_file_INTER = new File("results/hops/shortestHops-INTER.txt");
             hop_file_INTER.createNewFile();
             BufferedWriter outH_INTER= new BufferedWriter(new FileWriter(hop_file_INTER, true));
-            outH_INTER.write(hopStore_INTER.getAverage() + "\n");
+            outH_INTER.write(shortestAmountHops_INTER.getAverage() + "\n");
             outH_INTER.close();
 
             File latency_file_INTER = new File("results/latency/avgLatency-INTER.txt");
@@ -166,7 +179,7 @@ public class KademliaObserver implements Control {
             File success_file_INTER = new File("results/successratio/avgSR-INTER.txt");
             success_file_INTER.createNewFile();
             BufferedWriter outS_INTER = new BufferedWriter(new FileWriter(success_file_INTER, true));
-            outS_INTER.write(success_ratio + "\n");
+            outS_INTER.write(success_ratio_inter + "\n");
             outS_INTER.close();
 
             File message_file_INTER = new File("results/messages/avgMessages-INTER.txt");

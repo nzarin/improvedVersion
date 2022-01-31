@@ -6,10 +6,6 @@ import peersim.kademlia.*;
 public class BridgeToBridgeFindOperation extends FindOperation2 {
 
     public BridgeToBridgeFindOperation(int kid, Message lookupMsg, int tid){
-        this.source = (KadNode) lookupMsg.src;
-        this.target = (KadNode) lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;

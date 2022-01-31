@@ -3,20 +3,13 @@ package peersim.kademlia.HandleResponseOperation;
 import peersim.core.CommonState;
 import peersim.kademlia.*;
 
-import javax.annotation.processing.SupportedSourceVersion;
 
 /**
  * This class represents how the response should be handled when source and target are both KadNodes
  */
 public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
-    private boolean alreadyFoundTarget = false;
-
     public KadToKadHandleResponseOperation(int kid, Message lookupMsg, int tid) {
-        this.source = (KadNode) lookupMsg.src;
-        this.target = (KadNode) lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;
@@ -26,6 +19,8 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
     @Override
     public void handleResponse() {
+
+
         // remove the timer for the deadline because we already received a response on time
         lookupMessage.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
 
@@ -36,6 +31,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
         // get corresponding find operation (using the message field operationId)
         FindOperation fop = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
+        fop.nrResponse++;
 
         if (fop != null) {
             //Step 1: update the closest set by saving the received neighbour
@@ -45,13 +41,20 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                 fop.available_requests++;
             }
 
-            //update statistics of the shortest amount of hops if we have found the target node for the first time. Otherwise there will be another hop?
-            if(fop.getClosestSet().containsKey(fop.destNode) && !alreadyFoundTarget){
-                //do nothing
-//                System.err.println("We have found the target node! The shortestNrHops required was in the intra-domain " + fop.shortestNrHops);
-                alreadyFoundTarget = true;
-            } else {
-                fop.shortestNrHops++; //todo: this might nog be the case for empty messages
+//            System.err.println("number of responses received: " + fop.nrResponse);
+//            System.err.println("the modulo operation value: " + (fop.nrResponse % KademliaCommonConfig.ALPHA));
+
+
+            //Periodically update statistics of the shortest amount of hops if we have found the target node for the first time. Otherwise, there will be another hop?
+            if(fop.nrResponse % KademliaCommonConfig.ALPHA == 0){
+
+                //do we have found the message ?
+                if(!fop.getClosestSet().containsKey(fop.destNode) && !fop.alreadyFoundTarget){
+                    fop.shortestNrHops++;
+                } else {
+//                    System.err.println("We have found the target node! The shortestNrHops required was " + fop.shortestNrHops);
+                    fop.alreadyFoundTarget = true;
+                }
             }
 
             // Step 2: send the new requests if allowed
@@ -72,10 +75,6 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                     request.newLookup = false;
 //                    System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain() + ") of type " + request.receiver.getType() + " with msgId is " + request.msgId);
 
-                    //increment hop count for bookkeeping
-                    fop.nrHops++;
-                    fop.nrMessages++;
-
                     //send the ROUTE message
                     messageSender.sendMessage(request);
 
@@ -85,17 +84,17 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                     // Search operation finished. The lookup terminates when the initiator has queried and gotten responses
                     // from the k closest nodes (from the closest set) it has seen.
-                    this.receiver.getFindOperationsMap().remove(fop.operationId);
+                    lookupMessage.receiver.getFindOperationsMap().remove(fop.operationId);
 
                     // if the lookup operation was not for bootstrapping purposes
                     if (fop.body.equals("Automatically Generated Traffic")) {
 
-                        // if the source of the lookup is the same as this receiver -> it was an intradomain lookup
+                        // if the source of the lookup is the same as this receiver -> it was an intra-domain lookup
                         if (lookupMessage.src == lookupMessage.receiver){
                             Util.updateLookupStatistics((KadNode) lookupMessage.receiver, fop, this.kademliaid);
                         } else {
 
-                            // find the correct bridge node of the domain of the target node
+                            // It is an inter-domain lookup. So first find the correct bridge node of the domain of the target node.
                             BridgeNode randomBridgeNodeThisDomain;
                             do{
                                 randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));

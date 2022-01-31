@@ -44,9 +44,13 @@ public class FindOperation {
      */
     public int nrHops = 0;
 
-    public int shortestNrHops = 0;
+    public int shortestNrHops = 1;
 
     public int nrMessages = 0;
+
+    public int nrResponse = 0;
+
+    public boolean alreadyFoundTarget;
 
     /**
      * This map contains the K closest nodes and corresponding boolean value that indicates if the nodes has been already queried

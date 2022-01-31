@@ -9,10 +9,6 @@ import peersim.kademlia.*;
 public class KadToBridgeHandleRespondOperation extends HandleResponseOperation2 {
 
     public KadToBridgeHandleRespondOperation(int kid, Message lookupMsg, int tid){
-        this.source = (KadNode) lookupMsg.src;
-        this.target = (KadNode) lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;
@@ -21,9 +17,8 @@ public class KadToBridgeHandleRespondOperation extends HandleResponseOperation2 
 
     @Override
     public void handleResponse() {
-        // forward this message to the right domain bridge node
 
-        // find a random bridge of our domain and other domain and send it the route message
+        // find a random bridge of other domain and send it the route message
         BridgeNode randomBridgeNodeOtherDomain = null;
         for(BridgeNode b : lookupMessage.receiver.getBridgeNodes()){
             if(lookupMessage.src.getDomain() == b.getDomain()){

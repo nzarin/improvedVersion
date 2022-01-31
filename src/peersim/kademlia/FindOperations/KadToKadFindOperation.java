@@ -16,10 +16,6 @@ public class KadToKadFindOperation extends FindOperation2 {
      * @param tid
      */
     public KadToKadFindOperation(int kid, Message lookupMsg, int tid) {
-        this.source = (KadNode) lookupMsg.src;
-        this.target = (KadNode) lookupMsg.target;
-        this.sender = lookupMsg.sender;
-        this.receiver = lookupMsg.receiver;
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;
@@ -40,29 +36,24 @@ public class KadToKadFindOperation extends FindOperation2 {
         findOp.body = lookupMessage.body;
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
-        //update statistics
-        KademliaObserver.find_op_OVERALL.add(1);
-        if(lookupMessage.src.getDomain() == lookupMessage.target.getDomain()){
-            KademliaObserver.find_op_INTRA.add(1);
-        } else {
-            KademliaObserver.find_op_INTER.add(1);
-        }
 
         // get the K closest node to search key
         KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver);
+
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 
-        //we are going to have at least one extra hop
-        findOp.shortestNrHops++;
 
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
             KadNode nextNode = findOp.getNeighbour();
             if (nextNode != null) {
+
+                //update statistics of the find operation
                 findOp.nrHops++;
                 findOp.nrMessages++;
+
                 //create a request message
                 Message request = new Message(Message.MSG_REQUEST);
                 request.body = lookupMessage.body;

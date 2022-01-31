@@ -22,6 +22,9 @@ public class TrafficGenerator implements Control {
      */
     private final int pid;
 
+    /**
+     * The probability that a lookup is an intra-domain lookup.
+     */
     private final double p_intra;
 
     /**
