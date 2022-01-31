@@ -19,7 +19,7 @@ public class KadToBridgeFindOperation extends FindOperation2 {
 
     @Override
     public void find() {
-        //If I searched node is down, do nothing
+        //If searched node is down, do nothing
         Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
         if (!target.isUp())
             return;

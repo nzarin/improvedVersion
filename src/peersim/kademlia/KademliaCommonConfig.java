@@ -40,6 +40,8 @@ public class KademliaCommonConfig {
      */
     public static int NAIVE_KADEMLIA_PROTOCOL = 1;
 
+    public static double PERCENTAGE_INTRA = 0.5;
+
     /**
      * short information about current kademlia configuration
      *

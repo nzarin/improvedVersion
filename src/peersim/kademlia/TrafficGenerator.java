@@ -22,6 +22,8 @@ public class TrafficGenerator implements Control {
      */
     private final int pid;
 
+    private final double p_intra;
+
     /**
      * Constructor that links the CONTROL and PROTOCOL objects.
      *
@@ -29,7 +31,7 @@ public class TrafficGenerator implements Control {
      */
     public TrafficGenerator(String prefix) {
         pid = Configuration.getPid(prefix + "." + PAR_PROT);
-
+        p_intra = KademliaCommonConfig.PERCENTAGE_INTRA;
     }
 
     /**
@@ -48,22 +50,46 @@ public class TrafficGenerator implements Control {
         return m;
     }
 
-    private KadNode selectRandomKadNode() {
-        // existing active destination node
-        Node n = Network.get(CommonState.r.nextInt(Network.size()));
-        while (!n.isUp()) {
-            n = Network.get(CommonState.r.nextInt(Network.size()));
+
+    /**
+     * Create a intra domain lookup if variable intra is true. Otherwise, create inter-domain lookup.
+     *
+     * @param intra
+     */
+    private void createLookup(boolean intra) {
+        Node source;
+        Node target;
+        KademliaNode sourceKadNode;
+        KademliaNode targetKadNode;
+
+        if (intra) {
+            //create intra domain lookup
+            do {
+                source = Network.get(CommonState.r.nextInt(Network.size()));
+                target = Network.get(CommonState.r.nextInt(Network.size()));
+                KademliaProtocol kadProtocolSource = (KademliaProtocol) source.getProtocol(pid);
+                KademliaProtocol kadProtocolTarget = (KademliaProtocol) target.getProtocol(pid);
+                sourceKadNode = kadProtocolSource.getCurrentNode();
+                targetKadNode = kadProtocolTarget.getCurrentNode();
+            } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode) || (sourceKadNode.getNodeId() == targetKadNode.getNodeId()) || sourceKadNode.getDomain() != targetKadNode.getDomain());
+        } else {
+
+            //create inter-domain lookup
+            do {
+                source = Network.get(CommonState.r.nextInt(Network.size()));
+                target = Network.get(CommonState.r.nextInt(Network.size()));
+                KademliaProtocol kadProtocolSource = (KademliaProtocol) source.getProtocol(pid);
+                KademliaProtocol kadProtocolTarget = (KademliaProtocol) target.getProtocol(pid);
+                sourceKadNode = kadProtocolSource.getCurrentNode();
+                targetKadNode = kadProtocolTarget.getCurrentNode();
+            } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode) || (sourceKadNode.getNodeId() == targetKadNode.getNodeId()) || sourceKadNode.getDomain() == targetKadNode.getDomain());
         }
 
-        // prevent that a find message is generated for a bridge node
-        KademliaProtocol kademliaProtocol = (KademliaProtocol) n.getProtocol(pid);
-        if (kademliaProtocol.getCurrentNode() instanceof KadNode) {
-            return (KadNode) kademliaProtocol.getCurrentNode();
-        }
-        return selectRandomKadNode();
+
+        // send message
+        EDSimulator.add(0, generateFindNodeMessage((KadNode) sourceKadNode, (KadNode) targetKadNode), source, pid);
 
     }
-
 
     /**
      * Every call of this control generates and send a random find node message
@@ -71,22 +97,12 @@ public class TrafficGenerator implements Control {
      * @return boolean
      */
     public boolean execute() {
-        Node source;
-        Node target;
-        KademliaNode sourceKadNode;
-        KademliaNode targetKadNode;
 
-        do {
-            source = Network.get(CommonState.r.nextInt(Network.size()));
-            target = Network.get(CommonState.r.nextInt(Network.size()));
-            KademliaProtocol kadProtocolSource = (KademliaProtocol) source.getProtocol(pid);
-            KademliaProtocol kadProtocolTarget = (KademliaProtocol) target.getProtocol(pid);
-            sourceKadNode = kadProtocolSource.getCurrentNode();
-            targetKadNode = kadProtocolTarget.getCurrentNode();
-        } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode || sourceKadNode.getNodeId() == targetKadNode.getNodeId()));
+        // throw the dice
+        double dice = CommonState.r.nextDouble();
 
-        // send message
-        EDSimulator.add(0, generateFindNodeMessage((KadNode) sourceKadNode, (KadNode) targetKadNode), source, pid);
+        // perform the correct operation based on the probability
+        createLookup(dice < p_intra);
 
         return false;
     }
