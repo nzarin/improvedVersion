@@ -61,14 +61,6 @@ public class MessageSender {
      */
     private void sendMessageKadToKad(KadNode sender, KadNode receiver, Message m) {
 
-        //update statistics
-        KademliaObserver.messageStore_OVERALL.add(1);
-        if(m.src.getDomain() == m.target.getDomain()){
-            KademliaObserver.messageStore_INTRA.add(1);
-        } else{
-            KademliaObserver.messageStore_INTER.add(1);
-        }
-
         //retrieve the relevant network nodes
         Node s = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node r = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
@@ -101,10 +93,6 @@ public class MessageSender {
      */
     private void sendMessageKadToBridge(KadNode sender, BridgeNode receiver, Message m) {
 
-        //update statistics
-        KademliaObserver.messageStore_OVERALL.add(1);
-        KademliaObserver.messageStore_INTER.add(1);
-
         Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
 
@@ -122,10 +110,6 @@ public class MessageSender {
      */
     private void sendMessageBridgeToKad(BridgeNode sender, KadNode receiver, Message m) {
 
-        //update statistics
-        KademliaObserver.messageStore_OVERALL.add(1);
-        KademliaObserver.messageStore_INTER.add(1);
-
         Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);
 
@@ -142,10 +126,6 @@ public class MessageSender {
      * @param m
      */
     private void sendMessageBridgeToBridge(BridgeNode sender, BridgeNode receiver, Message m) {
-
-        //update statistics
-        KademliaObserver.messageStore_OVERALL.add(1);
-        KademliaObserver.messageStore_INTER.add(1);
 
         Node src = Util.nodeIdtoNode(sender.getNodeId(), kademliaid);
         Node dest = Util.nodeIdtoNode(receiver.getNodeId(), kademliaid);

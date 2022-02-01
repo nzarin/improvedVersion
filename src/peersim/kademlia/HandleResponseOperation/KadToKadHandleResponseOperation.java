@@ -31,7 +31,6 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
         // get corresponding find operation (using the message field operationId)
         FindOperation fop = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
-        fop.nrResponse++;
 
         if (fop != null) {
             //Step 1: update the closest set by saving the received neighbour
@@ -44,6 +43,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 //            System.err.println("number of responses received: " + fop.nrResponse);
 //            System.err.println("the modulo operation value: " + (fop.nrResponse % KademliaCommonConfig.ALPHA));
 
+            fop.nrResponse++;
 
             //Periodically update statistics of the shortest amount of hops if we have found the target node for the first time. Otherwise, there will be another hop?
             if(fop.nrResponse % KademliaCommonConfig.ALPHA == 0){
@@ -64,6 +64,8 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                 //SCENARIO 1: there exists some neighbour we can visit.
                 if (neighbour != null) {
 //                    System.err.println(" SCENARIO 1: THERE EXIST SOME NEIGHBOUR WE CAN VISIT");
+
+                    fop.nrMessages++;
 
                     //create new request to send to this neighbour
                     Message request = new Message(Message.MSG_REQUEST);

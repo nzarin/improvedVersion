@@ -36,7 +36,6 @@ public class KademliaObserver implements Control {
     public static IncrementalStats messageStore_INTRA = new IncrementalStats();
     public static IncrementalStats shortestAmountHops_INTRA = new IncrementalStats();
     public static IncrementalStats timeStore_INTRA = new IncrementalStats();
-    public static IncrementalStats find_op_INTRA = new IncrementalStats();
     public static IncrementalStats finished_lookups_INTRA = new IncrementalStats();
     public static IncrementalStats failed_lookups_INTRA = new IncrementalStats();
     public static IncrementalStats successful_lookups_INTRA = new IncrementalStats();
@@ -46,7 +45,6 @@ public class KademliaObserver implements Control {
     public static IncrementalStats messageStore_INTER = new IncrementalStats();
     public static IncrementalStats shortestAmountHops_INTER = new IncrementalStats();
     public static IncrementalStats timeStore_INTER = new IncrementalStats();
-    public static IncrementalStats find_op_INTER = new IncrementalStats();
     public static IncrementalStats finished_lookups_INTER = new IncrementalStats();
     public static IncrementalStats failed_lookups_INTER = new IncrementalStats();
     public static IncrementalStats successful_lookups_INTER = new IncrementalStats();
@@ -106,8 +104,8 @@ public class KademliaObserver implements Control {
 
 
         //format print result
-        String s = String.format("[time=%d]:[N=%d current nodes UP] [%f min hops] [%f average hops] [%f max hops] [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%f created findops] [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio] [%f shortest amount of hops] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
-                CommonState.getTime(), sz, hopStore_OVERALL.getMin(), hopStore_OVERALL.getAverage(), hopStore_OVERALL.getMax(), (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), find_op_OVERALL.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
+        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%f created findops] [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio] [%f shortest amount of hops] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
+                CommonState.getTime(), sz, (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), find_op_OVERALL.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
 
         // create files
         try {
