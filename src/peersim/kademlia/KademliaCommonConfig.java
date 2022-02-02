@@ -28,7 +28,7 @@ public class KademliaCommonConfig {
     /**
      * Number of domains (overlays)
      */
-    public static int NUMBER_OF_DOMAINS = 6;
+    public static int NUMBER_OF_DOMAINS = 2;
 
     /**
      * Number of bridge nodes per domain.

@@ -113,50 +113,50 @@ public class KademliaObserver implements Control {
             //create OVERALL files
             File hop_file_OVERALL = new File("results/hops/shortestHops-OVERALL.txt");
             hop_file_OVERALL.createNewFile();
-            BufferedWriter outH_OVERALL = new BufferedWriter(new FileWriter(hop_file_OVERALL, true));
+            BufferedWriter outH_OVERALL = new BufferedWriter(new FileWriter(hop_file_OVERALL, false));
             outH_OVERALL.write(shortestAmountHops_OVERALL.getAverage() + "\n");
             outH_OVERALL.close();
 
             File latency_file_OVERALL = new File("results/latency/avgLatency-OVERALL.txt");
             latency_file_OVERALL.createNewFile();
-            BufferedWriter outL_OVERALL = new BufferedWriter(new FileWriter(latency_file_OVERALL, true));
+            BufferedWriter outL_OVERALL = new BufferedWriter(new FileWriter(latency_file_OVERALL, false));
             outL_OVERALL.write(timeStore_OVERALL.getAverage() + "\n");
             outL_OVERALL.close();
 
             File success_file_OVERALL = new File("results/successratio/avgSR-OVERALL.txt");
             success_file_OVERALL.createNewFile();
-            BufferedWriter outS_OVERALL = new BufferedWriter(new FileWriter(success_file_OVERALL, true));
+            BufferedWriter outS_OVERALL = new BufferedWriter(new FileWriter(success_file_OVERALL, false));
             outS_OVERALL.write(success_ratio + "\n");
             outS_OVERALL.close();
 
             File message_file_OVERALL = new File("results/messages/avgMessages-OVERALL.txt");
             message_file_OVERALL.createNewFile();
-            BufferedWriter outM_OVERALL = new BufferedWriter(new FileWriter(message_file_OVERALL, true));
+            BufferedWriter outM_OVERALL = new BufferedWriter(new FileWriter(message_file_OVERALL, false));
             outM_OVERALL.write(messageStore_OVERALL.getAverage() + "\n");
             outM_OVERALL.close();
 
             //create INTRA-DOMAIN LOOKUP files
             File hop_file_INTRA = new File("results/hops/shortestHops-INTRA.txt");
             hop_file_INTRA.createNewFile();
-            BufferedWriter outH_INTRA = new BufferedWriter(new FileWriter(hop_file_INTRA, true));
+            BufferedWriter outH_INTRA = new BufferedWriter(new FileWriter(hop_file_INTRA, false));
             outH_INTRA.write(shortestAmountHops_INTRA.getAverage() + "\n");
             outH_INTRA.close();
 
             File latency_file_INTRA = new File("results/latency/avgLatency-INTRA.txt");
             latency_file_INTRA.createNewFile();
-            BufferedWriter outL_INTRA = new BufferedWriter(new FileWriter(latency_file_INTRA, true));
+            BufferedWriter outL_INTRA = new BufferedWriter(new FileWriter(latency_file_INTRA, false));
             outL_INTRA.write(timeStore_INTRA.getAverage() + "\n");
             outL_INTRA.close();
 
             File success_file_INTRA = new File("results/successratio/avgSR-INTRA.txt");
             success_file_INTRA.createNewFile();
-            BufferedWriter outS_INTRA = new BufferedWriter(new FileWriter(success_file_INTRA, true));
+            BufferedWriter outS_INTRA = new BufferedWriter(new FileWriter(success_file_INTRA, false));
             outS_INTRA.write(success_ratio_intra + "\n");
             outS_INTRA.close();
 
             File message_file_INTRA = new File("results/messages/avgMessages-INTRA.txt");
             message_file_INTRA.createNewFile();
-            BufferedWriter outM_INTRA = new BufferedWriter(new FileWriter(message_file_INTRA, true));
+            BufferedWriter outM_INTRA = new BufferedWriter(new FileWriter(message_file_INTRA, false));
             outM_INTRA.write(messageStore_INTRA.getAverage() + "\n");
             outM_INTRA.close();
 
@@ -164,25 +164,25 @@ public class KademliaObserver implements Control {
             //create INTER-DOMAIN LOOKUP files
             File hop_file_INTER = new File("results/hops/shortestHops-INTER.txt");
             hop_file_INTER.createNewFile();
-            BufferedWriter outH_INTER= new BufferedWriter(new FileWriter(hop_file_INTER, true));
+            BufferedWriter outH_INTER= new BufferedWriter(new FileWriter(hop_file_INTER, false));
             outH_INTER.write(shortestAmountHops_INTER.getAverage() + "\n");
             outH_INTER.close();
 
             File latency_file_INTER = new File("results/latency/avgLatency-INTER.txt");
             latency_file_INTER.createNewFile();
-            BufferedWriter outL_INTER = new BufferedWriter(new FileWriter(latency_file_INTER, true));
+            BufferedWriter outL_INTER = new BufferedWriter(new FileWriter(latency_file_INTER, false));
             outL_INTER.write(timeStore_INTER.getAverage() + "\n");
             outL_INTER.close();
 
             File success_file_INTER = new File("results/successratio/avgSR-INTER.txt");
             success_file_INTER.createNewFile();
-            BufferedWriter outS_INTER = new BufferedWriter(new FileWriter(success_file_INTER, true));
+            BufferedWriter outS_INTER = new BufferedWriter(new FileWriter(success_file_INTER, false));
             outS_INTER.write(success_ratio_inter + "\n");
             outS_INTER.close();
 
             File message_file_INTER = new File("results/messages/avgMessages-INTER.txt");
             message_file_INTER.createNewFile();
-            BufferedWriter outM_INTER = new BufferedWriter(new FileWriter(message_file_INTER, true));
+            BufferedWriter outM_INTER = new BufferedWriter(new FileWriter(message_file_INTER, false));
             outM_INTER.write(messageStore_INTER.getAverage() + "\n");
             outM_INTER.close();
 
