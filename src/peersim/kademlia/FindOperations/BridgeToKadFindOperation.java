@@ -15,13 +15,13 @@ public class BridgeToKadFindOperation extends FindOperation2 {
 
     @Override
     public void find() {
-        //If I searched node is down, do nothing
+        //If the searched node is down, do nothing
         Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
         if (!target.isUp())
             return;
 
         //select a random kadnode in this domain that can initiate the findoperation
-        KadNode randomKadNodeThisDomain = null;
+        KadNode randomKadNodeThisDomain;
         do{
             randomKadNodeThisDomain = lookupMessage.receiver.getKadNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getKadNodes().size()));
         } while (randomKadNodeThisDomain == null || randomKadNodeThisDomain == lookupMessage.target);

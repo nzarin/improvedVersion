@@ -14,7 +14,7 @@ public class KBucket implements Cloneable {
     /**
      * The k-bucket array.
      */
-    protected LinkedHashMap<KadNode, Long> neighbours = null;
+    protected LinkedHashMap<KadNode, Long> neighbours;
 
     /**
      * Empty constructor.
@@ -22,7 +22,6 @@ public class KBucket implements Cloneable {
     public KBucket() {
         neighbours = new LinkedHashMap<>();
     }
-
 
 
     /**

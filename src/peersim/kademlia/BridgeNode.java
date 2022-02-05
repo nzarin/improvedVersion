@@ -10,41 +10,31 @@ public class BridgeNode implements KademliaNode {
     private final BigInteger nodeId;
     private int domain;
     private final RoutingTable routingTable;
-    private final KademliaProtocol kademliaProtocol;
     private final ArrayList<KadNode> kadNodes;
     private final ArrayList<BridgeNode> bridgeNodes;
-    private final boolean available;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
 
     public BridgeNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
         this.nodeId = id;
         this.domain = domain;
-        this.kademliaProtocol = kademliaProtocol;
         this.routingTable = (new RoutingTable(this));
-        this.available = true;
         this.kadNodes = new ArrayList<>();
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
     }
 
-    public void addKadNode(KadNode node) {
-        this.kadNodes.add(node);
-    }
-
-    public void addBridgeNode(BridgeNode node) {
-        this.bridgeNodes.add(node);
-    }
-
-    //getters
-    public int getDomain() {
-        return this.domain;
-    }
 
     //setters
     public void setDomain(int domain) {
         this.domain = domain;
+    }
+
+
+    //getters
+    public int getDomain() {
+        return this.domain;
     }
 
     @Override
@@ -76,9 +66,6 @@ public class BridgeNode implements KademliaNode {
         return this.routingTable;
     }
 
-    public boolean isAvailable() {
-        return this.available;
-    }
 
     //printers
     @Override

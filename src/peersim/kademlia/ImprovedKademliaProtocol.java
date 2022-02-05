@@ -16,11 +16,10 @@ public class ImprovedKademliaProtocol extends Lookup {
         this.lookupMessage = lookupMsg;
         this.kademliaid = kid;
         this.transportid = tid;
-
     }
 
     /**
-     * Perform the find operation for the improved kademlia version.
+     * Perform the correct version of teh find operation for the improved kademlia version.
      */
     @Override
     public void performFindOp() {
@@ -29,12 +28,18 @@ public class ImprovedKademliaProtocol extends Lookup {
 
     }
 
+    /**
+     * Perform the correct version of the respond operation for the improved kademlia version.
+     */
     @Override
     public void performRespondOp() {
         this.resOp = lif2.createRespondOperation(kademliaid, lookupMessage, transportid);
         resOp.respond();
     }
 
+    /**
+     * Perform the correct version of the handle response operation for the improved kademlia version.
+     */
     @Override
     public void performHandleResponseOp() {
         this.handleResOp = lif2.createHandleResponseOperation(kademliaid, lookupMessage, transportid);

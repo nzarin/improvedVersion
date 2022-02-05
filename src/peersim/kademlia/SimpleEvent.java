@@ -7,12 +7,18 @@ import peersim.core.CommonState;
  */
 public class SimpleEvent {
 
+    /**
+     * Timestamp when this event was created.
+     */
     public long timestamp;
     /**
      * The identifier of the type of the event.
      */
     public int type;
 
+    /**
+     * Constructs the event.
+     */
     public SimpleEvent() {
         this.timestamp = CommonState.getTime();
     }

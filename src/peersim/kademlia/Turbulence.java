@@ -26,11 +26,10 @@ import java.util.Comparator;
 public class Turbulence implements Control {
 
     private static final String PAR_PROT = "protocol";
-    private static final String PAR_TRANSPORT = "transport";
     private static final String PAR_INIT = "init";
 
     /**
-     * Specify a minimum size for the network. By default there is no limit.
+     * Specify a minimum size for the network. By default, there is no limit.
      */
     private static final String PAR_MINSIZE = "minsize";
 
@@ -60,9 +59,7 @@ public class Turbulence implements Control {
      */
     protected NodeInitializer[] inits;
 
-    private final String prefix;
     private final int kademliaid;
-    private final int transportid;
     private final int maxsize;
     private final int minsize;
     private final double p_idle;
@@ -75,12 +72,10 @@ public class Turbulence implements Control {
      * @param prefix
      */
     public Turbulence(String prefix) {
-        this.prefix = prefix;
-        kademliaid = Configuration.getPid(this.prefix + "." + PAR_PROT);
-        transportid = Configuration.getPid(this.prefix + "." + PAR_TRANSPORT);
+        kademliaid = Configuration.getPid(prefix + "." + PAR_PROT);
 
-        minsize = Configuration.getInt(this.prefix + "." + PAR_MINSIZE, 1);
-        maxsize = Configuration.getInt(this.prefix + "." + PAR_MAXSIZE, Integer.MAX_VALUE);
+        minsize = Configuration.getInt(prefix + "." + PAR_MINSIZE, 1);
+        maxsize = Configuration.getInt(prefix + "." + PAR_MAXSIZE, Integer.MAX_VALUE);
 
         Object[] tmp = Configuration.getInstanceArray(prefix + "." + PAR_INIT);
         inits = new NodeInitializer[tmp.length];
@@ -88,9 +83,9 @@ public class Turbulence implements Control {
             inits[i] = (NodeInitializer) tmp[i];
 
         // load probability from configuration file
-        p_idle = Configuration.getDouble(this.prefix + "." + PAR_IDLE, 0); // idle default 0
-        p_add = Configuration.getDouble(this.prefix + "." + PAR_ADD, 0.5); // add default 0.5
-        p_rem = Configuration.getDouble(this.prefix + "." + PAR_REM, 0.5); // add default 0.5
+        p_idle = Configuration.getDouble(prefix + "." + PAR_IDLE, 0); // idle default 0
+        p_add = Configuration.getDouble(prefix + "." + PAR_ADD, 0.5); // add default 0.5
+        p_rem = Configuration.getDouble(prefix + "." + PAR_REM, 0.5); // add default 0.5
 
         // check probability values
         if (p_idle < 0 || p_idle > 1) {
@@ -103,7 +98,7 @@ public class Turbulence implements Control {
             System.err.println("Wrong event probability in Turbulence class: the sum of PAR_IDLE, PAR_ADD and PAR_REM must be 1");
         }
 
-        System.err.println(String.format("Turbulence: [p_idle=%f] [p_add=%f] [p_remove=%f] [(min,max)=(%d,%d)]", p_idle, p_add, p_rem, minsize, maxsize));
+        System.err.printf("Turbulence: [p_idle=%f] [p_add=%f] [p_remove=%f] [(min,max)=(%d,%d)]%n", p_idle, p_add, p_rem, minsize, maxsize);
     }
 
     @SuppressWarnings("unchecked")
@@ -133,8 +128,7 @@ public class Turbulence implements Control {
 
         // Add node to network
         Node newNetworkNode = (Node) Network.prototype.clone();
-        for (int j = 0; j < inits.length; ++j)
-            inits[j].initialize(newNetworkNode);
+        for (NodeInitializer init : inits) init.initialize(newNetworkNode);
         Network.add(newNetworkNode);
 
         // create new kad node
@@ -162,13 +156,6 @@ public class Turbulence implements Control {
         // start auto-search
         EDSimulator.add(0, m, newNetworkNode, kademliaid);
 
-//        // find another random node (this is to enrich the k-buckets)
-//        Node bootstrapNode2 = selectBootstrapNode(newKadNode);
-//
-//        Message m1 = Message.makeEmptyMessage("Bootstrap traffic", Message.MSG_FINDNODE);
-//        m1.timestamp = CommonState.getTime();
-//        m1.dest = urg.generateID();
-
         return false;
     }
 
@@ -193,7 +180,7 @@ public class Turbulence implements Control {
                 bootstrapKadNode = temp;
             }
 
-        } while ((bootstrapNode == null) || (bootstrapKadNode == null) || (!bootstrapNode.isUp()));
+        } while (bootstrapKadNode == null || !bootstrapNode.isUp());
 
         return bootstrapNode;
     }

@@ -13,7 +13,7 @@ public class BridgeToBridgeFindOperation extends FindOperation2 {
     }
     @Override
     public void find() {
-        //If I searched node is down, do nothing
+        //If a searched node is down, do nothing
         Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
         if (!target.isUp())
             return;
@@ -25,7 +25,6 @@ public class BridgeToBridgeFindOperation extends FindOperation2 {
                 randomBridgeNodeOtherDomain = b;
             }
         }
-
 
         //create FINDNODE message to send it to kad node
         Message forward = new Message(Message.MSG_FINDNODE);

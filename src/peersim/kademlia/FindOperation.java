@@ -37,7 +37,7 @@ public class FindOperation {
     /**
      * Start timestamp of the search operation
      */
-    public long timestamp = 0;
+    public long timestamp;
 
     /**
      * Number of hops the message did
@@ -75,7 +75,7 @@ public class FindOperation {
         available_requests = KademliaCommonConfig.ALPHA;
 
         // initialize closestSet
-        closestSet = new HashMap<KadNode, Boolean>();
+        closestSet = new HashMap<>();
     }
 
     /**
@@ -101,11 +101,8 @@ public class FindOperation {
 
                     } else {
 
-                        // find in the closest set if there are nodes with less distance
-                        BigInteger newdist = Util.distance(n.getNodeId(), destNode.getNodeId());
-
                         // find the node with max distance
-                        BigInteger maxdist = newdist;
+                        BigInteger maxdist = Util.distance(n.getNodeId(), destNode.getNodeId());
                         KadNode nodemaxdist = n;
                         for (KadNode i : closestSet.keySet()) {
                             BigInteger dist = Util.distance(i.getNodeId(), destNode.getNodeId());
@@ -137,7 +134,7 @@ public class FindOperation {
         // find closest neighbour (the first not already queried)
         KadNode res = null;
         for (KadNode n : closestSet.keySet()) {
-            if (n != null && closestSet.get(n) == false) {
+            if (n != null && !closestSet.get(n)) {
                 if (res == null) {
                     res = n;
                 } else if (Util.distance(n.getNodeId(), destNode.getNodeId()).compareTo(Util.distance(res.getNodeId(), destNode.getNodeId())) < 0) {

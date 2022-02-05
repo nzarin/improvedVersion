@@ -4,11 +4,8 @@ import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
-import peersim.transport.Transport;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * Initialization class that performs the bootstrap filling the k-buckets of all initial nodes.
@@ -18,18 +15,10 @@ import java.util.Comparator;
 public class StateBuilder implements peersim.core.Control {
 
     private static final String PAR_PROT = "protocol";
-    private static final String PAR_TRANSPORT = "transport";
-
-    private final String prefix;
     private final int kademliaid;
-    private final int transportid;
-    private final int amountDomains;
 
     public StateBuilder(String prefix) {
-        this.prefix = prefix;
-        kademliaid = Configuration.getPid(this.prefix + "." + PAR_PROT);
-        transportid = Configuration.getPid(this.prefix + "." + PAR_TRANSPORT);
-        this.amountDomains = KademliaCommonConfig.NUMBER_OF_DOMAINS;
+        kademliaid = Configuration.getPid(prefix + "." + PAR_PROT);
     }
 
     /**
@@ -51,15 +40,6 @@ public class StateBuilder implements peersim.core.Control {
         return ((KademliaProtocol) (Network.get(i)).getProtocol(kademliaid));
     }
 
-    /**
-     * Return the transport protocol from node with NETWORK ID i.
-     *
-     * @param i
-     * @return
-     */
-    public final Transport getTr(int i) {
-        return ((Transport) (Network.get(i)).getProtocol(transportid));
-    }
 
     /**
      * Add random nodes to the routing table
@@ -78,23 +58,23 @@ public class StateBuilder implements peersim.core.Control {
             if (iNode instanceof KadNode) {
 
                 // fill the routing table with random nodes
-                addRandomKadNodesToKadNode((KadNode) iNode, sz);
+                addRandomKadNodesToKadNode((KadNode) iNode);
 
                 //fill the routing table with close nodes
                 int start = i;
                 if (i > sz - 50) {
                     start = sz - 25;
                 }
-                addCloseKadNodesToKadNode((KadNode) iNode, sz, start);
+                addCloseKadNodesToKadNode((KadNode) iNode, start);
 
                 // add all the relevant bridge nodes to this kad node
-                addBridgeNodesToKadNode((KadNode) iNode, sz);
+                addBridgeNodesToKadNode((KadNode) iNode);
 
                 // i am  bridge node
             } else {
 
                 //fill the list
-                addNodesToBridgeNode((BridgeNode) iNode, sz);
+                addNodesToBridgeNode((BridgeNode) iNode);
             }
 
         }
@@ -107,12 +87,11 @@ public class StateBuilder implements peersim.core.Control {
      * Add hundred of random nodes to the routing table of iNode
      *
      * @param iNode
-     * @param networkSize
      */
-    private void addRandomKadNodesToKadNode(KadNode iNode, int networkSize) {
+    private void addRandomKadNodesToKadNode(KadNode iNode) {
         //take 100 random nodes add to routing table or arraylist according to the rules
         for (int j = 0; j < 100; j++) {
-            Node randomNetworkNode = Network.get(CommonState.r.nextInt(networkSize));
+            Node randomNetworkNode = Network.get(CommonState.r.nextInt(Network.size()));
             KademliaProtocol jKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
             KademliaNode jNode;
 
@@ -135,9 +114,14 @@ public class StateBuilder implements peersim.core.Control {
         }
     }
 
-    public void addBridgeNodesToKadNode(KadNode i, int networkSize) {
+    /**
+     * Add bridge nodes to Kad Node's list B.
+     * @param i
+     */
+    public void addBridgeNodesToKadNode(KadNode i) {
+
         //iterate over entire
-        for (int j = 0; j < networkSize; j++) {
+        for (int j = 0; j < Network.size(); j++) {
             Node networkNode = Network.get(j);
             KademliaProtocol jProt = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
 
@@ -158,16 +142,14 @@ public class StateBuilder implements peersim.core.Control {
      * Add hundred of random nodes to the routing table of iNode
      *
      * @param iNode
-     * @param networkSize
      */
-    private void addCloseKadNodesToKadNode(KadNode iNode, int networkSize, int start) {
-        ArrayList<BigInteger> alreadyAddedBridges = new ArrayList<>();
+    private void addCloseKadNodesToKadNode(KadNode iNode, int start) {
 
         //take 50 close nodes add to routing table or arraylist according to the rules
         for (int j = 0; j < 50; j++) {
             start++;
 
-            if (start > 0 && start < networkSize) {
+            if (start > 0 && start < Network.size()) {
                 Node neighbourNetworkNode = Network.get(start++);
                 KademliaProtocol jKad = (KademliaProtocol) (neighbourNetworkNode.getProtocol(kademliaid));
                 KademliaNode jNode;
@@ -198,12 +180,11 @@ public class StateBuilder implements peersim.core.Control {
      * Add nodes to bridge node i.
      *
      * @param iNode
-     * @param networkSize
      */
-    private void addNodesToBridgeNode(BridgeNode iNode, int networkSize) {
+    private void addNodesToBridgeNode(BridgeNode iNode) {
 
         //iterate over all the network nodes and add all bridge nodes to the routing table and all domain kadnode to list
-        for (int j = 0; j < networkSize; j++) {
+        for (int j = 0; j < Network.size(); j++) {
 
             Node networkNode = Network.get(j);
             KademliaProtocol jKad = (KademliaProtocol) (networkNode.getProtocol(kademliaid));
@@ -220,7 +201,7 @@ public class StateBuilder implements peersim.core.Control {
                 // This j node must be a bridge node -> add to the list of bridge nodes
             } else {
 
-                if (iNode.getNodeId() != jNode.getNodeId()) {
+                if (!Objects.equals(iNode.getNodeId(), jNode.getNodeId())) {
                     iNode.getBridgeNodes().add((BridgeNode) jNode);
                 }
 
@@ -237,17 +218,11 @@ public class StateBuilder implements peersim.core.Control {
     public boolean execute() {
 
         // Sort the network by nodeId (Ascending)
-        Network.sort(new Comparator<Node>() {
+        Network.sort((o1, o2) -> {
 
-            public int compare(Node o1, Node o2) {
-                Node n1 = o1;
-                Node n2 = o2;
-
-                KademliaProtocol pr1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
-                KademliaProtocol pr2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
-                return Util.put0(pr1.getCurrentNode().getNodeId()).compareTo(Util.put0(pr2.getCurrentNode().getNodeId()));
-            }
-
+            KademliaProtocol pr1 = (KademliaProtocol) (o1.getProtocol(kademliaid));
+            KademliaProtocol pr2 = (KademliaProtocol) (o2.getProtocol(kademliaid));
+            return Util.put0(pr1.getCurrentNode().getNodeId()).compareTo(Util.put0(pr2.getCurrentNode().getNodeId()));
         });
 
         createState();

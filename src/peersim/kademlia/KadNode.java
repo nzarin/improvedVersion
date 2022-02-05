@@ -14,7 +14,6 @@ public class KadNode implements KademliaNode {
     private final RoutingTable routingTable;
     private final ArrayList<BridgeNode> bridgeNodes;
     private int domain;
-    private KademliaProtocol kademliaProtocol;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
 
@@ -38,26 +37,27 @@ public class KadNode implements KademliaNode {
      *
      * @param id
      * @param domain
-     * @param kadprotocol
+     * @param kademliaProtocol
      */
-    public KadNode(BigInteger id, int domain, KademliaProtocol kadprotocol) {
+    public KadNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
-        this.kademliaProtocol = kadprotocol;
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
+    }
+
+    //SETTERS
+
+    public void setDomain(int domain) {
+        this.domain = domain;
     }
 
     // GETTERS
 
     public int getDomain() {
         return this.domain;
-    }
-
-    public void setDomain(int domain) {
-        this.domain = domain;
     }
 
     public RoutingTable getRoutingTable() {

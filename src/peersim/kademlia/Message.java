@@ -33,8 +33,10 @@ public class Message extends SimpleEvent {
      */
     private static long ID_GENERATOR = 0;
 
+    /**
+     * The ID of this find operation
+     */
     private static long FIND_OPERATION_ID = 0;
-
 
     /**
      * This Object contains the body of the message, no matter what it contains
