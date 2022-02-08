@@ -59,7 +59,7 @@ public class CustomDistribution implements peersim.core.Control {
                 kademliaProtocol.setKadNode((KadNode) kadNode);
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
                 //determine whether this node has to be an adversarial
-                if(currentIndexNetworkNode <= numberOfAdversarialNodes){
+                if(currentIndexNetworkNode < numberOfAdversarialNodes){
                     ((KadNode) kadNode).setAdversarial(true);
                 }
                 currentIndexNetworkNode++;

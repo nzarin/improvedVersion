@@ -30,6 +30,8 @@ public class KademliaObserver implements Control {
     public static IncrementalStats finished_lookups_OVERALL = new IncrementalStats();
     public static IncrementalStats failed_lookups_OVERALL = new IncrementalStats();
     public static IncrementalStats successful_lookups_OVERALL = new IncrementalStats();
+    public static IncrementalStats fraction_f_CS_OVERALL = new IncrementalStats();
+
 
     // INTRA-DOMAIN LOOKUP statistics
     public static IncrementalStats hopStore_INTRA = new IncrementalStats();
@@ -39,6 +41,7 @@ public class KademliaObserver implements Control {
     public static IncrementalStats finished_lookups_INTRA = new IncrementalStats();
     public static IncrementalStats failed_lookups_INTRA = new IncrementalStats();
     public static IncrementalStats successful_lookups_INTRA = new IncrementalStats();
+    public static IncrementalStats fraction_f_CS_INTRA = new IncrementalStats();
 
     // INTER-DOMAIN LOOKUP statistics
     public static IncrementalStats hopStore_INTER = new IncrementalStats();
@@ -48,6 +51,7 @@ public class KademliaObserver implements Control {
     public static IncrementalStats finished_lookups_INTER = new IncrementalStats();
     public static IncrementalStats failed_lookups_INTER = new IncrementalStats();
     public static IncrementalStats successful_lookups_INTER = new IncrementalStats();
+    public static IncrementalStats fraction_f_CS_INTER = new IncrementalStats();
 
     /**
      * Protocol id
@@ -135,6 +139,12 @@ public class KademliaObserver implements Control {
             outM_OVERALL.write(messageStore_OVERALL.getAverage() + "\n");
             outM_OVERALL.close();
 
+            File adversarial_file_OVERALL = new File("results/adversarials/fraction-f-OVERALL.txt");
+            adversarial_file_OVERALL.createNewFile();
+            BufferedWriter outA_OVERALL = new BufferedWriter(new FileWriter(adversarial_file_OVERALL, false));
+            outA_OVERALL.write(fraction_f_CS_OVERALL.getAverage() + "\n");
+            outA_OVERALL.close();
+
             //create INTRA-DOMAIN LOOKUP files
             File hop_file_INTRA = new File("results/hops/shortestHops-INTRA.txt");
             hop_file_INTRA.createNewFile();
@@ -160,6 +170,11 @@ public class KademliaObserver implements Control {
             outM_INTRA.write(messageStore_INTRA.getAverage() + "\n");
             outM_INTRA.close();
 
+            File adversarial_file_INTRA = new File("results/adversarials/fraction-f-INTRA.txt");
+            adversarial_file_INTRA.createNewFile();
+            BufferedWriter outA_INTRA = new BufferedWriter(new FileWriter(adversarial_file_INTRA, false));
+            outA_INTRA.write(fraction_f_CS_INTRA.getAverage() + "\n");
+            outA_INTRA.close();
 
             //create INTER-DOMAIN LOOKUP files
             File hop_file_INTER = new File("results/hops/shortestHops-INTER.txt");
@@ -185,6 +200,12 @@ public class KademliaObserver implements Control {
             BufferedWriter outM_INTER = new BufferedWriter(new FileWriter(message_file_INTER, false));
             outM_INTER.write(messageStore_INTER.getAverage() + "\n");
             outM_INTER.close();
+
+            File adversarial_file_INTER = new File("results/adversarials/fraction-f-INTER.txt");
+            adversarial_file_INTER.createNewFile();
+            BufferedWriter outA_INTER = new BufferedWriter(new FileWriter(adversarial_file_INTER, false));
+            outA_INTER.write(fraction_f_CS_INTER.getAverage() + "\n");
+            outA_INTER.close();
 
 
         } catch (IOException e) {
