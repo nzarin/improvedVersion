@@ -62,6 +62,8 @@ public class KadNode implements KademliaNode {
 
     // GETTERS
 
+    public boolean isAdversarial(){return this.adversarial;}
+
     public int getDomain() {
         return this.domain;
     }
@@ -75,9 +77,7 @@ public class KadNode implements KademliaNode {
     }
 
     @Override
-    public ArrayList<KadNode> getKadNodes() {
-        return null;
-    }
+    public ArrayList<KadNode> getKadNodes() {return null;}
 
     @Override
     public LinkedHashMap<Long, FindOperation> getFindOperationsMap() {

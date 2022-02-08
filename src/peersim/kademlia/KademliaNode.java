@@ -15,5 +15,4 @@ public interface KademliaNode {
     TreeMap<Long, Long> getSentMsgTracker();
     String getType();
 
-
 }

@@ -93,7 +93,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                         // if the source of the lookup is the same as this receiver -> it was an intra-domain lookup
                         if (lookupMessage.src == lookupMessage.receiver){
-                            Util.updateLookupStatistics((KadNode) lookupMessage.receiver, fop, this.kademliaid);
+                            Statistician.updateLookupStatistics((KadNode) lookupMessage.receiver, fop, this.kademliaid);
                         } else {
 
                             // It is an inter-domain lookup. So first find the correct bridge node of the domain of the target node.
