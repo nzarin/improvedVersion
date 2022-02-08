@@ -15,11 +15,13 @@ public class CustomDistribution implements peersim.core.Control {
 
     //initializers
     private static final String PAR_PROT = "protocol";
+    private static final String PAR_FRACTION_ADVERSARIAL = "fraction_f";
     private final int protocolID;
     private final UniformRandomGenerator urg;
     private final TreeMap<Long, BigInteger> mapNIDoPID;
     private final int numberOfDomains;
     private final int numberOfBridgeNodesPerDomain;
+    private final double fractionAdversarial;
     private int currentIndexNetworkNode;
 
     /**
@@ -29,11 +31,13 @@ public class CustomDistribution implements peersim.core.Control {
      */
     public CustomDistribution(String prefix) {
         protocolID = Configuration.getPid(prefix + "." + PAR_PROT);
+        fractionAdversarial = Configuration.getDouble(prefix + "." + PAR_FRACTION_ADVERSARIAL);
         urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
         mapNIDoPID = new TreeMap<>();
         this.numberOfDomains = KademliaCommonConfig.NUMBER_OF_DOMAINS;
         this.numberOfBridgeNodesPerDomain = KademliaCommonConfig.NUMBER_OF_BRIDGES_PER_DOMAIN;
         this.currentIndexNetworkNode = 0;
+
     }
 
     /**
@@ -41,7 +45,9 @@ public class CustomDistribution implements peersim.core.Control {
      */
     private void generateKadNodes() {
         //determine number of KadNodes in the network
-        int amountKadNodes = Network.size() - (numberOfDomains * numberOfBridgeNodesPerDomain);
+        int numberOfBridgeNodes = numberOfBridgeNodesPerDomain * numberOfDomains;
+        int numberOfAdversarialNodes = (int) Math.round(Network.size() * fractionAdversarial);
+        int amountKadNodes = Network.size() - numberOfBridgeNodes;
 
         //create them
         for (int i = 0; i < amountKadNodes; ++i) {
@@ -52,7 +58,10 @@ public class CustomDistribution implements peersim.core.Control {
                 KademliaNode kadNode = new KadNode(tmpID, tmpDomain, kademliaProtocol);
                 kademliaProtocol.setKadNode((KadNode) kadNode);
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
-                System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " is a KADNODE and gets assigned Node ID : " + tmpID + " for domain " + tmpDomain);
+                //determine whether this node has to be an adversarial
+                if(currentIndexNetworkNode <= numberOfAdversarialNodes){
+                    ((KadNode) kadNode).setAdversarial(true);
+                }
                 currentIndexNetworkNode++;
             } else {
                 // set i back with 1 to retry
@@ -76,13 +85,19 @@ public class CustomDistribution implements peersim.core.Control {
                     KademliaNode bridgeNode = new BridgeNode(tmpId, i, kademliaProtocol);
                     kademliaProtocol.setBridgeNode((BridgeNode) bridgeNode);
                     mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpId);
-                    System.err.println("Network node " + Network.get(currentIndexNetworkNode).getID() + " is a BRIDGENODE and gets assigned Node ID : " + tmpId + " for domain " + i);
                     currentIndexNetworkNode++;
                 } else {
                     j--;
                 }
             }
         }
+    }
+
+    /**
+     * Generates adversarial nodes in the network.
+     */
+    private void generateAdversarialNodes(){
+
     }
 
     /**

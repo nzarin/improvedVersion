@@ -5,43 +5,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
-/**
- * This class represents a normal (traditional) KadNode
- */
-public class KadNode implements KademliaNode {
-    private KademliaProtocol kademliaProtocol;
+public class AdversarialNode implements KademliaNode {
+
+    KademliaProtocol kademliaProtocol;
     private final BigInteger nodeId;
     private final RoutingTable routingTable;
     private final ArrayList<BridgeNode> bridgeNodes;
     private int domain;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
-    private boolean adversarial;
 
-    /**
-     * Constructs the KadNode
-     *
-     * @param id
-     * @param domain
-     */
-    public KadNode(BigInteger id, int domain) {
+    public AdversarialNode(BigInteger id, int domain){
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
-        this.adversarial = false;
     }
 
-    /**
-     * Constructs the KadNode
-     *
-     * @param id
-     * @param domain
-     * @param kademliaProtocol
-     */
-    public KadNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
+    public AdversarialNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol){
         this.kademliaProtocol = kademliaProtocol;
         this.nodeId = id;
         this.domain = domain;
@@ -49,27 +32,24 @@ public class KadNode implements KademliaNode {
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
-        this.adversarial = false;
     }
 
-    //SETTERS
-
-    public void setDomain(int domain) {
-        this.domain = domain;
+    @Override
+    public BigInteger getNodeId() {
+        return this.nodeId;
     }
 
-    public void setAdversarial(boolean adversarial){ this.adversarial = adversarial;}
-
-    // GETTERS
-
-    public int getDomain() {
-        return this.domain;
-    }
-
+    @Override
     public RoutingTable getRoutingTable() {
         return this.routingTable;
     }
 
+    @Override
+    public int getDomain() {
+        return this.domain;
+    }
+
+    @Override
     public ArrayList<BridgeNode> getBridgeNodes() {
         return this.bridgeNodes;
     }
@@ -91,36 +71,6 @@ public class KadNode implements KademliaNode {
 
     @Override
     public String getType() {
-        return "KadNode";
-    }
-
-
-    // PRINTERS
-
-    @Override
-    public String toString() {
-        return "KadNode{" +
-                "nodeId=" + nodeId +
-                ", domain=" + domain +
-                ", routingTable=" + routingTable.toString() +
-                '}';
-    }
-
-
-    public String toString2() {
-        return "KadNode{" +
-                "nodeId=" + nodeId +
-                ", domain=" + domain +
-                '}';
-    }
-
-
-    public String toString3(){
-        return "nodeId=" + nodeId + ", ";
-    }
-
-    @Override
-    public BigInteger getNodeId() {
-        return this.nodeId;
+        return "AdversarialNode";
     }
 }
