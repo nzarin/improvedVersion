@@ -105,7 +105,7 @@ public class RoutingTable implements Cloneable {
     }
 
     private  void selectKClosestNeighbours(TreeMap<BigInteger, KadNode> distance_map, KadNode[] result, int start_index, boolean give_incorrect_results){
-        for(int i = start_index; i < KademliaCommonConfig.K; i++){
+        for(int i = start_index; i < Math.min(KademliaCommonConfig.K, distance_map.size()); i++){
             if(give_incorrect_results){
                 result[i] = distance_map.pollLastEntry().getValue();
             } else{
