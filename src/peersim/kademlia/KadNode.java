@@ -58,11 +58,9 @@ public class KadNode implements KademliaNode {
         this.domain = domain;
     }
 
-    public void setAdversarial(boolean adversarial){ this.adversarial = adversarial;}
+    public void makeMalicious(){ this.adversarial = true;}
 
     // GETTERS
-
-    public boolean isAdversarial(){return this.adversarial;}
 
     public int getDomain() {
         return this.domain;
@@ -92,6 +90,11 @@ public class KadNode implements KademliaNode {
     @Override
     public String getType() {
         return "KadNode";
+    }
+
+    @Override
+    public boolean isMalicious() {
+        return this.adversarial;
     }
 
 

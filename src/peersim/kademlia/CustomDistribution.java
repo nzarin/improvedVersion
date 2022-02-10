@@ -60,7 +60,7 @@ public class CustomDistribution implements peersim.core.Control {
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
                 //determine whether this node has to be an adversarial
                 if(currentIndexNetworkNode < numberOfAdversarialNodes){
-                    ((KadNode) kadNode).setAdversarial(true);
+                    ((KadNode) kadNode).makeMalicious();
                 }
                 currentIndexNetworkNode++;
             } else {
@@ -93,12 +93,6 @@ public class CustomDistribution implements peersim.core.Control {
         }
     }
 
-    /**
-     * Generates adversarial nodes in the network.
-     */
-    private void generateAdversarialNodes(){
-
-    }
 
     /**
      * Scan over the nodes in the network and assign a randomly generated NodeId in the space 0..2^BITS, where BITS is a parameter

@@ -66,53 +66,55 @@ public class RoutingTable implements Cloneable {
     /**
      * Return the closest neighbour to a key from the correct k-bucket.
      *
-     * @param searchkey The ID we are looking up
-     * @param src       The original requester of this lookup
+     * @param target The ID we are looking up
+     * @param source The original requester of this lookup
      * @return The k closest neighbors to the search key
      */
-    public KadNode[] getKClosestNeighbours(final KadNode searchkey, final KadNode src) {
+    public KadNode[] getKNeighbours(final KadNode target, final KadNode receiver, final KadNode source) {
 
-        // resulting neighbors
+        ArrayList<KadNode> malicious_collaborators = new ArrayList<>();
         KadNode[] result = new KadNode[KademliaCommonConfig.K];
-
-        // neighbour candidates identifiers
-        ArrayList<KadNode> neighbour_candidates = new ArrayList<KadNode>();
-
-        // get the length of the longest common prefix
-        int prefix_len = Util.prefixLen(this.owner.getNodeId(), searchkey.getNodeId());
-
-        // return the k-bucket if it is full
-        if (k_buckets.get(prefix_len).neighbours.size() >= KademliaCommonConfig.K) {
-            return k_buckets.get(prefix_len).neighbours.keySet().toArray(result);
-        }
-
-        // else get k closest node from all k-buckets
-        prefix_len = 0;
-        while (prefix_len < KademliaCommonConfig.BITS) {
-            neighbour_candidates.addAll(k_buckets.get(prefix_len).neighbours.keySet());
-            // remove source id since it is the requester and cannot be in result
-            neighbour_candidates.remove(src);
-            prefix_len++;
-        }
-
 
         // create a map (distance, node)
         TreeMap<BigInteger, KadNode> distance_map = new TreeMap<BigInteger, KadNode>();
-        for (KadNode node : neighbour_candidates) {
-            distance_map.put(Util.distance(node.getNodeId(), searchkey.getNodeId()), node);
-        }
-
-        // select the k closest nodes from the distance map
-        int i = 0;
-        for (BigInteger bi : distance_map.keySet()) {
-            if (i < KademliaCommonConfig.K) {
-                result[i] = distance_map.get(bi);
-                i++;
+        for(int i=0; i < KademliaCommonConfig.BITS; i++){
+            for(KadNode node : k_buckets.get(i).neighbours.keySet()){
+                //add the collaborator malicious node if there is place in the array list
+                if(!source.isMalicious() && receiver.isMalicious() && node.isMalicious() && malicious_collaborators.size() < KademliaCommonConfig.K){
+                    malicious_collaborators.add(node);
+                }
+                distance_map.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
             }
         }
 
+        //add the malicious nodes to the list of results
+        for(int i = 0; i < malicious_collaborators.size(); i++){
+            result[i] = malicious_collaborators.get(i);
+        }
+
+        // if we have  more than K malicious users in our routing table, then we return those and do not perform further expensive operations
+        if(malicious_collaborators.size() == KademliaCommonConfig.K){
+            return result;
+        }
+
+        //if the source is not malicious (so we have an honest lookup), and I am malicious (and should route maliciously) -> we should give incorrect results
+        selectKClosestNeighbours(distance_map, result, malicious_collaborators.size(), (!source.isMalicious() && receiver.isMalicious()));
+
         return result;
+
     }
+
+    private  void selectKClosestNeighbours(TreeMap<BigInteger, KadNode> distance_map, KadNode[] result, int start_index, boolean give_incorrect_results){
+        for(int i = start_index; i < KademliaCommonConfig.K; i++){
+            if(give_incorrect_results){
+                result[i] = distance_map.pollLastEntry().getValue();
+            } else{
+                result[i] = distance_map.pollFirstEntry().getValue();
+            }
+        }
+    }
+
+
 
     public Object clone() {
         RoutingTable dolly = new RoutingTable(this.owner);

@@ -14,5 +14,6 @@ public interface KademliaNode {
     LinkedHashMap<Long, FindOperation> getFindOperationsMap();
     TreeMap<Long, Long> getSentMsgTracker();
     String getType();
+    boolean isMalicious();
 
 }

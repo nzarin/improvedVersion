@@ -8,12 +8,12 @@ import java.util.TreeMap;
 public class BridgeNode implements KademliaNode {
 
     private final BigInteger nodeId;
-    private int domain;
     private final RoutingTable routingTable;
     private final ArrayList<KadNode> kadNodes;
     private final ArrayList<BridgeNode> bridgeNodes;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
+    private int domain;
 
     public BridgeNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
         this.nodeId = id;
@@ -25,16 +25,14 @@ public class BridgeNode implements KademliaNode {
         this.sentMsgTracker = new TreeMap<>();
     }
 
+    //getters
+    public int getDomain() {
+        return this.domain;
+    }
 
     //setters
     public void setDomain(int domain) {
         this.domain = domain;
-    }
-
-
-    //getters
-    public int getDomain() {
-        return this.domain;
     }
 
     @Override
@@ -61,6 +59,9 @@ public class BridgeNode implements KademliaNode {
     public String getType() {
         return "BridgeNode";
     }
+
+    @Override
+    public boolean isMalicious() { return false;}
 
     public RoutingTable getRoutingTable() {
         return this.routingTable;

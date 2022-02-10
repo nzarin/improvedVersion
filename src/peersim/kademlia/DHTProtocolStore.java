@@ -7,16 +7,16 @@ public abstract class DHTProtocolStore {
 
     public Lookup lookup = null;
 
-    public Lookup orderLookup(String type, Message lookupMessage) {
+    public Lookup orderLookup(String version, Message lookupMessage) {
 
         //create either the correct protocol (naive or improved) and the corresponding intra or inter-domain factory
-        this.lookup = createLookup(type, lookupMessage.src, lookupMessage.target);
+        this.lookup = createLookup(version, lookupMessage.src, lookupMessage.target);
 
         return this.lookup;
     }
 
     //note that the factory method is now abstract in DHTProtocolStore
-    abstract Lookup createLookup(String type, KademliaNode source, KademliaNode target);
+    abstract Lookup createLookup(String version, KademliaNode source, KademliaNode target);
 
     public Lookup getLookup() {
         return lookup;

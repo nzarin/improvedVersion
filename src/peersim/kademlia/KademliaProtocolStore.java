@@ -16,33 +16,30 @@ public class KademliaProtocolStore extends DHTProtocolStore {
     /**
      * Create a lookup with the corresponding factory.
      *
-     * @param type
+     * @param version
      * @param s
      * @param r
      * @return
      */
     @Override
-    Lookup createLookup(String type, KademliaNode s, KademliaNode r) {
+    Lookup createLookup(String version, KademliaNode s, KademliaNode r) {
         Lookup lookup = null;
 
         //determine what type of lookup we have and create the correct factory
-        LookupIngredientFactory2 interDomainLookupFactory = new InterDomainKademliaFactory();
-        LookupIngredientFactory2 intraDomainLookupFactory = new IntraDomainKademliaFactory();
-
-        switch (type) {
+        switch (version) {
             case "naive":
                 if (s.getDomain() == r.getDomain()) {
-                    lookup = new NaiveKademliaLookup(intraDomainLookupFactory);
+                    lookup = new NaiveKademliaLookup(new IntraDomainKademliaFactory());
                 } else {
-                    lookup = new NaiveKademliaLookup(interDomainLookupFactory);
+                    lookup = new NaiveKademliaLookup(new InterDomainKademliaFactory());
                 }
                 lookup.setType("naive kademlia lookup");
                 break;
             case "improved":
                 if (s.getDomain() == r.getDomain()) {
-                    lookup = new ImprovedKademliaProtocol(intraDomainLookupFactory);
+                    lookup = new ImprovedKademliaProtocol(new IntraDomainKademliaFactory());
                 } else {
-                    lookup = new ImprovedKademliaProtocol(interDomainLookupFactory);
+                    lookup = new ImprovedKademliaProtocol(new InterDomainKademliaFactory());
                 }
                 lookup.setType("naive kademlia lookup");
                 break;

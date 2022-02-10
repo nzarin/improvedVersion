@@ -20,7 +20,7 @@ public class KadToKadRespondOperation extends RespondOperation2 {
     public void respond() {
 
         // get the k closest nodes to target node -> I AM RECEIVER OF THE MESSAGE
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.sender);
+        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
         //get the BETA closest nodes from the neighbours
         KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);

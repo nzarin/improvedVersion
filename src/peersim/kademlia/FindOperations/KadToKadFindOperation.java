@@ -36,14 +36,12 @@ public class KadToKadFindOperation extends FindOperation2 {
         findOp.body = lookupMessage.body;
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
-
         // get the K closest node to search key
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKClosestNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver);
+        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);
         findOp.available_requests = KademliaCommonConfig.ALPHA;
-
 
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {

@@ -14,7 +14,6 @@ public class Statistician {
      */
     public static void updateLookupStatistics(KadNode currentNode, FindOperation fop, int kademliaid) {
 
-
         //if the target is found -> SUCCESSFUL LOOKUP
         if (fop.closestSet.containsKey(fop.destNode)) {
 
@@ -57,7 +56,7 @@ public class Statistician {
     public static double calculateFInClosestSet(FindOperation fop) {
         int nmrAdversarialNodes = 0;
         for (KadNode kadNode : fop.getClosestSet().keySet()) {
-            if (kadNode.isAdversarial()) {
+            if (kadNode.isMalicious()) {
                 nmrAdversarialNodes++;
             }
         }
