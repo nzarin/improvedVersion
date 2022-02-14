@@ -14,42 +14,22 @@ public class Statistician {
      */
     public static void updateLookupStatistics(KadNode currentNode, FindOperation fop, int kademliaid) {
 
+        System.err.println("findOp " + fop.operationId + " has finished and we are collecting statistics");
+
         //if the target is found -> SUCCESSFUL LOOKUP
         if (fop.closestSet.containsKey(fop.destNode)) {
 
-            //update statistics OVERALL
-            KademliaObserver.finished_lookups_OVERALL.add(1);
-            KademliaObserver.successful_lookups_OVERALL.add(1);
-            KademliaObserver.messageStore_OVERALL.add(fop.nrMessages);
-            KademliaObserver.shortestAmountHops_OVERALL.add(fop.shortestNrHops);
-            long duration = (CommonState.getTime() - (fop.timestamp));
-            KademliaObserver.timeStore_OVERALL.add(duration);
-            KademliaObserver.fraction_f_CS_OVERALL.add(calculateFInClosestSet(fop));
-
-            //update the correct statistics
-            if (currentNode.getDomain() == fop.destNode.getDomain()) {
-                updateIntraDomainLookupStatistics(fop, duration);
-            } else {
-                updateInterDomainLookupStatistics(fop, duration);
-            }
-
+            updateSuccessfulLookup(currentNode, fop);
 
             // if I and the destination node are up -> FAILURE LOOKUP
         } else if (Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() && Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
 
-            //update statistics OVERALL
-            KademliaObserver.finished_lookups_OVERALL.add(1);
-            KademliaObserver.failed_lookups_OVERALL.add(1);
-            KademliaObserver.fraction_f_CS_OVERALL.add(calculateFInClosestSet(fop));
+            updateFailedLookup(currentNode, fop);
 
-            //update statistics INTRA
-            if (currentNode.getDomain() == fop.destNode.getDomain()) {
-                KademliaObserver.finished_lookups_INTRA.add(1);
-                KademliaObserver.failed_lookups_INTRA.add(1);
-            } else {
-                KademliaObserver.finished_lookups_INTER.add(1);
-                KademliaObserver.failed_lookups_INTER.add(1);
-            }
+        } else {
+
+            System.err.println("Check this case in Statistician");
+
         }
     }
 
@@ -89,6 +69,47 @@ public class Statistician {
         KademliaObserver.successful_lookups_INTER.add(1);
         KademliaObserver.fraction_f_CS_INTER.add(calculateFInClosestSet(fop));
 
+    }
+
+    public static void updateSuccessfulLookup(KadNode currentNode, FindOperation findOp) {
+
+        //update statistics OVERALL
+        KademliaObserver.finished_lookups_OVERALL.add(1);
+        KademliaObserver.successful_lookups_OVERALL.add(1);
+        KademliaObserver.messageStore_OVERALL.add(findOp.nrMessages);
+        KademliaObserver.shortestAmountHops_OVERALL.add(findOp.shortestNrHops);
+        long duration = (CommonState.getTime() - (findOp.timestamp));
+        KademliaObserver.timeStore_OVERALL.add(duration);
+        KademliaObserver.fraction_f_CS_OVERALL.add(calculateFInClosestSet(findOp));
+
+        //update the correct statistics
+        if (currentNode.getDomain() == findOp.destNode.getDomain()) {
+            updateIntraDomainLookupStatistics(findOp, duration);
+        } else {
+            updateInterDomainLookupStatistics(findOp, duration);
+        }
+
+    }
+
+    public static void updateFailedLookup(KadNode currentNode, FindOperation findOp) {
+
+        System.err.println("findOp " + findOp.operationId + " is a failed lookup!");
+
+        //update statistics OVERALL
+        KademliaObserver.finished_lookups_OVERALL.add(1);
+        KademliaObserver.failed_lookups_OVERALL.add(1);
+        KademliaObserver.messageStore_OVERALL.add(findOp.nrMessages);
+
+        KademliaObserver.fraction_f_CS_OVERALL.add(calculateFInClosestSet(findOp));
+
+        //update statistics INTRA
+        if (currentNode.getDomain() == findOp.destNode.getDomain()) {
+            KademliaObserver.finished_lookups_INTRA.add(1);
+            KademliaObserver.failed_lookups_INTRA.add(1);
+        } else {
+            KademliaObserver.finished_lookups_INTER.add(1);
+            KademliaObserver.failed_lookups_INTER.add(1);
+        }
     }
 
 

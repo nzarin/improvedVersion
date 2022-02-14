@@ -97,7 +97,6 @@ public class Turbulence implements Control {
         } else if (p_idle + p_add + p_idle > 1) {
             System.err.println("Wrong event probability in Turbulence class: the sum of PAR_IDLE, PAR_ADD and PAR_REM must be 1");
         }
-
         System.err.printf("Turbulence: [p_idle=%f] [p_add=%f] [p_remove=%f] [(min,max)=(%d,%d)]%n", p_idle, p_add, p_rem, minsize, maxsize);
     }
 
@@ -120,14 +119,15 @@ public class Turbulence implements Control {
         ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setKadNode(newKadNode);
         newKadNode.getRoutingTable().setOwnerKadNode(newKadNode);
 
-        System.err.println("New node is spawn with node id : " + newKadNode.getNodeId() + " in domain " + newKadNode.getDomain());
-
         // sort network
         Util.sortNet(kademliaid);
 
-        // find random node to add to k-bucket
-        Node bootstrapNode = selectBootstrapNode(newKadNode);
-        newKadNode.getRoutingTable().addNeighbour((KadNode) ((KademliaProtocol) bootstrapNode.getProtocol(kademliaid)).getCurrentNode());
+        // find random node to add to k-bucket & fill its list of bridge nodes
+        KadNode bootstrapNode = selectBootstrapNode(newKadNode);
+        newKadNode.getRoutingTable().addNeighbour(bootstrapNode);
+        for(BridgeNode b : bootstrapNode.getBridgeNodes()){
+            newKadNode.getBridgeNodes().add(b);
+        }
 
         // create auto-search message (search message with destination my own Id)
         Message m = Message.makeEmptyMessage("Bootstrap traffic", Message.MSG_FINDNODE);
@@ -137,6 +137,8 @@ public class Turbulence implements Control {
         m.receiver = newKadNode;
         m.target = newKadNode;
         m.newLookup = true;
+
+        System.err.println("we created a new node (" + newKadNode.getNodeId() + ", " +  newKadNode.getDomain() + ") ");
 
         // start auto-search
         EDSimulator.add(0, m, newNetworkNode, kademliaid);
@@ -150,7 +152,7 @@ public class Turbulence implements Control {
      * @param newKadNode the node for which we are selecting a bootstrap node.
      * @return
      */
-    private Node selectBootstrapNode(KadNode newKadNode){
+    private KadNode selectBootstrapNode(KadNode newKadNode){
         // select one random bootstrap node within this domain
         Node bootstrapNode;
         KademliaProtocol kadP;
@@ -167,7 +169,7 @@ public class Turbulence implements Control {
 
         } while (bootstrapKadNode == null || !bootstrapNode.isUp() || bootstrapKadNode instanceof BridgeNode);
 
-        return bootstrapNode;
+        return (KadNode) bootstrapKadNode;
     }
 
     /**

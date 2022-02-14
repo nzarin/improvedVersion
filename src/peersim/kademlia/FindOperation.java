@@ -24,6 +24,8 @@ public class FindOperation {
      */
     public KadNode destNode;
 
+    private BridgeNode sourceBridgeNode;
+
     /**
      * Body of the original find message.
      */
@@ -65,7 +67,6 @@ public class FindOperation {
      */
     public FindOperation(KadNode destNode, long timestamp) {
         this.destNode = destNode;
-
         this.timestamp = timestamp;
 
         // set a new find id
@@ -113,7 +114,7 @@ public class FindOperation {
                             }
                         }
 
-                        // replace the node with larger distance with n
+                        // replace the node with larger distance with n if n is closer
                         if (nodemaxdist.getNodeId().compareTo(n.getNodeId()) != 0) {
                             closestSet.remove(nodemaxdist);
                             closestSet.put(n, false);
@@ -162,7 +163,22 @@ public class FindOperation {
         return closestSet;
     }
 
+    /**
+     * Get the bridge node of the source domain
+     * @return
+     */
+    public BridgeNode getSourceBridgeNode() {return sourceBridgeNode;}
 
+    /**
+     * Set the bridge node of the source for the findOp object
+     * @param sourceBridgeNode
+     */
+    public void setSourceBridgeNode(BridgeNode sourceBridgeNode) {this.sourceBridgeNode = sourceBridgeNode;}
+
+    /**
+     * Set the operation id of this find operation
+     * @param id
+     */
     public void setOperationId(long id){
         this.operationId = id;
     }

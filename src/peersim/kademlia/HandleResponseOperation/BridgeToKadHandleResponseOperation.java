@@ -17,16 +17,17 @@ public class BridgeToKadHandleResponseOperation extends HandleResponseOperation2
         lookupMessage.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
 
         //update statistics (also the other direction)
-        FindOperation fop = (FindOperation) lookupMessage.body;
-        fop.nrMessages = fop.nrMessages + 2;
-        fop.shortestNrHops++;
+        FindOperation findOp = (FindOperation) lookupMessage.body;
+        findOp.nrMessages = findOp.nrMessages++;
 
-        if(fop != null){
+        if(findOp != null){
 
-            lookupMessage.receiver.getFindOperationsMap().remove(fop.operationId);
+            lookupMessage.receiver.getFindOperationsMap().remove(findOp.operationId);
 //            System.err.println("I have received the result of the lookup and I am going to update the statistics!");
 
-            Statistician.updateLookupStatistics((KadNode) lookupMessage.receiver, fop, kademliaid);
+            Statistician.updateLookupStatistics((KadNode) lookupMessage.receiver, findOp, kademliaid);
+        } else {
+            System.err.println(" something weird is going on: the findOp in the response message in inter-domain lookup is null");
         }
     }
 }

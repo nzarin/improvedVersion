@@ -26,14 +26,17 @@ public class KadToKadFindOperation extends FindOperation2 {
 
     @Override
     public void find() {
-        //If I searched node is down, do nothing
-        Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
-        if (!target.isUp())
-            return;
 
-        // create a new find operation and add to operations array for bookkeeping
-        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
-        findOp.body = lookupMessage.body;
+        //check whether the findOp object already exists (inter-domain) or whether we have to create one (intra-domain)
+        FindOperation findOp;
+        if(lookupMessage.src.getDomain() == lookupMessage.target.getDomain()){
+            findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
+            findOp.body = lookupMessage.body;
+        } else{
+            findOp = (FindOperation) lookupMessage.body;
+        }
+
+        //add the findOp to my map of find operations any way
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
         // get the K closest node to search key
@@ -49,7 +52,6 @@ public class KadToKadFindOperation extends FindOperation2 {
             if (nextNode != null) {
 
                 //update statistics of the find operation
-                findOp.nrHops++;
                 findOp.nrMessages++;
 
                 //create a request message

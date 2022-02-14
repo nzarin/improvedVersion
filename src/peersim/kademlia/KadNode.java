@@ -13,6 +13,7 @@ public class KadNode implements KademliaNode {
     private final BigInteger nodeId;
     private final RoutingTable routingTable;
     private final ArrayList<BridgeNode> bridgeNodes;
+    private final ArrayList<KadNode> colluders;
     private int domain;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
@@ -28,6 +29,7 @@ public class KadNode implements KademliaNode {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
+        this.colluders = new ArrayList<>();
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
@@ -46,6 +48,7 @@ public class KadNode implements KademliaNode {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
+        this.colluders = new ArrayList<>();
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
@@ -76,6 +79,8 @@ public class KadNode implements KademliaNode {
 
     @Override
     public ArrayList<KadNode> getKadNodes() {return null;}
+
+    public ArrayList<KadNode> getColluders() {return this.colluders;}
 
     @Override
     public LinkedHashMap<Long, FindOperation> getFindOperationsMap() {

@@ -72,45 +72,56 @@ public class RoutingTable implements Cloneable {
      */
     public KadNode[] getKNeighbours(final KadNode target, final KadNode receiver, final KadNode source) {
 
-        ArrayList<KadNode> malicious_collaborators = new ArrayList<>();
         KadNode[] result = new KadNode[KademliaCommonConfig.K];
 
         // create a map (distance, node)
-        TreeMap<BigInteger, KadNode> distance_map = new TreeMap<BigInteger, KadNode>();
+        TreeMap<BigInteger, KadNode> distance_map = new TreeMap<>();
+        TreeMap<BigInteger, KadNode> distance_map_colluders = new TreeMap<>();
+
         for(int i=0; i < KademliaCommonConfig.BITS; i++){
             for(KadNode node : k_buckets.get(i).neighbours.keySet()){
                 //add the collaborator malicious node if there is place in the array list
-                if(!source.isMalicious() && receiver.isMalicious() && node.isMalicious() && malicious_collaborators.size() < KademliaCommonConfig.K){
-                    malicious_collaborators.add(node);
+                if(!source.isMalicious() && receiver.isMalicious() && node.isMalicious()){
+                    distance_map_colluders.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
                 }
                 distance_map.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
             }
         }
 
-        //add the malicious nodes to the list of results
-        for(int i = 0; i < malicious_collaborators.size(); i++){
-            result[i] = malicious_collaborators.get(i);
+        // this means that we should add malicious nodes to the head of the array
+        if(distance_map_colluders.size() > 0){
+            addMaliciousNeighbours(distance_map_colluders, result);
         }
 
-        // if we have  more than K malicious users in our routing table, then we return those and do not perform further expensive operations
-        if(malicious_collaborators.size() == KademliaCommonConfig.K){
-            return result;
+        // fill the rest with the table with honest nodes (if there is space left)
+        if(distance_map_colluders.size() < KademliaCommonConfig.K){
+            addHonestNeighbours(distance_map, result, distance_map_colluders.size());
         }
-
-        //if the source is not malicious (so we have an honest lookup), and I am malicious (and should route maliciously) -> we should give incorrect results
-        selectKClosestNeighbours(distance_map, result, malicious_collaborators.size(), (!source.isMalicious() && receiver.isMalicious()));
 
         return result;
-
     }
 
-    private  void selectKClosestNeighbours(TreeMap<BigInteger, KadNode> distance_map, KadNode[] result, int start_index, boolean give_incorrect_results){
+
+    /**
+     * Add honest neighbours to the list of closest neighbours to a target node
+     * @param distance_map
+     * @param result
+     * @param start_index
+     */
+    private  void addHonestNeighbours(TreeMap<BigInteger, KadNode> distance_map, KadNode[] result, int start_index){
         for(int i = start_index; i < Math.min(KademliaCommonConfig.K, distance_map.size()); i++){
-            if(give_incorrect_results){
-                result[i] = distance_map.pollLastEntry().getValue();
-            } else{
-                result[i] = distance_map.pollFirstEntry().getValue();
-            }
+            result[i] = distance_map.pollFirstEntry().getValue();
+        }
+    }
+
+    /**
+     * Add malicious colluders to the list of closest neighbours to a target node
+     * @param distance_map_colluders
+     * @param result
+     */
+    private  void addMaliciousNeighbours(TreeMap<BigInteger, KadNode> distance_map_colluders, KadNode[] result){
+        for(int i = 0; i < Math.min(KademliaCommonConfig.K, distance_map_colluders.size()); i++){
+            result[i] = distance_map_colluders.pollFirstEntry().getValue();
         }
     }
 

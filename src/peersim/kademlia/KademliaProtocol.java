@@ -138,8 +138,8 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
                         if (m.src instanceof KadNode) {
 
                             //remove this node from routing table and from the closest set of findOperation
-                            m.receiver.getRoutingTable().removeNeighbour((KadNode) m.src);
-                            m.receiver.getFindOperationsMap().get(m.operationId).closestSet.remove((KadNode) m.src);
+                            m.receiver.getRoutingTable().removeNeighbour((KadNode) m.sender);
+                            m.receiver.getFindOperationsMap().get(m.operationId).closestSet.remove((KadNode) m.sender);
                             //try another node
                             Message m2 = new Message();
                             m2.operationId = m.operationId;

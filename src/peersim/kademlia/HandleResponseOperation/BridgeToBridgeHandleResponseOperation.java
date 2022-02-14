@@ -18,13 +18,12 @@ public class BridgeToBridgeHandleResponseOperation extends HandleResponseOperati
     public void handleResponse() {
 
         //update statistics also from the other direction
-        FindOperation fop = (FindOperation) lookupMessage.body;
-        fop.nrMessages = fop.nrMessages + 2;
-        fop.shortestNrHops++;
+        FindOperation findOp = (FindOperation) lookupMessage.body;
+        findOp.nrMessages = findOp.nrMessages++;
 
         //find the correct kad node and forward it the results;
         Message response = new Message(Message.MSG_RESPONSE);
-        response.body = fop;
+        response.body = findOp;
         response.src = lookupMessage.src;
         response.target = lookupMessage.target;
         response.sender = lookupMessage.receiver;

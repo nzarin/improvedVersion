@@ -15,21 +15,26 @@ public class KadToBridgeFindOperation extends FindOperation2 {
 
     @Override
     public void find() {
-        //If searched node is down, do nothing
-        Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
-        if (!target.isUp())
-            return;
 
-        // find a random bridge of our domain and other domain and send it the route message
+        //create a findOp object
+        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
+        findOp.body = lookupMessage.body;
+        lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
+
+        // find a random bridge of our domain and send it the route message
         BridgeNode randomBridgeNodeThisDomain;
         do{
             randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));
         } while (randomBridgeNodeThisDomain == null);
+        findOp.setSourceBridgeNode(randomBridgeNodeThisDomain);
 
+        //update statistics of the find operation
+        findOp.nrMessages++;
+        findOp.shortestNrHops++;
 
         // create FINDNODE message to send it to this bridge node
         Message forward = new Message(Message.MSG_FINDNODE);
-        forward.body = lookupMessage.body;
+        forward.body = findOp;
         forward.src = lookupMessage.src;
         forward.target = lookupMessage.target;
         forward.sender = lookupMessage.receiver;

@@ -108,8 +108,8 @@ public class KademliaObserver implements Control {
 
 
         //format print result
-        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%d min ltcy] [%d msec average ltcy] [%d max ltcy] [%f created findops] [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio] [%f shortest amount of hops] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
-                CommonState.getTime(), sz, (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), find_op_OVERALL.getSum(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
+        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%d min ltcy] [%d msec average ltcy] [%d max ltcy]  [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio] [%f shortest amount of hops] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
+                CommonState.getTime(), sz, (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
 
         // create files
         try {

@@ -13,26 +13,32 @@ public class BridgeToBridgeFindOperation extends FindOperation2 {
     }
     @Override
     public void find() {
-        //If a searched node is down, do nothing
-        Node target = Util.nodeIdtoNode(lookupMessage.target.getNodeId(), kademliaid);
-        if (!target.isUp())
-            return;
+
+        //add this node my list of kad nodes
+        if(lookupMessage.sender instanceof KadNode && !lookupMessage.receiver.getKadNodes().contains(lookupMessage.sender)){
+            lookupMessage.receiver.getKadNodes().add((KadNode) lookupMessage.sender);
+        }
 
         // find the correct bridge node of the domain of the target node
-        BridgeNode randomBridgeNodeOtherDomain = null;
+        BridgeNode randomBridgeNodeTargetDomain = null;
         for(BridgeNode b : lookupMessage.receiver.getBridgeNodes()){
             if(lookupMessage.target.getDomain() == b.getDomain() && b != lookupMessage.target){
-                randomBridgeNodeOtherDomain = b;
+                randomBridgeNodeTargetDomain = b;
             }
         }
 
+        //update statistics of the find operation
+        FindOperation findOp = (FindOperation) lookupMessage.body;
+        findOp.nrMessages++;
+        findOp.shortestNrHops++;
+
         //create FINDNODE message to send it to kad node
         Message forward = new Message(Message.MSG_FINDNODE);
-        forward.body = lookupMessage.body;
+        forward.body = findOp;
         forward.src = lookupMessage.src;
         forward.target = lookupMessage.target;
         forward.sender = lookupMessage.receiver;
-        forward.receiver = randomBridgeNodeOtherDomain;
+        forward.receiver = randomBridgeNodeTargetDomain;
         forward.operationId = lookupMessage.operationId;
         forward.newLookup = lookupMessage.newLookup;
 //        System.err.println(" I am forwarding the FIND message to (" + randomBridgeNodeOtherDomain.getNodeId() + "," + randomBridgeNodeOtherDomain.getDomain() + ") of type " + randomBridgeNodeOtherDomain.getType());

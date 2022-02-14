@@ -24,12 +24,16 @@ public class BridgeToKadFindOperation extends FindOperation2 {
         KadNode randomKadNodeThisDomain;
         do{
             randomKadNodeThisDomain = lookupMessage.receiver.getKadNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getKadNodes().size()));
-        } while (randomKadNodeThisDomain == null || randomKadNodeThisDomain == lookupMessage.target);
+        } while (randomKadNodeThisDomain == null);
 
+        //update statistics of the find operation
+        FindOperation findOp = (FindOperation) lookupMessage.body;
+        findOp.nrMessages++;
+        findOp.shortestNrHops++;
 
         // create FINDNODE message to send it to this bridge node
         Message forward = new Message(Message.MSG_FINDNODE);
-        forward.body = lookupMessage.body;
+        forward.body = findOp;
         forward.src = lookupMessage.src;
         forward.target = lookupMessage.target;
         forward.sender = lookupMessage.receiver;
