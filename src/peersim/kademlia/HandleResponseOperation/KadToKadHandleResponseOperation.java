@@ -20,7 +20,6 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
     @Override
     public void handleResponse() {
 
-
         // remove the timer for the deadline because we already received a response on time
         lookupMessage.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
 

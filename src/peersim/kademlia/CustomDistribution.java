@@ -30,10 +30,10 @@ public class CustomDistribution implements peersim.core.Control {
      * @param prefix from the config file
      */
     public CustomDistribution(String prefix) {
-        protocolID = Configuration.getPid(prefix + "." + PAR_PROT);
-        fractionAdversarial = Configuration.getDouble(prefix + "." + PAR_FRACTION_ADVERSARIAL);
-        urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
-        mapNIDoPID = new TreeMap<>();
+        this.protocolID = Configuration.getPid(prefix + "." + PAR_PROT);
+        this.fractionAdversarial = Configuration.getDouble(prefix + "." + PAR_FRACTION_ADVERSARIAL);
+        this.urg = new UniformRandomGenerator(KademliaCommonConfig.BITS, CommonState.r);
+        this.mapNIDoPID = new TreeMap<>();
         this.numberOfDomains = KademliaCommonConfig.NUMBER_OF_DOMAINS;
         this.numberOfBridgeNodesPerDomain = KademliaCommonConfig.NUMBER_OF_BRIDGES_PER_DOMAIN;
         this.currentIndexNetworkNode = 0;

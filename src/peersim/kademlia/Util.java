@@ -5,6 +5,7 @@ import peersim.core.Network;
 import peersim.core.Node;
 
 import java.math.BigInteger;
+import java.util.Comparator;
 
 /**
  * Some utility and mathematical function to work with BigInteger numbers and strings.
@@ -101,6 +102,24 @@ public class Util {
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void sortNet(int kademliaid) {
+        Network.sort(new Comparator() {
+            // ______________________________________________________________________________________
+            public int compare(Object o1, Object o2) {
+                Node n1 = (Node) o1;
+                Node n2 = (Node) o2;
+                KademliaProtocol p1 = (KademliaProtocol) (n1.getProtocol(kademliaid));
+                KademliaProtocol p2 = (KademliaProtocol) (n2.getProtocol(kademliaid));
+                return Util.put0(p1.getCurrentNode().getNodeId()).compareTo(Util.put0(p2.getCurrentNode().getNodeId()));
+            }
+
+            public boolean equals(Object obj) {
+                return compare(this, obj) == 0;
+            }
+        });
     }
 
 
