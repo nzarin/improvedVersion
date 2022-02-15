@@ -61,8 +61,8 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                 //SCENARIO 1: there exists some neighbour we can visit.
                 if (neighbour != null) {
-//                    System.err.println(" SCENARIO 1: THERE EXIST SOME NEIGHBOUR WE CAN VISIT");
 
+                    //update statistics of the find operation
                     findOp.nrMessages++;
 
                     //create new request to send to this neighbour
@@ -100,6 +100,8 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                                 randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));
                             } while (randomBridgeNodeThisDomain == null);
 
+                            //update statistics of the find operation
+                            findOp.nrMessages++;
 
                             //create RESPONSE message to send it to the bridge node of this domain we got the request from
                             Message response = new Message(Message.MSG_RESPONSE);

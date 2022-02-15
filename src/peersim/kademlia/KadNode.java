@@ -17,7 +17,7 @@ public class KadNode implements KademliaNode {
     private int domain;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
-    private boolean adversarial;
+    private boolean malicious;
 
     /**
      * Constructs the KadNode
@@ -33,7 +33,7 @@ public class KadNode implements KademliaNode {
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
-        this.adversarial = false;
+        this.malicious = false;
     }
 
     /**
@@ -52,7 +52,7 @@ public class KadNode implements KademliaNode {
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
-        this.adversarial = false;
+        this.malicious = false;
     }
 
     //SETTERS
@@ -61,7 +61,7 @@ public class KadNode implements KademliaNode {
         this.domain = domain;
     }
 
-    public void makeMalicious(){ this.adversarial = true;}
+    public void makeMalicious(){ this.malicious = true;}
 
     // GETTERS
 
@@ -99,7 +99,7 @@ public class KadNode implements KademliaNode {
 
     @Override
     public boolean isMalicious() {
-        return this.adversarial;
+        return this.malicious;
     }
 
 

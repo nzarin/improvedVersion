@@ -14,7 +14,7 @@ public class Statistician {
      */
     public static void updateLookupStatistics(KadNode currentNode, FindOperation fop, int kademliaid) {
 
-        System.err.println("findOp " + fop.operationId + " has finished and we are collecting statistics");
+//        System.err.println("findOp " + fop.operationId + " has finished and we are collecting statistics");
 
         //if the target is found -> SUCCESSFUL LOOKUP
         if (fop.closestSet.containsKey(fop.destNode)) {
@@ -33,9 +33,9 @@ public class Statistician {
         }
     }
 
-    public static double calculateFInClosestSet(FindOperation fop) {
+    public static double calculateFInClosestSet(FindOperation findOp) {
         int nmrAdversarialNodes = 0;
-        for (KadNode kadNode : fop.getClosestSet().keySet()) {
+        for (KadNode kadNode : findOp.getClosestSet().keySet()) {
             if (kadNode.isMalicious()) {
                 nmrAdversarialNodes++;
             }
@@ -43,72 +43,75 @@ public class Statistician {
 
         //covert to doubles and return the value
         double nmrAdverserials = nmrAdversarialNodes;
-        double sizeClosestSet = fop.getClosestSet().keySet().size();
+        double sizeClosestSet = findOp.getClosestSet().keySet().size();
         return (nmrAdverserials / sizeClosestSet);
     }
 
 
-    public static void updateIntraDomainLookupStatistics(FindOperation fop, long duration) {
+    public static void updateIntraDomainLookupStatistics(FindOperation findOp, long duration, boolean success) {
         KademliaObserver.finished_lookups_INTRA.add(1);
-        KademliaObserver.messageStore_INTRA.add(fop.nrMessages);
-        KademliaObserver.shortestAmountHops_INTRA.add(fop.shortestNrHops);
+        KademliaObserver.messageStore_INTRA.add(findOp.nrMessages);
         KademliaObserver.timeStore_INTRA.add(duration);
-        KademliaObserver.hopStore_INTRA.add(fop.nrHops);
-        KademliaObserver.successful_lookups_INTRA.add(1);
-        KademliaObserver.fraction_f_CS_INTRA.add(calculateFInClosestSet(fop));
+        KademliaObserver.fraction_f_CS_INTRA.add(calculateFInClosestSet(findOp));
 
+        if (success) {
+            KademliaObserver.successful_lookups_INTRA.add(1);
+            KademliaObserver.shortestAmountHops_INTRA.add(findOp.shortestNrHops);
+        } else {
+            KademliaObserver.failed_lookups_INTRA.add(1);
+        }
     }
 
 
-    public static void updateInterDomainLookupStatistics(FindOperation fop, long duration) {
-        KademliaObserver.messageStore_INTER.add(fop.nrMessages);
-        KademliaObserver.shortestAmountHops_INTER.add(fop.shortestNrHops);
-        KademliaObserver.timeStore_INTER.add(duration);
-        KademliaObserver.hopStore_INTER.add(fop.nrHops);
+    public static void updateInterDomainLookupStatistics(FindOperation findOp, long duration, boolean success) {
         KademliaObserver.finished_lookups_INTER.add(1);
-        KademliaObserver.successful_lookups_INTER.add(1);
-        KademliaObserver.fraction_f_CS_INTER.add(calculateFInClosestSet(fop));
+        KademliaObserver.messageStore_INTER.add(findOp.nrMessages);
+        KademliaObserver.timeStore_INTER.add(duration);
+        KademliaObserver.fraction_f_CS_INTER.add(calculateFInClosestSet(findOp));
 
+        if (success) {
+            KademliaObserver.successful_lookups_INTER.add(1);
+            KademliaObserver.shortestAmountHops_INTER.add(findOp.shortestNrHops);
+        } else {
+            KademliaObserver.failed_lookups_INTER.add(1);
+        }
     }
 
     public static void updateSuccessfulLookup(KadNode currentNode, FindOperation findOp) {
 
-        //update statistics OVERALL
-        KademliaObserver.finished_lookups_OVERALL.add(1);
-        KademliaObserver.successful_lookups_OVERALL.add(1);
-        KademliaObserver.messageStore_OVERALL.add(findOp.nrMessages);
-        KademliaObserver.shortestAmountHops_OVERALL.add(findOp.shortestNrHops);
         long duration = (CommonState.getTime() - (findOp.timestamp));
-        KademliaObserver.timeStore_OVERALL.add(duration);
-        KademliaObserver.fraction_f_CS_OVERALL.add(calculateFInClosestSet(findOp));
 
-        //update the correct statistics
         if (currentNode.getDomain() == findOp.destNode.getDomain()) {
-            updateIntraDomainLookupStatistics(findOp, duration);
+            updateIntraDomainLookupStatistics(findOp, duration, true);
+            KademliaObserver.shortestAmountHops_INTRA_SUCCESS.add(findOp.shortestNrHops);
+            KademliaObserver.timeStore_INTRA_SUCCESS.add(duration);
+            KademliaObserver.messageStore_INTRA_SUCCESS.add(findOp.nrMessages);
+            KademliaObserver.fraction_f_INTRA_SUCCESS.add(calculateFInClosestSet(findOp));
         } else {
-            updateInterDomainLookupStatistics(findOp, duration);
+            updateInterDomainLookupStatistics(findOp, duration, true);
+            KademliaObserver.shortestAmountHops_INTER_SUCCESS.add(findOp.shortestNrHops);
+            KademliaObserver.timeStore_INTER_SUCCESS.add(duration);
+            KademliaObserver.messageStore_INTER_SUCCESS.add(findOp.nrMessages);
+            KademliaObserver.fraction_f_INTER_SUCCESS.add(calculateFInClosestSet(findOp));
         }
 
     }
 
     public static void updateFailedLookup(KadNode currentNode, FindOperation findOp) {
 
-        System.err.println("findOp " + findOp.operationId + " is a failed lookup!");
+        long duration = (CommonState.getTime() - (findOp.timestamp));
 
-        //update statistics OVERALL
-        KademliaObserver.finished_lookups_OVERALL.add(1);
-        KademliaObserver.failed_lookups_OVERALL.add(1);
-        KademliaObserver.messageStore_OVERALL.add(findOp.nrMessages);
-
-        KademliaObserver.fraction_f_CS_OVERALL.add(calculateFInClosestSet(findOp));
-
-        //update statistics INTRA
+        //update the correct inter or intra domain statistics
         if (currentNode.getDomain() == findOp.destNode.getDomain()) {
-            KademliaObserver.finished_lookups_INTRA.add(1);
-            KademliaObserver.failed_lookups_INTRA.add(1);
+            updateIntraDomainLookupStatistics(findOp, duration, false);
+            KademliaObserver.timeStore_INTRA_FAILURE.add(duration);
+            KademliaObserver.messageStore_INTRA_FAILURE.add(findOp.nrMessages);
+            KademliaObserver.fraction_f_INTRA_FAILURE.add(calculateFInClosestSet(findOp));
         } else {
-            KademliaObserver.finished_lookups_INTER.add(1);
-            KademliaObserver.failed_lookups_INTER.add(1);
+            updateInterDomainLookupStatistics(findOp, duration, false);
+            KademliaObserver.timeStore_INTER_FAILURE.add(duration);
+            KademliaObserver.messageStore_INTER_FAILURE.add(findOp.nrMessages);
+            KademliaObserver.fraction_f_INTER_FAILURE.add(calculateFInClosestSet(findOp));
         }
     }
 

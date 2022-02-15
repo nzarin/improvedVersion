@@ -21,20 +21,7 @@ public class KademliaObserver implements Control {
      */
     private static final String PAR_PROT = "protocol";
 
-    // OVERALL statistics
-    public static IncrementalStats find_op_OVERALL = new IncrementalStats();
-    public static IncrementalStats hopStore_OVERALL = new IncrementalStats();
-    public static IncrementalStats messageStore_OVERALL = new IncrementalStats();
-    public static IncrementalStats timeStore_OVERALL = new IncrementalStats();
-    public static IncrementalStats shortestAmountHops_OVERALL = new IncrementalStats();
-    public static IncrementalStats finished_lookups_OVERALL = new IncrementalStats();
-    public static IncrementalStats failed_lookups_OVERALL = new IncrementalStats();
-    public static IncrementalStats successful_lookups_OVERALL = new IncrementalStats();
-    public static IncrementalStats fraction_f_CS_OVERALL = new IncrementalStats();
-
-
-    // INTRA-DOMAIN LOOKUP statistics
-    public static IncrementalStats hopStore_INTRA = new IncrementalStats();
+    // general intra-domain lookup statistics
     public static IncrementalStats messageStore_INTRA = new IncrementalStats();
     public static IncrementalStats shortestAmountHops_INTRA = new IncrementalStats();
     public static IncrementalStats timeStore_INTRA = new IncrementalStats();
@@ -43,8 +30,7 @@ public class KademliaObserver implements Control {
     public static IncrementalStats successful_lookups_INTRA = new IncrementalStats();
     public static IncrementalStats fraction_f_CS_INTRA = new IncrementalStats();
 
-    // INTER-DOMAIN LOOKUP statistics
-    public static IncrementalStats hopStore_INTER = new IncrementalStats();
+    // general inter-domain lookup statistics
     public static IncrementalStats messageStore_INTER = new IncrementalStats();
     public static IncrementalStats shortestAmountHops_INTER = new IncrementalStats();
     public static IncrementalStats timeStore_INTER = new IncrementalStats();
@@ -52,6 +38,31 @@ public class KademliaObserver implements Control {
     public static IncrementalStats failed_lookups_INTER = new IncrementalStats();
     public static IncrementalStats successful_lookups_INTER = new IncrementalStats();
     public static IncrementalStats fraction_f_CS_INTER = new IncrementalStats();
+
+    // successful intra-domain lookup statistics
+    public static IncrementalStats messageStore_INTRA_SUCCESS = new IncrementalStats();
+    public static IncrementalStats shortestAmountHops_INTRA_SUCCESS = new IncrementalStats();
+    public static IncrementalStats timeStore_INTRA_SUCCESS = new IncrementalStats();
+    public static IncrementalStats fraction_f_INTRA_SUCCESS = new IncrementalStats();
+
+    // SUCCESSFUL inter-domain lookup statistics
+    public static IncrementalStats messageStore_INTER_SUCCESS = new IncrementalStats();
+    public static IncrementalStats shortestAmountHops_INTER_SUCCESS = new IncrementalStats();
+    public static IncrementalStats timeStore_INTER_SUCCESS = new IncrementalStats();
+    public static IncrementalStats fraction_f_INTER_SUCCESS = new IncrementalStats();
+
+    // FAILED intra-domain lookup statistics
+    public static IncrementalStats messageStore_INTRA_FAILURE = new IncrementalStats();
+    public static IncrementalStats shortestAmountHops_INTRA_FAILURE = new IncrementalStats();
+    public static IncrementalStats timeStore_INTRA_FAILURE = new IncrementalStats();
+    public static IncrementalStats fraction_f_INTRA_FAILURE = new IncrementalStats();
+
+    // FAILED inter-domain lookup statistics
+    public static IncrementalStats messageStore_INTER_FAILURE = new IncrementalStats();
+    public static IncrementalStats shortestAmountHops_INTER_FAILURE = new IncrementalStats();
+    public static IncrementalStats timeStore_INTER_FAILURE = new IncrementalStats();
+    public static IncrementalStats fraction_f_INTER_FAILURE = new IncrementalStats();
+
 
     /**
      * Protocol id
@@ -87,11 +98,6 @@ public class KademliaObserver implements Control {
             if (!Network.get(i).isUp())
                 sz--;
 
-        // calculate overall success ratio
-        double success_lookups = successful_lookups_OVERALL.getSum();
-        double failure_lookups = failed_lookups_OVERALL.getSum();
-        double no_btstrp_completed_lookups = success_lookups + failure_lookups;
-        double success_ratio = success_lookups / no_btstrp_completed_lookups;
 
         //calculate intra-domain success ratio
         double success_lookups_intra = successful_lookups_INTRA.getSum();
@@ -105,107 +111,167 @@ public class KademliaObserver implements Control {
         double completed_lookups_inter = success_lookups_inter + failure_lookups_inter;
         double success_ratio_inter = success_lookups_inter / completed_lookups_inter;
 
-
+        double completed_findoperations = finished_lookups_INTER.getSum() + finished_lookups_INTRA.getSum();
 
         //format print result
-        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%d min ltcy] [%d msec average ltcy] [%d max ltcy]  [%f completed findops] [%f success lookups] [%f failed lookups]  [%f success ratio] [%f shortest amount of hops] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
-                CommonState.getTime(), sz, (int) timeStore_OVERALL.getMin(), (int) timeStore_OVERALL.getAverage(), (int) timeStore_OVERALL.getMax(), no_btstrp_completed_lookups, success_lookups, failure_lookups, success_ratio, shortestAmountHops_OVERALL.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
+        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%f completed findops] [%f success lookups TOTAL] [%f failed lookups TOTAL]  [%f shortest amount of hops INTRA] [%f shortest amount of hops INTER] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
+                CommonState.getTime(), sz, completed_findoperations, success_lookups_inter + success_lookups_intra, failure_lookups_inter + failure_lookups_intra, shortestAmountHops_INTRA.getAverage(), shortestAmountHops_INTER.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
 
         // create files
         try {
 
-            //create OVERALL files
-            File hop_file_OVERALL = new File("results/hops/shortestHops-OVERALL.txt");
-            hop_file_OVERALL.createNewFile();
-            BufferedWriter outH_OVERALL = new BufferedWriter(new FileWriter(hop_file_OVERALL, false));
-            outH_OVERALL.write(shortestAmountHops_OVERALL.toString() + "\n");
-            outH_OVERALL.close();
-
-            File latency_file_OVERALL = new File("results/latency/avgLatency-OVERALL.txt");
-            latency_file_OVERALL.createNewFile();
-            BufferedWriter outL_OVERALL = new BufferedWriter(new FileWriter(latency_file_OVERALL, false));
-            outL_OVERALL.write(timeStore_OVERALL.toString() + "\n");
-            outL_OVERALL.close();
-
-            File success_file_OVERALL = new File("results/successratio/avgSR-OVERALL.txt");
-            success_file_OVERALL.createNewFile();
-            BufferedWriter outS_OVERALL = new BufferedWriter(new FileWriter(success_file_OVERALL, false));
-            outS_OVERALL.write(success_ratio + "\n");
-            outS_OVERALL.close();
-
-            File message_file_OVERALL = new File("results/messages/avgMessages-OVERALL.txt");
-            message_file_OVERALL.createNewFile();
-            BufferedWriter outM_OVERALL = new BufferedWriter(new FileWriter(message_file_OVERALL, false));
-            outM_OVERALL.write(messageStore_OVERALL.toString() + "\n");
-            outM_OVERALL.close();
-
-            File adversarial_file_OVERALL = new File("results/adversarials/fraction-f-OVERALL.txt");
-            adversarial_file_OVERALL.createNewFile();
-            BufferedWriter outA_OVERALL = new BufferedWriter(new FileWriter(adversarial_file_OVERALL, false));
-            outA_OVERALL.write(fraction_f_CS_OVERALL.toString() + "\n");
-            outA_OVERALL.close();
-
             //create INTRA-DOMAIN LOOKUP files
-            File hop_file_INTRA = new File("results/hops/shortestHops-INTRA.txt");
+            File hop_file_INTRA = new File("results/intradomain/hops.txt");
             hop_file_INTRA.createNewFile();
             BufferedWriter outH_INTRA = new BufferedWriter(new FileWriter(hop_file_INTRA, false));
             outH_INTRA.write(shortestAmountHops_INTRA.toString() + "\n");
             outH_INTRA.close();
 
-            File latency_file_INTRA = new File("results/latency/avgLatency-INTRA.txt");
+            File latency_file_INTRA = new File("results/intradomain/latency.txt");
             latency_file_INTRA.createNewFile();
             BufferedWriter outL_INTRA = new BufferedWriter(new FileWriter(latency_file_INTRA, false));
             outL_INTRA.write(timeStore_INTRA.toString() + "\n");
             outL_INTRA.close();
 
-            File success_file_INTRA = new File("results/successratio/avgSR-INTRA.txt");
+            File success_file_INTRA = new File("results/intradomain/success-rate.txt");
             success_file_INTRA.createNewFile();
             BufferedWriter outS_INTRA = new BufferedWriter(new FileWriter(success_file_INTRA, false));
             outS_INTRA.write(success_ratio_intra + "\n");
             outS_INTRA.close();
 
-            File message_file_INTRA = new File("results/messages/avgMessages-INTRA.txt");
+            File message_file_INTRA = new File("results/intradomain/messages.txt");
             message_file_INTRA.createNewFile();
             BufferedWriter outM_INTRA = new BufferedWriter(new FileWriter(message_file_INTRA, false));
             outM_INTRA.write(messageStore_INTRA.toString() + "\n");
             outM_INTRA.close();
 
-            File adversarial_file_INTRA = new File("results/adversarials/fraction-f-INTRA.txt");
+            File adversarial_file_INTRA = new File("results/intradomain/fraction-f.txt");
             adversarial_file_INTRA.createNewFile();
             BufferedWriter outA_INTRA = new BufferedWriter(new FileWriter(adversarial_file_INTRA, false));
             outA_INTRA.write(fraction_f_CS_INTRA.toString() + "\n");
             outA_INTRA.close();
 
             //create INTER-DOMAIN LOOKUP files
-            File hop_file_INTER = new File("results/hops/shortestHops-INTER.txt");
+            File hop_file_INTER = new File("results/interdomain/hops.txt");
             hop_file_INTER.createNewFile();
             BufferedWriter outH_INTER= new BufferedWriter(new FileWriter(hop_file_INTER, false));
             outH_INTER.write(shortestAmountHops_INTER.toString() + "\n");
             outH_INTER.close();
 
-            File latency_file_INTER = new File("results/latency/avgLatency-INTER.txt");
+            File latency_file_INTER = new File("results/interdomain/latency.txt");
             latency_file_INTER.createNewFile();
             BufferedWriter outL_INTER = new BufferedWriter(new FileWriter(latency_file_INTER, false));
             outL_INTER.write(timeStore_INTER.toString() + "\n");
             outL_INTER.close();
 
-            File success_file_INTER = new File("results/successratio/avgSR-INTER.txt");
+            File success_file_INTER = new File("results/interdomain/success-rate.txt");
             success_file_INTER.createNewFile();
             BufferedWriter outS_INTER = new BufferedWriter(new FileWriter(success_file_INTER, false));
             outS_INTER.write(success_ratio_inter + "\n");
             outS_INTER.close();
 
-            File message_file_INTER = new File("results/messages/avgMessages-INTER.txt");
+            File message_file_INTER = new File("results/interdomain/messages.txt");
             message_file_INTER.createNewFile();
             BufferedWriter outM_INTER = new BufferedWriter(new FileWriter(message_file_INTER, false));
             outM_INTER.write(messageStore_INTER.toString() + "\n");
             outM_INTER.close();
 
-            File adversarial_file_INTER = new File("results/adversarials/fraction-f-INTER.txt");
+            File adversarial_file_INTER = new File("results/interdomain/fraction-f.txt");
             adversarial_file_INTER.createNewFile();
             BufferedWriter outA_INTER = new BufferedWriter(new FileWriter(adversarial_file_INTER, false));
             outA_INTER.write(fraction_f_CS_INTER.toString() + "\n");
             outA_INTER.close();
+
+
+            //create successful intra-domain lookup statistics files
+            File hop_file_SUCCESS = new File("results/intradomain/successfulLookups/hops.txt");
+            hop_file_SUCCESS.createNewFile();
+            BufferedWriter outH_SUCCESS= new BufferedWriter(new FileWriter(hop_file_SUCCESS, false));
+            outH_SUCCESS.write(shortestAmountHops_INTRA_SUCCESS.toString() + "\n");
+            outH_SUCCESS.close();
+
+            File latency_file_SUCCESS = new File("results/intradomain/successfulLookups/latency.txt");
+            latency_file_SUCCESS.createNewFile();
+            BufferedWriter outL_SUCCESS = new BufferedWriter(new FileWriter(latency_file_SUCCESS, false));
+            outL_SUCCESS.write(timeStore_INTRA_SUCCESS.toString() + "\n");
+            outL_SUCCESS.close();
+
+            File message_file_SUCCESS = new File("results/intradomain/successfulLookups/messages.txt");
+            message_file_SUCCESS.createNewFile();
+            BufferedWriter outM_SUCCESS = new BufferedWriter(new FileWriter(message_file_SUCCESS, false));
+            outM_SUCCESS.write(messageStore_INTRA_SUCCESS.toString() + "\n");
+            outM_SUCCESS.close();
+
+            File adversarial_file_SUCCESS = new File("results/intradomain/successfulLookups/fraction-f.txt");
+            adversarial_file_SUCCESS.createNewFile();
+            BufferedWriter outA_SUCCESS = new BufferedWriter(new FileWriter(adversarial_file_SUCCESS, false));
+            outA_SUCCESS.write(fraction_f_INTRA_SUCCESS.toString() + "\n");
+            outA_SUCCESS.close();
+
+            //create successful inter-domain lookup statistics files
+            File hop_file_INTER_SUCCESS = new File("results/interdomain/successfulLookups/hops.txt");
+            hop_file_INTER_SUCCESS.createNewFile();
+            BufferedWriter outH_INTER_SUCCESS= new BufferedWriter(new FileWriter(hop_file_INTER_SUCCESS, false));
+            outH_INTER_SUCCESS.write(shortestAmountHops_INTER_SUCCESS.toString() + "\n");
+            outH_INTER_SUCCESS.close();
+
+            File latency_file_INTER_SUCCESS = new File("results/interdomain/successfulLookups/latency.txt");
+            latency_file_INTER_SUCCESS.createNewFile();
+            BufferedWriter outL_INTER_SUCCESS = new BufferedWriter(new FileWriter(latency_file_INTER_SUCCESS, false));
+            outL_INTER_SUCCESS.write(timeStore_INTER_SUCCESS.toString() + "\n");
+            outL_INTER_SUCCESS.close();
+
+            File message_file_INTER_SUCCESS = new File("results/interdomain/successfulLookups/messages.txt");
+            message_file_INTER_SUCCESS.createNewFile();
+            BufferedWriter outM_INTER_SUCCESS = new BufferedWriter(new FileWriter(message_file_INTER_SUCCESS, false));
+            outM_INTER_SUCCESS.write(messageStore_INTER_SUCCESS.toString() + "\n");
+            outM_INTER_SUCCESS.close();
+
+            File adversarial_file_INTER_SUCCESS = new File("results/interdomain/successfulLookups/fraction-f.txt");
+            adversarial_file_INTER_SUCCESS.createNewFile();
+            BufferedWriter outA_INTER_SUCCESS = new BufferedWriter(new FileWriter(adversarial_file_INTER_SUCCESS, false));
+            outA_INTER_SUCCESS.write(fraction_f_INTER_SUCCESS.toString() + "\n");
+            outA_INTER_SUCCESS.close();
+
+
+            //create failed intra-domain lookup statistics files
+            File latency_file_INTRA_FAIL = new File("results/intradomain/failedLookups/latency.txt");
+            latency_file_INTRA_FAIL.createNewFile();
+            BufferedWriter outL_INTRA_FAIL = new BufferedWriter(new FileWriter(latency_file_INTRA_FAIL, false));
+            outL_INTRA_FAIL.write(timeStore_INTRA_FAILURE.toString() + "\n");
+            outL_INTRA_FAIL.close();
+
+            File message_file_INTRA_FAILED = new File("results/intradomain/failedLookups/messages.txt");
+            message_file_INTRA_FAILED.createNewFile();
+            BufferedWriter outM_INTRA_FAIL = new BufferedWriter(new FileWriter(message_file_INTRA_FAILED, false));
+            outM_INTRA_FAIL.write(messageStore_INTRA_FAILURE.toString() + "\n");
+            outM_INTRA_FAIL.close();
+
+            File adversarial_file_INTRA_FAIL = new File("results/intradomain/failedLookups/fraction-f.txt");
+            adversarial_file_INTRA_FAIL.createNewFile();
+            BufferedWriter outA_INTRA_FAIL = new BufferedWriter(new FileWriter(adversarial_file_INTRA_FAIL, false));
+            outA_INTRA_FAIL.write(fraction_f_INTRA_FAILURE.toString() + "\n");
+            outA_INTRA_FAIL.close();
+
+            //create failed inter-domain lookup statistics files
+            File latency_file_INTER_FAIL = new File("results/interdomain/failedLookups/latency.txt");
+            latency_file_INTER_FAIL.createNewFile();
+            BufferedWriter outL_INTER_FAIL = new BufferedWriter(new FileWriter(latency_file_INTER_FAIL, false));
+            outL_INTER_FAIL.write(timeStore_INTER_FAILURE.toString() + "\n");
+            outL_INTER_FAIL.close();
+
+            File message_file_INTER_FAILED = new File("results/interdomain/failedLookups/messages.txt");
+            message_file_INTER_FAILED.createNewFile();
+            BufferedWriter outM_INTER_FAIL = new BufferedWriter(new FileWriter(message_file_INTER_FAILED, false));
+            outM_INTER_FAIL.write(messageStore_INTER_FAILURE.toString() + "\n");
+            outM_INTER_FAIL.close();
+
+            File adversarial_file_INTER_FAIL = new File("results/interdomain/failedLookups/fraction-f.txt");
+            adversarial_file_INTER_FAIL.createNewFile();
+            BufferedWriter outA_INTER_FAIL = new BufferedWriter(new FileWriter(adversarial_file_INTER_FAIL, false));
+            outA_INTER_FAIL.write(fraction_f_INTER_FAILURE.toString() + "\n");
+            outA_INTER_FAIL.close();
+
 
         } catch (IOException e) {
             e.printStackTrace();
