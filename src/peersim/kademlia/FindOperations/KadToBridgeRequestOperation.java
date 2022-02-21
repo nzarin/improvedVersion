@@ -1,12 +1,11 @@
 package peersim.kademlia.FindOperations;
 
 import peersim.core.CommonState;
-import peersim.core.Node;
 import peersim.kademlia.*;
 
-public class KadToBridgeFindOperation extends FindOperation2 {
+public class KadToBridgeRequestOperation extends RequestOperation {
 
-    public KadToBridgeFindOperation(int kid, Message lookupMsg, int tid){
+    public KadToBridgeRequestOperation(int kid, Message lookupMsg, int tid){
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;

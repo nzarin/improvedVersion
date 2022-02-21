@@ -1,6 +1,6 @@
 package peersim.kademlia;
 
-import peersim.kademlia.FindOperations.FindOperation2;
+import peersim.kademlia.FindOperations.RequestOperation;
 import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
 import peersim.kademlia.RespondOperations.RespondOperation2;
 
@@ -9,7 +9,7 @@ import peersim.kademlia.RespondOperations.RespondOperation2;
  */
 public abstract class Lookup {
     String type;
-    FindOperation2 findOp;
+    RequestOperation findOp;
     RespondOperation2 resOp;
     HandleResponseOperation2 handleResOp;
     Message lookupMessage;
@@ -18,7 +18,7 @@ public abstract class Lookup {
 
     abstract void prepare(int kademliaid, Message lookupMessage, int tid);
 
-    abstract void performFindOp();
+    abstract void performRequestOp();
 
     abstract void performRespondOp();
 

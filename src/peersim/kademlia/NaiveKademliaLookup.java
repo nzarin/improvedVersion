@@ -29,8 +29,8 @@ public class NaiveKademliaLookup extends Lookup {
      * Perform the find operation of the naive kademlia variant.
      */
     @Override
-    public void performFindOp() {
-        findOp = lif2.createFindOperation(kademliaid, lookupMessage, transportid);
+    public void performRequestOp() {
+        findOp = lif2.createRequestOperation(kademliaid, lookupMessage, transportid);
         findOp.find();
     }
 

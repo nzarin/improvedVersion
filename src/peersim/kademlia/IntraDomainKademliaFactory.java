@@ -1,7 +1,7 @@
 package peersim.kademlia;
 
-import peersim.kademlia.FindOperations.FindOperation2;
-import peersim.kademlia.FindOperations.KadToKadFindOperation;
+import peersim.kademlia.FindOperations.RequestOperation;
+import peersim.kademlia.FindOperations.KadToKadRequestOperation;
 import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
 import peersim.kademlia.HandleResponseOperation.KadToKadHandleResponseOperation;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
@@ -20,8 +20,8 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory2 {
      * @return
      */
     @Override
-    public FindOperation2 createFindOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadFindOperation(kademliaid, lookupMessage, tid);
+    public RequestOperation createRequestOperation(int kademliaid, Message lookupMessage, int tid) {
+        return new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
     }
 
     /**

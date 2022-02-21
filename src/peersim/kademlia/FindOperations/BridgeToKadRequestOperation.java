@@ -4,9 +4,9 @@ import peersim.core.CommonState;
 import peersim.core.Node;
 import peersim.kademlia.*;
 
-public class BridgeToKadFindOperation extends FindOperation2 {
+public class BridgeToKadRequestOperation extends RequestOperation {
 
-    public BridgeToKadFindOperation(int kid, Message lookupMsg, int tid){
+    public BridgeToKadRequestOperation(int kid, Message lookupMsg, int tid){
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;

@@ -1,12 +1,11 @@
 package peersim.kademlia.FindOperations;
 
-import peersim.core.Node;
 import peersim.kademlia.*;
 
 /**
  * This class represents the find operation when the source and target are both KadNodes
  */
-public class KadToKadFindOperation extends FindOperation2 {
+public class KadToKadRequestOperation extends RequestOperation {
 
 
     /**
@@ -15,7 +14,7 @@ public class KadToKadFindOperation extends FindOperation2 {
      * @param lookupMsg
      * @param tid
      */
-    public KadToKadFindOperation(int kid, Message lookupMsg, int tid) {
+    public KadToKadRequestOperation(int kid, Message lookupMsg, int tid) {
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;

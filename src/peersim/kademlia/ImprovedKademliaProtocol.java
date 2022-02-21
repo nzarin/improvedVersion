@@ -22,8 +22,8 @@ public class ImprovedKademliaProtocol extends Lookup {
      * Perform the correct version of teh find operation for the improved kademlia version.
      */
     @Override
-    public void performFindOp() {
-        this.findOp = lif2.createFindOperation(kademliaid, lookupMessage, transportid);
+    public void performRequestOp() {
+        this.findOp = lif2.createRequestOperation(kademliaid, lookupMessage, transportid);
         findOp.find();
 
     }

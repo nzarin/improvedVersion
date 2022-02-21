@@ -115,7 +115,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
                 case Message.MSG_FINDNODE:
 //                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a FIND message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ") to find node ("+ m.target.getNodeId() + "," + m.target.getDomain() + ")");
                     this.currentLookup.prepare(kademliaid, m, tid);
-                    currentLookup.performFindOp();
+                    currentLookup.performRequestOp();
                     break;
                 case Message.MSG_REQUEST:
 //                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain() + ") of type " + m.receiver.getType()  + " gets a REQUEST message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain() + ") of type " + m.sender.getType());

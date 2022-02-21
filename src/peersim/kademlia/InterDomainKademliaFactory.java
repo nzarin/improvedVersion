@@ -9,26 +9,26 @@ import peersim.kademlia.RespondOperations.RespondOperation2;
 public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
 
     @Override
-    public FindOperation2 createFindOperation(int kademliaid, Message lookupMessage, int tid) {
+    public RequestOperation createRequestOperation(int kademliaid, Message lookupMessage, int tid) {
 
-        FindOperation2 fop = null;
+        RequestOperation fop = null;
 
         //for the first message its always the case that the receiver is the source -> so we have a kad to bridge find operation
         if (lookupMessage.receiver == lookupMessage.src) {
 //            System.err.println("We have a new lookup request ");
-            fop = new KadToBridgeFindOperation(kademliaid, lookupMessage, tid);
+            fop = new KadToBridgeRequestOperation(kademliaid, lookupMessage, tid);
         } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof KadNode) {
 //            System.err.println("it is a bridge to bridge find operation ");
-            fop = new BridgeToBridgeFindOperation(kademliaid, lookupMessage, tid);
+            fop = new BridgeToBridgeRequestOperation(kademliaid, lookupMessage, tid);
         } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof BridgeNode) {
 //            System.err.println("it is a bridge to kad find operation ");
-            fop = new BridgeToKadFindOperation(kademliaid, lookupMessage, tid);
+            fop = new BridgeToKadRequestOperation(kademliaid, lookupMessage, tid);
         } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof BridgeNode) {
 //            System.err.println("it is a kad to kad find operation ");
-            fop = new KadToKadFindOperation(kademliaid, lookupMessage, tid);
+            fop = new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
         } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof KadNode) {
 //            System.err.println("it is a kad to bridge find operation ");
-            fop = new KadToBridgeFindOperation(kademliaid, lookupMessage, tid);
+            fop = new KadToBridgeRequestOperation(kademliaid, lookupMessage, tid);
         }
 
         return fop;
