@@ -4,7 +4,6 @@ import peersim.core.CommonState;
 
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
-import java.util.TreeMap;
 
 /**
  * This class implements a kademlia k-bucket. Function for the management of the neighbours update are also implemented
@@ -29,12 +28,30 @@ public class KBucket implements Cloneable {
      *
      * @param node The to-be added neighbour.
      */
-    public void addNeighbour(KadNode node) {
+    public void fillKBucket(KadNode node) {
         long time = CommonState.getTime();
 
         // if the k-bucket isn't full, add neighbour to tail of the list.
         if (neighbours.size() < KademliaCommonConfig.K) { // k-bucket isn't full
             neighbours.put(node, time);
+        }
+
+    }
+
+
+    public void addKadNode(KadNode node){
+        long time = CommonState.getTime();
+
+        if(neighbours.size() < KademliaCommonConfig.K){
+            neighbours.put(node, time);
+        } else {
+            //determine whether there is a node that is offline
+            for(KadNode neighbour : neighbours.keySet()){
+                if(!neighbour.isAlive()){
+                    neighbours.remove(neighbour);
+                    neighbours.put(node,time);
+                }
+            }
         }
     }
 

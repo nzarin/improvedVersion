@@ -1,7 +1,6 @@
 package peersim.kademlia;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,7 +17,7 @@ public class RoutingTable implements Cloneable {
     /**
      * K-Buckets of this node.
      */
-    public TreeMap<Integer, KBucket> k_buckets;
+    private TreeMap<Integer, KBucket> k_buckets;
 
     /**
      * Instantiates a new empty routing table with the specified size
@@ -30,6 +29,11 @@ public class RoutingTable implements Cloneable {
         for (int i = 0; i <= KademliaCommonConfig.BITS; i++) {
             k_buckets.put(i, new KBucket());
         }
+    }
+
+    public void fillRoutingTable(KadNode node){
+        int prefix_len = Util.prefixLen(owner.getNodeId(), node.getNodeId());
+        k_buckets.get(prefix_len).fillKBucket(node);
     }
 
 
@@ -44,7 +48,7 @@ public class RoutingTable implements Cloneable {
         int prefix_len = Util.prefixLen(owner.getNodeId(), neighbour.getNodeId());
 
         // add the node to the corresponding k-bucket
-        k_buckets.get(prefix_len).addNeighbour(neighbour);
+        k_buckets.get(prefix_len).fillKBucket(neighbour);
     }
 
 
@@ -148,6 +152,10 @@ public class RoutingTable implements Cloneable {
             s = s + "Nodes with common prefix " + entry.getKey() + " are : " + ith_k_bucket + "\n";
         }
         return s;
+    }
+
+    public KBucket getKBucket(int index){
+        return this.k_buckets.get(index);
     }
 
 

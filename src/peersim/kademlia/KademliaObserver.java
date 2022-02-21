@@ -53,16 +53,16 @@ public class KademliaObserver implements Control {
 
     // FAILED intra-domain lookup statistics
     public static IncrementalStats messageStore_INTRA_FAILURE = new IncrementalStats();
-    public static IncrementalStats shortestAmountHops_INTRA_FAILURE = new IncrementalStats();
     public static IncrementalStats timeStore_INTRA_FAILURE = new IncrementalStats();
     public static IncrementalStats fraction_f_INTRA_FAILURE = new IncrementalStats();
 
     // FAILED inter-domain lookup statistics
     public static IncrementalStats messageStore_INTER_FAILURE = new IncrementalStats();
-    public static IncrementalStats shortestAmountHops_INTER_FAILURE = new IncrementalStats();
     public static IncrementalStats timeStore_INTER_FAILURE = new IncrementalStats();
     public static IncrementalStats fraction_f_INTER_FAILURE = new IncrementalStats();
 
+    // OTHER
+    public static IncrementalStats churn_store = new IncrementalStats();
 
     /**
      * Protocol id
@@ -114,8 +114,8 @@ public class KademliaObserver implements Control {
         double completed_findoperations = finished_lookups_INTER.getSum() + finished_lookups_INTRA.getSum();
 
         //format print result
-        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%f completed findops] [%f success lookups TOTAL] [%f failed lookups TOTAL]  [%f shortest amount of hops INTRA] [%f shortest amount of hops INTER] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups]",
-                CommonState.getTime(), sz, completed_findoperations, success_lookups_inter + success_lookups_intra, failure_lookups_inter + failure_lookups_intra, shortestAmountHops_INTRA.getAverage(), shortestAmountHops_INTER.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum());
+        String s = String.format("[time=%d]:[N=%d current nodes UP]  [%f completed findops] [%f success lookups TOTAL] [%f failed lookups TOTAL]  [%f shortest amount of hops INTRA] [%f shortest amount of hops INTER] [%f INTRA-DOMAIN lookups] [%f INTER-DOMAIN lookups] [%f CHURN COUNT]",
+                CommonState.getTime(), sz, completed_findoperations, success_lookups_inter + success_lookups_intra, failure_lookups_inter + failure_lookups_intra, shortestAmountHops_INTRA.getAverage(), shortestAmountHops_INTER.getAverage(), finished_lookups_INTRA.getSum(), finished_lookups_INTER.getSum(), churn_store.getSum());
 
         // create files
         try {
@@ -272,6 +272,12 @@ public class KademliaObserver implements Control {
             outA_INTER_FAIL.write(fraction_f_INTER_FAILURE.toString() + "\n");
             outA_INTER_FAIL.close();
 
+            //OTHER
+            File churn_file = new File("results/churn.txt");
+            churn_file.createNewFile();
+            BufferedWriter out_churn =  new BufferedWriter(new FileWriter(churn_file, false));
+            out_churn.write(String.valueOf(churn_store.getSum()));
+            out_churn.close();
 
         } catch (IOException e) {
             e.printStackTrace();

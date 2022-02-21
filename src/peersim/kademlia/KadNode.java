@@ -1,5 +1,7 @@
 package peersim.kademlia;
 
+import peersim.core.Node;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -130,5 +132,10 @@ public class KadNode implements KademliaNode {
     @Override
     public BigInteger getNodeId() {
         return this.nodeId;
+    }
+
+    public boolean isAlive(){
+        Node n = Util.nodeIdtoNode(nodeId, kademliaProtocol.getKademliaId());
+        return n.isUp();
     }
 }

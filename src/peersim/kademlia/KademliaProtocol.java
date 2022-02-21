@@ -187,5 +187,6 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
         return this.me;
     }
 
+    public int getKademliaId(){return this.kademliaid;}
 
 }

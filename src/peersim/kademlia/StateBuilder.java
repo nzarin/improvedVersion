@@ -105,7 +105,7 @@ public class StateBuilder implements peersim.core.Control {
 
                 //if it is in the same domain -> add it to iNode its routing table
                 if (iNode.getDomain() == jNode.getDomain()) {
-                    iNode.getRoutingTable().addNeighbour((KadNode) jNode);
+                    iNode.getRoutingTable().fillRoutingTable((KadNode) jNode);
                 } else {
                     //retry
                     j--;
@@ -162,7 +162,7 @@ public class StateBuilder implements peersim.core.Control {
 
                     //if it is in the same domain -> add it to iNode its routing table
                     if (iNode.getDomain() == jNode.getDomain()) {
-                        iNode.getRoutingTable().addNeighbour((KadNode) jNode);
+                        iNode.getRoutingTable().fillRoutingTable((KadNode) jNode);
                     } else {
                         //retry
                         j--;

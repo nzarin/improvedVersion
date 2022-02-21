@@ -16,13 +16,13 @@ public class Statistician {
 
 //        System.err.println("findOp " + fop.operationId + " has finished and we are collecting statistics");
 
-        //if the target is found -> SUCCESSFUL LOOKUP
-        if (fop.closestSet.containsKey(fop.destNode)) {
+        //if the target is found AND IT was online -> SUCCESSFUL LOOKUP
+        if (fop.closestSet.containsKey(fop.destNode) && Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp()) {
 
             updateSuccessfulLookup(currentNode, fop);
 
-            // if I and the destination node are up -> FAILURE LOOKUP
-        } else if (Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp() && Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
+            // if I am still up -> FAILURE LOOKUP
+        } else if (Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
 
             updateFailedLookup(currentNode, fop);
 

@@ -124,7 +124,7 @@ public class Turbulence implements Control {
 
         // find random node to add to k-bucket & fill its list of bridge nodes
         KadNode bootstrapNode = selectBootstrapNode(newKadNode);
-        newKadNode.getRoutingTable().addNeighbour(bootstrapNode);
+        newKadNode.getRoutingTable().fillRoutingTable(bootstrapNode);
         for(BridgeNode b : bootstrapNode.getBridgeNodes()){
             newKadNode.getBridgeNodes().add(b);
         }
@@ -137,8 +137,6 @@ public class Turbulence implements Control {
         m.receiver = newKadNode;
         m.target = newKadNode;
         m.newLookup = true;
-
-        System.err.println("we created a new node (" + newKadNode.getNodeId() + ", " +  newKadNode.getDomain() + ") ");
 
         // start auto-search
         EDSimulator.add(0, m, newNetworkNode, kademliaid);
@@ -179,9 +177,13 @@ public class Turbulence implements Control {
      */
     public boolean rem() {
         Node remove;
+        KademliaProtocol iKad;
+        KademliaNode iNode;
         do {
             remove = Network.get(CommonState.r.nextInt(Network.size()));
-        } while ((remove == null) || (!remove.isUp()));
+            iKad = (KademliaProtocol) (remove.getProtocol(kademliaid));
+            iNode = iKad.getCurrentNode();
+        } while ((remove == null) || (!remove.isUp()) || iNode.isMalicious());
 
         // remove node (set its state to DOWN)
         remove.setFailState(Node.DOWN);
@@ -195,6 +197,8 @@ public class Turbulence implements Control {
      * @return Always false.
      */
     public boolean execute() {
+        KademliaObserver.churn_store.add(1);
+
         // throw the dice
         double dice = CommonState.r.nextDouble();
         if (dice < p_idle)

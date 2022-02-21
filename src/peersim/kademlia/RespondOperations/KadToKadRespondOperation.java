@@ -19,6 +19,12 @@ public class KadToKadRespondOperation extends RespondOperation2 {
     @Override
     public void respond() {
 
+        //try to update the routing table
+        if(lookupMessage.sender instanceof KadNode){
+            lookupMessage.receiver.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
+        }
+
+
         // get the k closest nodes to target node -> I AM RECEIVER OF THE MESSAGE
         KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 

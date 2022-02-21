@@ -1,5 +1,7 @@
 package peersim.kademlia;
 
+import peersim.core.Node;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,6 +9,7 @@ import java.util.TreeMap;
 
 public class BridgeNode implements KademliaNode {
 
+    private KademliaProtocol kademliaProtocol;
     private final BigInteger nodeId;
     private final RoutingTable routingTable;
     private final ArrayList<KadNode> kadNodes;
@@ -16,6 +19,7 @@ public class BridgeNode implements KademliaNode {
     private int domain;
 
     public BridgeNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
+        this.kademliaProtocol = kademliaProtocol;
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = (new RoutingTable(this));
@@ -62,6 +66,12 @@ public class BridgeNode implements KademliaNode {
 
     @Override
     public boolean isMalicious() { return false;}
+
+    @Override
+    public boolean isAlive() {
+        Node n = Util.nodeIdtoNode(nodeId, kademliaProtocol.getKademliaId());
+        return n.isUp();
+    }
 
     public RoutingTable getRoutingTable() {
         return this.routingTable;
