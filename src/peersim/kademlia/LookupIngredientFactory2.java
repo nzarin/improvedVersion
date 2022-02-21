@@ -1,6 +1,6 @@
 package peersim.kademlia;
 
-import peersim.kademlia.FindOperations.RequestOperation;
+import peersim.kademlia.RequestOperation.RequestOperation;
 import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
 import peersim.kademlia.RespondOperations.RespondOperation2;
 
