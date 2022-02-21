@@ -103,4 +103,14 @@ public class KBucket implements Cloneable {
 
         return res + "}";
     }
+
+
+    public KadNode getKadNode(KadNode kadNode){
+        for(KadNode neighbour : neighbours.keySet()){
+            if (kadNode.getNodeId() ==  neighbour.getNodeId()){
+                return neighbour;
+            }
+        }
+        return null;
+    }
 }

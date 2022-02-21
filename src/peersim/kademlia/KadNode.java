@@ -121,6 +121,7 @@ public class KadNode implements KademliaNode {
         return "KadNode{" +
                 "nodeId=" + nodeId +
                 ", domain=" + domain +
+                ", has target in routing table= " + hasNodeInRoutingTable(this) +
                 '}';
     }
 
@@ -138,4 +139,15 @@ public class KadNode implements KademliaNode {
         Node n = Util.nodeIdtoNode(nodeId, kademliaProtocol.getKademliaId());
         return n.isUp();
     }
+
+    public boolean hasNodeInRoutingTable(KadNode node){
+        //iterate over routing table
+        int index = Util.prefixLen(this.nodeId, node.getNodeId());
+        KBucket targetBucket = routingTable.getKBucket(index);
+        if(targetBucket.getKadNode(node) != null){
+            return true;
+        }
+        return false;
+    }
+
 }

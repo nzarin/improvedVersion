@@ -182,4 +182,15 @@ public class FindOperation {
     public void setOperationId(long id){
         this.operationId = id;
     }
+
+
+    public String printClosestSet(){
+        StringBuilder str = new StringBuilder();
+        str.append("[ ");
+        for(KadNode node : closestSet.keySet()){
+            str.append(node.toString2() + " with longest common prefix to target node is " + Util.prefixLen(node.getNodeId(), this.destNode.getNodeId()) + " \n");
+        }
+        str.append(" ]");
+        return str.toString();
+    }
 }

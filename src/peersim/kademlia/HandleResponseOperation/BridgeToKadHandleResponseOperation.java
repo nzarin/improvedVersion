@@ -21,6 +21,8 @@ public class BridgeToKadHandleResponseOperation extends HandleResponseOperation2
 
         if(findOp != null){
             lookupMessage.receiver.getFindOperationsMap().remove(findOp.operationId);
+//            System.err.println("FINAL CLOSEST SET IS");
+//            System.err.println(findOp.printClosestSet());
             Statistician.updateLookupStatistics((KadNode) lookupMessage.receiver, findOp, kademliaid);
         } else {
             System.err.println(" something weird is going on: the findOp in the response message in inter-domain lookup is null");
