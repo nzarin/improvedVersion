@@ -6,7 +6,7 @@ import peersim.kademlia.*;
 /**
  * Kad to Bridge indicates that the intra domain lookup has finished, and we have to forward this result back to the source
  */
-public class KadToBridgeHandleRespondOperation extends HandleResponseOperation2 {
+public class KadToBridgeHandleRespondOperation extends HandleResponseOperation {
 
     public KadToBridgeHandleRespondOperation(int kid, Message lookupMsg, int tid){
         kademliaid = kid;

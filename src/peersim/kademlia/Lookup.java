@@ -1,7 +1,7 @@
 package peersim.kademlia;
 
 import peersim.kademlia.RequestOperation.RequestOperation;
-import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
+import peersim.kademlia.HandleResponseOperation.HandleResponseOperation;
 import peersim.kademlia.RespondOperations.RespondOperation;
 
 /**
@@ -11,7 +11,7 @@ public abstract class Lookup {
     String type;
     RequestOperation findOp;
     RespondOperation resOp;
-    HandleResponseOperation2 handleResOp;
+    HandleResponseOperation handleResOp;
     Message lookupMessage;
     int kademliaid;
     int transportid;

@@ -7,7 +7,7 @@ import peersim.kademlia.*;
 /**
  * This class represents how the response should be handled when source and target are both KadNodes
  */
-public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
+public class KadToKadHandleResponseOperation extends HandleResponseOperation {
 
     public KadToKadHandleResponseOperation(int kid, Message lookupMsg, int tid) {
         kademliaid = kid;

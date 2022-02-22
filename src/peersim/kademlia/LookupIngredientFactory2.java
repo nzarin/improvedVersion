@@ -1,7 +1,7 @@
 package peersim.kademlia;
 
 import peersim.kademlia.RequestOperation.RequestOperation;
-import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
+import peersim.kademlia.HandleResponseOperation.HandleResponseOperation;
 import peersim.kademlia.RespondOperations.RespondOperation;
 
 /**
@@ -12,6 +12,6 @@ public interface LookupIngredientFactory2 {
 
     RespondOperation createNaiveRespondOperation(int kademliaid, Message lookupMessage, int tid);
 
-    HandleResponseOperation2 createNaiveHandleResponseOperation(int kademliaid, Message lookupMessage, int tid);
+    HandleResponseOperation createNaiveHandleResponseOperation(int kademliaid, Message lookupMessage, int tid);
 
 }

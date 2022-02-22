@@ -2,7 +2,7 @@ package peersim.kademlia.HandleResponseOperation;
 
 import peersim.kademlia.*;
 
-public abstract class HandleResponseOperation2 {
+public abstract class HandleResponseOperation {
 
     int kademliaid;
     Message lookupMessage;

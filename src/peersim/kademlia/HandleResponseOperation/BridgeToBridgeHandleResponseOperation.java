@@ -5,7 +5,7 @@ import peersim.kademlia.KadNode;
 import peersim.kademlia.Message;
 import peersim.kademlia.MessageSender;
 
-public class BridgeToBridgeHandleResponseOperation extends HandleResponseOperation2 {
+public class BridgeToBridgeHandleResponseOperation extends HandleResponseOperation {
 
     public BridgeToBridgeHandleResponseOperation(int kid, Message lookupMsg, int tid){
         kademliaid = kid;
