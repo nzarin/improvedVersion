@@ -1,6 +1,5 @@
-package peersim.kademlia.HandleResponseOperation;
+package peersim.kademlia.HandleResponseOperations;
 
-import peersim.core.CommonState;
 import peersim.kademlia.*;
 
 /**

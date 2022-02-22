@@ -1,7 +1,6 @@
-package peersim.kademlia.HandleResponseOperation;
+package peersim.kademlia.HandleResponseOperations;
 
 import peersim.kademlia.FindOperation;
-import peersim.kademlia.KadNode;
 import peersim.kademlia.Message;
 import peersim.kademlia.MessageSender;
 

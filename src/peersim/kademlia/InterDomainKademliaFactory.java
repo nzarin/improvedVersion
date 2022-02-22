@@ -1,7 +1,7 @@
 package peersim.kademlia;
 
-import peersim.kademlia.RequestOperation.*;
-import peersim.kademlia.HandleResponseOperation.*;
+import peersim.kademlia.RequestOperations.*;
+import peersim.kademlia.HandleResponseOperations.*;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
 import peersim.kademlia.RespondOperations.RespondOperation;
 
@@ -60,5 +60,21 @@ public class InterDomainKademliaFactory implements LookupIngredientFactory {
         }
         return handleResponseOperation;
     }
+
+    @Override
+    public RequestOperation createImprovedRequestOperation(int kademliaid, Message lookupMessage, int tid) {
+        return null;
+    }
+
+    @Override
+    public RespondOperation createImprovedRespondOperation(int kademliaid, Message lookupMessage, int tid) {
+        return null;
+    }
+
+    @Override
+    public RespondOperation createImprovedHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
+        return null;
+    }
+
 
 }

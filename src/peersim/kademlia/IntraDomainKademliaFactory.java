@@ -1,9 +1,9 @@
 package peersim.kademlia;
 
-import peersim.kademlia.RequestOperation.RequestOperation;
-import peersim.kademlia.RequestOperation.KadToKadRequestOperation;
-import peersim.kademlia.HandleResponseOperation.HandleResponseOperation;
-import peersim.kademlia.HandleResponseOperation.KadToKadHandleResponseOperation;
+import peersim.kademlia.RequestOperations.RequestOperation;
+import peersim.kademlia.RequestOperations.KadToKadRequestOperation;
+import peersim.kademlia.HandleResponseOperations.HandleResponseOperation;
+import peersim.kademlia.HandleResponseOperations.KadToKadHandleResponseOperation;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
 import peersim.kademlia.RespondOperations.RespondOperation;
 
