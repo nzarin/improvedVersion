@@ -1,6 +1,6 @@
 package peersim.kademlia.RespondOperations;
 
-public class KadToBridgeRespondOperation extends RespondOperation2 {
+public class KadToBridgeRespondOperation extends RespondOperation {
     @Override
     public void respond() {
 

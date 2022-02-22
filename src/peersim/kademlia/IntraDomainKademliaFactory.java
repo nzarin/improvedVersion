@@ -5,7 +5,7 @@ import peersim.kademlia.RequestOperation.KadToKadRequestOperation;
 import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
 import peersim.kademlia.HandleResponseOperation.KadToKadHandleResponseOperation;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
-import peersim.kademlia.RespondOperations.RespondOperation2;
+import peersim.kademlia.RespondOperations.RespondOperation;
 
 /**
  * This class represents a factory that creates the correct operations for an intra-domain lookup.
@@ -20,7 +20,7 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory2 {
      * @return
      */
     @Override
-    public RequestOperation createRequestOperation(int kademliaid, Message lookupMessage, int tid) {
+    public RequestOperation createNaiveRequestOperation(int kademliaid, Message lookupMessage, int tid) {
         return new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
     }
 
@@ -32,7 +32,7 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory2 {
      * @return
      */
     @Override
-    public RespondOperation2 createRespondOperation(int kademliaid, Message lookupMessage, int tid) {
+    public RespondOperation createNaiveRespondOperation(int kademliaid, Message lookupMessage, int tid) {
         return new KadToKadRespondOperation(kademliaid, lookupMessage, tid);
     }
 
@@ -44,7 +44,7 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory2 {
      * @return
      */
     @Override
-    public HandleResponseOperation2 createHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
+    public HandleResponseOperation2 createNaiveHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
         return new KadToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
     }
 

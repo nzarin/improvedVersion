@@ -23,7 +23,7 @@ public class ImprovedKademliaProtocol extends Lookup {
      */
     @Override
     public void performRequestOp() {
-        this.findOp = lif2.createRequestOperation(kademliaid, lookupMessage, transportid);
+        this.findOp = lif2.createNaiveRequestOperation(kademliaid, lookupMessage, transportid);
         findOp.find();
 
     }
@@ -33,7 +33,7 @@ public class ImprovedKademliaProtocol extends Lookup {
      */
     @Override
     public void performRespondOp() {
-        this.resOp = lif2.createRespondOperation(kademliaid, lookupMessage, transportid);
+        this.resOp = lif2.createNaiveRespondOperation(kademliaid, lookupMessage, transportid);
         resOp.respond();
     }
 
@@ -42,7 +42,7 @@ public class ImprovedKademliaProtocol extends Lookup {
      */
     @Override
     public void performHandleResponseOp() {
-        this.handleResOp = lif2.createHandleResponseOperation(kademliaid, lookupMessage, transportid);
+        this.handleResOp = lif2.createNaiveHandleResponseOperation(kademliaid, lookupMessage, transportid);
         handleResOp.handleResponse();
     }
 

@@ -3,13 +3,13 @@ package peersim.kademlia;
 import peersim.kademlia.RequestOperation.*;
 import peersim.kademlia.HandleResponseOperation.*;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
-import peersim.kademlia.RespondOperations.RespondOperation2;
+import peersim.kademlia.RespondOperations.RespondOperation;
 
 
 public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
 
     @Override
-    public RequestOperation createRequestOperation(int kademliaid, Message lookupMessage, int tid) {
+    public RequestOperation createNaiveRequestOperation(int kademliaid, Message lookupMessage, int tid) {
 
         RequestOperation fop = null;
 
@@ -35,14 +35,14 @@ public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
     }
 
     @Override
-    public RespondOperation2 createRespondOperation(int kademliaid, Message lookupMessage, int tid) {
+    public RespondOperation createNaiveRespondOperation(int kademliaid, Message lookupMessage, int tid) {
         //because the lookup operation will eventually always be
 //        System.err.println("it is a kad to kad respond operation ");
         return new KadToKadRespondOperation(kademliaid, lookupMessage, tid);
     }
 
     @Override
-    public HandleResponseOperation2 createHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
+    public HandleResponseOperation2 createNaiveHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
         HandleResponseOperation2 handleResponseOperation2 = null;
 
         if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof KadNode) {

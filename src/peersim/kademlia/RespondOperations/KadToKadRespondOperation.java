@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  *  This class represents the respond operation when the source and target are both KadNodes
  */
-public class KadToKadRespondOperation extends RespondOperation2 {
+public class KadToKadRespondOperation extends RespondOperation {
 
     public KadToKadRespondOperation(int kademliaid, Message lookupMessage, int tid){
         this.kademliaid = kademliaid;
