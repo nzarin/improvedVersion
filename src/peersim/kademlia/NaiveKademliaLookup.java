@@ -4,9 +4,9 @@ package peersim.kademlia;
  * This class specifies the naive variant of the Kademlia protocol for cross-DHT lookups.
  */
 public class NaiveKademliaLookup extends Lookup {
-    LookupIngredientFactory2 lif2;
+    LookupIngredientFactory lif2;
 
-    public NaiveKademliaLookup(LookupIngredientFactory2 lif) {
+    public NaiveKademliaLookup(LookupIngredientFactory lif) {
         this.lif2 = lif;
     }
 

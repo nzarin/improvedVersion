@@ -7,7 +7,7 @@ import peersim.kademlia.RespondOperations.RespondOperation;
 /**
  * The factory class that creates all the ingredients of a lookup: FindOperation, RespondOperation and HandleRespondOperation
  */
-public interface LookupIngredientFactory2 {
+public interface LookupIngredientFactory {
     RequestOperation createNaiveRequestOperation(int kademliaid, Message lookupMessage, int tid);
 
     RespondOperation createNaiveRespondOperation(int kademliaid, Message lookupMessage, int tid);

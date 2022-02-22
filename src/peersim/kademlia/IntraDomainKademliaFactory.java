@@ -10,7 +10,7 @@ import peersim.kademlia.RespondOperations.RespondOperation;
 /**
  * This class represents a factory that creates the correct operations for an intra-domain lookup.
  */
-public class IntraDomainKademliaFactory implements LookupIngredientFactory2 {
+public class IntraDomainKademliaFactory implements LookupIngredientFactory {
 
     /**
      * Create the find operation for an intra-domain lookup.

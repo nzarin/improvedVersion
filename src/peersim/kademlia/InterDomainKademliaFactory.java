@@ -6,7 +6,7 @@ import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
 import peersim.kademlia.RespondOperations.RespondOperation;
 
 
-public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
+public class InterDomainKademliaFactory implements LookupIngredientFactory {
 
     @Override
     public RequestOperation createNaiveRequestOperation(int kademliaid, Message lookupMessage, int tid) {
