@@ -32,7 +32,19 @@ public class RoutingTable implements Cloneable {
     }
 
     public void fillRoutingTable(KadNode node){
+        // get the length of the longest common prefix (correspond to the correct k-bucket)
         int prefix_len = Util.prefixLen(owner.getNodeId(), node.getNodeId());
+
+        // add the node to the corresponding k-bucket
+        k_buckets.get(prefix_len).fillKBucket(node);
+    }
+
+
+    public void fillOctopusRoutingTable(KadNode node){
+        // get the length of the longest common prefix (correspond to the correct k-bucket)
+        int prefix_len = Util.prefixLen(owner.getNodeId(), node.getDomain().getDomainId());
+
+        // add the node to the corresponding k-bucket
         k_buckets.get(prefix_len).fillKBucket(node);
     }
 
@@ -48,7 +60,7 @@ public class RoutingTable implements Cloneable {
         int prefix_len = Util.prefixLen(owner.getNodeId(), neighbour.getNodeId());
 
         // add the node to the corresponding k-bucket
-        k_buckets.get(prefix_len).fillKBucket(neighbour);
+        k_buckets.get(prefix_len).addKadNode(neighbour);
     }
 
 

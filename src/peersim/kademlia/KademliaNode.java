@@ -8,7 +8,7 @@ import java.util.TreeMap;
 public interface KademliaNode {
     BigInteger getNodeId();
     RoutingTable getRoutingTable();
-    BigInteger getDomain();
+    Domain getDomain();
     ArrayList<BridgeNode> getBridgeNodes();
     ArrayList<KadNode> getKadNodes();
     LinkedHashMap<Long, FindOperation> getFindOperationsMap();

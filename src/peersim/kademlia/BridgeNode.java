@@ -16,9 +16,10 @@ public class BridgeNode implements KademliaNode {
     private final ArrayList<BridgeNode> bridgeNodes;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
-    private BigInteger domain;
+    private Domain domain;
+    private Role role;
 
-    public BridgeNode(BigInteger id, BigInteger domain, KademliaProtocol kademliaProtocol) {
+    public BridgeNode(BigInteger id, Domain domain, KademliaProtocol kademliaProtocol) {
         this.kademliaProtocol = kademliaProtocol;
         this.nodeId = id;
         this.domain = domain;
@@ -27,17 +28,16 @@ public class BridgeNode implements KademliaNode {
         this.bridgeNodes = new ArrayList<>();
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
+        this.role = Role.BRIDGE;
     }
 
     //getters
-    public BigInteger getDomain() {
+    public Domain getDomain() {
         return this.domain;
     }
 
     //setters
-    public void setDomain(BigInteger domain) {
-        this.domain = domain;
-    }
+    public void setDomain(Domain domain) {this.domain = domain;}
 
     @Override
     public ArrayList<BridgeNode> getBridgeNodes() {
