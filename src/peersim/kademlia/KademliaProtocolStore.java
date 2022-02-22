@@ -33,7 +33,7 @@ public class KademliaProtocolStore extends DHTProtocolStore {
                 } else {
                     lookup = new NaiveKademliaLookup(new InterDomainKademliaFactory());
                 }
-                lookup.setType("naive kademlia lookup");
+                lookup.setType("naive");
                 break;
             case "improved":
                 if (s.getDomain() == r.getDomain()) {
@@ -41,7 +41,7 @@ public class KademliaProtocolStore extends DHTProtocolStore {
                 } else {
                     lookup = new ImprovedKademliaProtocol(new InterDomainKademliaFactory());
                 }
-                lookup.setType("naive kademlia lookup");
+                lookup.setType("improved");
                 break;
         }
 

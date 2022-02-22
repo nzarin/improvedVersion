@@ -14,38 +14,27 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory {
 
     /**
      * Create the find operation for an intra-domain lookup.
-     * @param kademliaid
-     * @param lookupMessage
-     * @param tid
-     * @return
      */
     @Override
-    public RequestOperation createNaiveRequestOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
+    public RequestOperation createRequestOperation(Lookup lookup) {
+        return new KadToKadRequestOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
     }
 
     /**
      * Create the respond operation for an intra-domain lookup.
-     * @param kademliaid
-     * @param lookupMessage
-     * @param tid
-     * @return
      */
     @Override
-    public RespondOperation createNaiveRespondOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadRespondOperation(kademliaid, lookupMessage, tid);
+    public RespondOperation createRespondOperation(Lookup lookup) {
+        return new KadToKadRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
     }
 
     /**
      * Create a handle response operation for an intra-domain lookup.
-     * @param kademliaid
-     * @param lookupMessage
-     * @param tid
-     * @return
      */
     @Override
-    public HandleResponseOperation createNaiveHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
+    public HandleResponseOperation createHandleResponseOperation(Lookup lookup) {
+        return new KadToKadHandleResponseOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
     }
+
 
 }

@@ -58,7 +58,7 @@ public class CustomDistribution implements peersim.core.Control {
             BigInteger tmpID = urg.generateID();
             if (!mapNIDoPID.containsValue(tmpID)) {
                 KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
-                KademliaNode kadNode = new KadNode(tmpID, selectRandomDomain(), kademliaProtocol);
+                KademliaNode kadNode = new KadNode(tmpID, selectRandomDomain(), kademliaProtocol, Role.NORMAL);
                 kademliaProtocol.setKadNode((KadNode) kadNode);
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
                 //determine whether this node has to be an adversarial
@@ -85,7 +85,7 @@ public class CustomDistribution implements peersim.core.Control {
                 BigInteger tmpId = urg.generateID();
                 if (!mapNIDoPID.containsValue(tmpId)) {
                     KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
-                    KademliaNode bridgeNode = new BridgeNode(tmpId, domains.get(i).getDomainId(), kademliaProtocol);
+                    KademliaNode bridgeNode = new BridgeNode(tmpId, domains.get(i), kademliaProtocol);
                     kademliaProtocol.setBridgeNode((BridgeNode) bridgeNode);
                     mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpId);
                     currentIndexNetworkNode++;
@@ -103,8 +103,8 @@ public class CustomDistribution implements peersim.core.Control {
         }
     }
 
-    public BigInteger selectRandomDomain(){
-        return domains.get(CommonState.r.nextInt(domains.size())).getDomainId();
+    public Domain selectRandomDomain(){
+        return domains.get(CommonState.r.nextInt(domains.size()));
     }
 
 

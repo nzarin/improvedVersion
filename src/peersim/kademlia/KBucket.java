@@ -40,19 +40,21 @@ public class KBucket implements Cloneable {
 
 
     public void addKadNode(KadNode node){
-        long time = CommonState.getTime();
+        fillKBucket(node);
 
-        if(neighbours.size() < KademliaCommonConfig.K){
-            neighbours.put(node, time);
-        } else {
-            //determine whether there is a node that is offline
-            for(KadNode neighbour : neighbours.keySet()){
-                if(!neighbour.isAlive()){
-                    neighbours.remove(neighbour);
-                    neighbours.put(node,time);
-                }
-            }
-        }
+//        long time = CommonState.getTime();
+//
+//        if(neighbours.size() < KademliaCommonConfig.K){
+//            neighbours.put(node, time);
+//        } else {
+//            //determine whether there is a node that is offline
+//            for(KadNode neighbour : neighbours.keySet()){
+//                if(!neighbour.isAlive()){
+//                    neighbours.remove(neighbour);
+//                    neighbours.put(node,time);
+//                }
+//            }
+//        }
     }
 
 

@@ -30,7 +30,7 @@ public class NaiveKademliaLookup extends Lookup {
      */
     @Override
     public void performRequestOp() {
-        findOp = lif2.createNaiveRequestOperation(kademliaid, lookupMessage, transportid);
+        findOp = lif2.createRequestOperation(this);
         findOp.find();
     }
 
@@ -39,7 +39,7 @@ public class NaiveKademliaLookup extends Lookup {
      */
     @Override
     public void performRespondOp() {
-        resOp = lif2.createNaiveRespondOperation(kademliaid, lookupMessage, transportid);
+        resOp = lif2.createRespondOperation(this);
         resOp.respond();
 
     }
@@ -49,7 +49,7 @@ public class NaiveKademliaLookup extends Lookup {
      */
     @Override
     public void performHandleResponseOp() {
-        handleResOp = lif2.createNaiveHandleResponseOperation(kademliaid, lookupMessage, transportid);
+        handleResOp = lif2.createHandleResponseOperation(this);
         handleResOp.handleResponse();
 
     }
