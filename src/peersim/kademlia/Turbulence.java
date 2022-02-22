@@ -115,7 +115,7 @@ public class Turbulence implements Control {
 
         // create new kad node
         UniformRandomGenerator urg = new UniformRandomGenerator(KademliaCommonConfig.BITS,  CommonState.r);
-        KadNode newKadNode = new KadNode(urg.generateID(), urg.selectDomain());
+        KadNode newKadNode = new KadNode(urg.generateID());
         ((KademliaProtocol) (newNetworkNode.getProtocol(kademliaid))).setKadNode(newKadNode);
         newKadNode.getRoutingTable().setOwnerKadNode(newKadNode);
 
@@ -125,6 +125,7 @@ public class Turbulence implements Control {
         // find random node to add to k-bucket & fill its list of bridge nodes
         KadNode bootstrapNode = selectBootstrapNode(newKadNode);
         newKadNode.getRoutingTable().fillRoutingTable(bootstrapNode);
+        newKadNode.setDomain(bootstrapNode.getDomain());
         for(BridgeNode b : bootstrapNode.getBridgeNodes()){
             newKadNode.getBridgeNodes().add(b);
         }

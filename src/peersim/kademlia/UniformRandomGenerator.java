@@ -59,7 +59,7 @@ public final class UniformRandomGenerator {
      *
      * @return BigInteger
      */
-    public final BigInteger generateID() {
+    public BigInteger generateID() {
         return nextRand();
     }
 

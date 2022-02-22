@@ -154,6 +154,17 @@ public class RoutingTable implements Cloneable {
         return s;
     }
 
+
+    public String toString2(){
+        StringBuilder str = new StringBuilder();
+        str.append("I am node " + owner.getNodeId() + "\n");
+        for(int i = 0; i < k_buckets.size(); i++){
+            str.append("Number of nodes with longest common " + i + ": " + k_buckets.get(0).neighbours.size() + " \n");
+        }
+
+        return str.toString();
+    }
+
     public KBucket getKBucket(int index){
         return this.k_buckets.get(index);
     }
