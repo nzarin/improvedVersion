@@ -125,7 +125,7 @@ public class Turbulence implements Control {
 
         // find random node to add to k-bucket & fill its list of bridge nodes
         KadNode bootstrapNode = selectBootstrapNode(newKadNode);
-        newKadNode.getRoutingTable().fillRoutingTable(bootstrapNode);
+        newKadNode.getRoutingTable().addNeighbour(bootstrapNode);
         newKadNode.setDomain(bootstrapNode.getDomain());
         for(BridgeNode b : bootstrapNode.getBridgeNodes()){
             newKadNode.getBridgeNodes().add(b);

@@ -5,7 +5,6 @@ import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -105,56 +104,73 @@ public class StateBuilder2 implements peersim.core.Control {
             Node randomNetworkNode = Network.get(CommonState.r.nextInt(Network.size()));
             KademliaProtocol randomKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
             randomNode = randomKad.getCurrentNode();
-        } while(randomNode instanceof KadNode);
+        } while(randomNode instanceof BridgeNode);
 
-        // create distance map
-        TreeMap<BigInteger, Domain> distance_map_domains = new TreeMap<>();
+        // sort the domain array in ascending distance order
         ArrayList<Domain> otherDomains = randomNode.getDomain().getOtherDomains();
-        for(int i =0; i < otherDomains.size(); i++){
-            distance_map_domains.put(Util.distance((otherDomains.get(i).getDomainId()), iNode.getNodeId()), otherDomains.get(i));
+        otherDomains.sort(Comparator.comparing(o -> Util.put0(Util.distance(o.getDomainId(), iNode.getNodeId()))));
+
+
+        //sample 100 random kad nodes from other domains
+        HashMap<Integer, ArrayList<KadNode>> nodes_other_domain = new HashMap<>();
+
+        //initialize the nodes_other_domain list such that every ith key displays the ith domain id from the sorted list
+        for(int i = 0; i < otherDomains.size(); i++){
+            nodes_other_domain.put(i, new ArrayList<>());
         }
 
-
-        //normalize the distances to the domains
-        distance_map_domains = normalize(distance_map_domains);
-
-        //todo: now add all nodes such that nodes from certain domain x are more in routing table than from domain y if dist(i,x) < dist(y,i)
+        //hashmap looks like this:
+        // ----------------------------
+        // 0 | nodes from closest domain
+        // 1 | nodes from second closest domain
+        // ..|
+        // n | nodes from farthest domain
 
         int nmrAddedNodes = 0;
-        //sample 500 random nodes from other domains
         do{
             Node randNode = Network.get(CommonState.r.nextInt(Network.size()));
             KademliaProtocol jKad = (KademliaProtocol) (randNode.getProtocol(kademliaid));
             KademliaNode jNode = jKad.getCurrentNode();
 
             //if this random node is a KadNode and its from another domain
-            if ((jNode instanceof KadNode) && (iNode.getDomain().getDomainId() != (jKad.getCurrentNode().getDomain().getDomainId()))) {
+            if ((jNode instanceof KadNode) && otherDomains.contains(jNode.getDomain())) {
 
-                //add it to the k-bucket that has the longest common prefix with domain id
-                iNode.getRoutingTable().fillOctopusRoutingTable((KadNode) jNode);
+                // determine what domain it is and which index it should get
+                int index = otherDomains.indexOf(jNode.getDomain());
+
+                // add it to this index in the hashmap
+                nodes_other_domain.get(index).add((KadNode) jNode);
+
+                //increment counter
                 nmrAddedNodes++;
             }
 
-        } while (nmrAddedNodes < 500);
+        } while (nmrAddedNodes < 200);      //should be large enough to prevent null pointers
 
 
+        // now add 50 nodes from other domains to routing table of iNode with a bias towards nodes from closer domains
+        for (int i = 0; i < 50; i++){
+            System.err.println("otherDomain.size() : " + otherDomains.size());
+            int domainIndex = chooseBiasedIndex(0, otherDomains.size()-1);
+            System.err.println("biased domainIndex: " + domainIndex);
+
+            ArrayList<KadNode> nodes = nodes_other_domain.get(domainIndex);
+            System.err.println("nodes.size(): " + nodes.size());
+            //select random node from this arraylist
+            KadNode node = nodes.get(chooseRandomIndex(0, nodes.size()-1));
+
+            //add to iNode routing table
+            iNode.getRoutingTable().addNeighbourOfOctopus(node);
+        }
     }
 
-    private TreeMap<BigInteger, Domain> normalize(TreeMap<BigInteger, Domain> domains){
-        TreeMap<BigInteger, Domain> result = new TreeMap<>();
 
-        BigInteger min = domains.firstKey();
-        BigInteger max = domains.lastKey();
+    private int chooseBiasedIndex(int min, int max){
+        return (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + max - min) + min);
+    }
 
-        for(Map.Entry<BigInteger, Domain> entry : domains.entrySet()){
-            BigInteger numerator = entry.getKey().subtract(min);
-            BigInteger denominator = max.subtract(min);
-            BigInteger normalizedDistance = numerator.divide(denominator);
-            result.put(normalizedDistance, entry.getValue());
-        }
-
-        return result;
-
+    private int chooseRandomIndex(int min, int max){
+        return (int)(Math.random() * ((max - min) + 1)) + min;
     }
 
 
