@@ -5,6 +5,9 @@ import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 
+import java.math.BigInteger;
+import java.util.*;
+
 /**
  * Initialization class that performs the bootstrap filling the k-buckets of all initial nodes.
  * In particular every node is added to the routing table of every other node in the network. In the end however the various nodes
@@ -74,8 +77,8 @@ public class StateBuilder2 implements peersim.core.Control {
                 addBridgeAndColludeNodesToKadNode((KadNode) iNode);
 
                 //if it is an octopus -> add other-domain nodes to routing table
-                if(((KadNode) iNode).getRole() == Role.OCTOPUS){
-                    addOtherDomainRandomKadNodesToKadNode((KadNode) iNode);
+                if((iNode).getRole() == Role.OCTOPUS){
+                    addRandomKadNodesToOctopusKadNode((KadNode) iNode);
                 }
 
                 // i is a bridge node
@@ -95,26 +98,63 @@ public class StateBuilder2 implements peersim.core.Control {
      *
      * @param iNode
      */
-    private void addOtherDomainRandomKadNodesToKadNode(KadNode iNode) {
-
-        //take 50 random nodes from other domains add to routing table or arraylist according to the rules
-        for (int j = 0; j < 50; j++) {
+    private void addRandomKadNodesToOctopusKadNode(KadNode iNode) {
+        //select random node in order to retrieve domain info
+        KademliaNode randomNode;
+        do{
             Node randomNetworkNode = Network.get(CommonState.r.nextInt(Network.size()));
-            KademliaProtocol jKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
-            KademliaNode jNode;
+            KademliaProtocol randomKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
+            randomNode = randomKad.getCurrentNode();
+        } while(randomNode instanceof KadNode);
+
+        // create distance map
+        TreeMap<BigInteger, Domain> distance_map_domains = new TreeMap<>();
+        ArrayList<Domain> otherDomains = randomNode.getDomain().getOtherDomains();
+        for(int i =0; i < otherDomains.size(); i++){
+            distance_map_domains.put(Util.distance((otherDomains.get(i).getDomainId()), iNode.getNodeId()), otherDomains.get(i));
+        }
+
+
+        //normalize the distances to the domains
+        distance_map_domains = normalize(distance_map_domains);
+
+        //todo: now add all nodes such that nodes from certain domain x are more in routing table than from domain y if dist(i,x) < dist(y,i)
+
+        int nmrAddedNodes = 0;
+        //sample 500 random nodes from other domains
+        do{
+            Node randNode = Network.get(CommonState.r.nextInt(Network.size()));
+            KademliaProtocol jKad = (KademliaProtocol) (randNode.getProtocol(kademliaid));
+            KademliaNode jNode = jKad.getCurrentNode();
 
             //if this random node is a KadNode and its from another domain
-            if ((jKad.getCurrentNode() instanceof KadNode) && (iNode.getDomain().getDomainId() != (jKad.getCurrentNode().getDomain().getDomainId()))) {
-                jNode = jKad.getCurrentNode();
+            if ((jNode instanceof KadNode) && (iNode.getDomain().getDomainId() != (jKad.getCurrentNode().getDomain().getDomainId()))) {
 
                 //add it to the k-bucket that has the longest common prefix with domain id
                 iNode.getRoutingTable().fillOctopusRoutingTable((KadNode) jNode);
-
-                // if this random node is a BridgeNode -> retry
-            } else {
-                j--;
+                nmrAddedNodes++;
             }
+
+        } while (nmrAddedNodes < 500);
+
+
+    }
+
+    private TreeMap<BigInteger, Domain> normalize(TreeMap<BigInteger, Domain> domains){
+        TreeMap<BigInteger, Domain> result = new TreeMap<>();
+
+        BigInteger min = domains.firstKey();
+        BigInteger max = domains.lastKey();
+
+        for(Map.Entry<BigInteger, Domain> entry : domains.entrySet()){
+            BigInteger numerator = entry.getKey().subtract(min);
+            BigInteger denominator = max.subtract(min);
+            BigInteger normalizedDistance = numerator.divide(denominator);
+            result.put(normalizedDistance, entry.getValue());
         }
+
+        return result;
+
     }
 
 
@@ -124,30 +164,20 @@ public class StateBuilder2 implements peersim.core.Control {
      * @param iNode
      */
     private void addSameDomainRandomKadNodesToKadNode(KadNode iNode) {
+        int nmrAddedNodes = 0;
 
-        //take 100 random nodes add to routing table or arraylist according to the rules
-        for (int j = 0; j < 100; j++) {
+        do {
             Node randomNetworkNode = Network.get(CommonState.r.nextInt(Network.size()));
             KademliaProtocol jKad = (KademliaProtocol) (randomNetworkNode.getProtocol(kademliaid));
-            KademliaNode jNode;
+            KademliaNode jNode = jKad.getCurrentNode();
 
-            //if this random node is a KadNode
-            if (jKad.getCurrentNode() instanceof KadNode) {
-                jNode = jKad.getCurrentNode();
-
-                //if it is in the same domain -> add it to iNode its routing table
-                if (iNode.getDomain() == jNode.getDomain()) {
-                    iNode.getRoutingTable().fillRoutingTable((KadNode) jNode);
-                } else {
-                    //retry
-                    j--;
-                }
-
-                // if this random node is a BridgeNode -> retry
-            } else {
-                j--;
+            if(jNode instanceof KadNode && (iNode.getDomain().getDomainId() == jNode.getDomain().getDomainId()) ){
+                iNode.getRoutingTable().addNeighbour((KadNode) jNode);
+                nmrAddedNodes++;
             }
-        }
+
+        } while (nmrAddedNodes < 100);
+
     }
 
     /**
@@ -194,7 +224,7 @@ public class StateBuilder2 implements peersim.core.Control {
 
                     //if it is in the same domain -> add it to iNode its routing table
                     if (iNode.getDomain() == jNode.getDomain()) {
-                        iNode.getRoutingTable().fillRoutingTable((KadNode) jNode);
+                        iNode.getRoutingTable().addNeighbour((KadNode) jNode);
                     } else {
                         //retry
                         j--;
@@ -237,12 +267,8 @@ public class StateBuilder2 implements peersim.core.Control {
                 }
 
                 // This j node must be a bridge node -> add to the list of bridge nodes
-            } else {
-
-                if (iNode.getNodeId() != jNode.getNodeId()) {
-                    iNode.getBridgeNodes().add((BridgeNode) jNode);
-                }
-
+            } else if (!(iNode.getNodeId() == jNode.getNodeId())) {
+                iNode.getBridgeNodes().add((BridgeNode) jNode);
             }
 
         }

@@ -79,11 +79,8 @@ public class KadNode implements KademliaNode {
 
     // GETTERS
 
-    public Role getRole(){ return this.role;}
 
-    public Domain getDomain() {
-        return this.domain;
-    }
+    public Domain getDomain() {return this.domain;}
 
     public RoutingTable getRoutingTable() {
         return this.routingTable;
@@ -143,6 +140,9 @@ public class KadNode implements KademliaNode {
     public String toString3(){
         return "nodeId=" + nodeId + ", ";
     }
+
+    @Override
+    public Role getRole() {return this.role;}
 
     @Override
     public BigInteger getNodeId() {

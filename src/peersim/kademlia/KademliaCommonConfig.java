@@ -1,5 +1,7 @@
 package peersim.kademlia;
 
+import java.util.ArrayList;
+
 /**
  * Fixed Parameters of a kademlia network. They have a default value and can be configured at startup of the network, once only.
  */
@@ -33,7 +35,7 @@ public class KademliaCommonConfig {
     /**
      * Number of bridge nodes per domain.
      */
-    public static int NUMBER_OF_BRIDGES_PER_DOMAIN = 3;
+    public static int NUMBER_OF_BRIDGES_PER_DOMAIN = 0;
 
     /**
      * The version of the protocol: either naive or improved

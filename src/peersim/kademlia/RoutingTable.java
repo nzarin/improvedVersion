@@ -17,35 +17,26 @@ public class RoutingTable implements Cloneable {
     /**
      * K-Buckets of this node.
      */
-    private TreeMap<Integer, KBucket> k_buckets;
+    private TreeMap<Integer, KBucket> routingTable;
 
     /**
      * Instantiates a new empty routing table with the specified size
      */
     public RoutingTable(KademliaNode owner) {
         this.owner = owner;
-        k_buckets = new TreeMap<>();
+        routingTable = new TreeMap<>();
         // initialize k-bukets
         for (int i = 0; i <= KademliaCommonConfig.BITS; i++) {
-            k_buckets.put(i, new KBucket());
+            routingTable.put(i, new KBucket());
         }
     }
-
-    public void fillRoutingTable(KadNode node){
-        // get the length of the longest common prefix (correspond to the correct k-bucket)
-        int prefix_len = Util.prefixLen(owner.getNodeId(), node.getNodeId());
-
-        // add the node to the corresponding k-bucket
-        k_buckets.get(prefix_len).fillKBucket(node);
-    }
-
 
     public void fillOctopusRoutingTable(KadNode node){
         // get the length of the longest common prefix (correspond to the correct k-bucket)
         int prefix_len = Util.prefixLen(owner.getNodeId(), node.getDomain().getDomainId());
 
         // add the node to the corresponding k-bucket
-        k_buckets.get(prefix_len).fillKBucket(node);
+        routingTable.get(prefix_len).addKadNode(node);
     }
 
 
@@ -60,7 +51,7 @@ public class RoutingTable implements Cloneable {
         int prefix_len = Util.prefixLen(owner.getNodeId(), neighbour.getNodeId());
 
         // add the node to the corresponding k-bucket
-        k_buckets.get(prefix_len).addKadNode(neighbour);
+        routingTable.get(prefix_len).addKadNode(neighbour);
     }
 
 
@@ -75,18 +66,63 @@ public class RoutingTable implements Cloneable {
         int prefix_len = Util.prefixLen(this.owner.getNodeId(), node.getNodeId());
 
         // add the node to the k-bucket
-        k_buckets.get(prefix_len).removeNeighbour(node);
+        routingTable.get(prefix_len).removeNeighbour(node);
     }
 
+
+    public KadNode[] getKNeighbours2(final KadNode target, final KadNode receiver, final KadNode source){
+//        int prefix_len = Util.prefixLen(this.owner.getNodeId(), target.getNodeId());
+//        KBucket kBucket = routingTable.get(prefix_len);
+
+        KadNode[] result = new KadNode[KademliaCommonConfig.K];
+
+        // create a map (distance, node) for nodes from target domain
+        TreeMap<BigInteger, KadNode> distance_map = new TreeMap<>();
+        TreeMap<BigInteger, KadNode> distance_map_colluders = new TreeMap<>();
+        TreeMap<BigInteger, KadNode> distance_map_target_domain = new TreeMap<>();
+
+        for(int i=0; i < KademliaCommonConfig.BITS; i++){
+            for(KadNode node : routingTable.get(i).neighbours.keySet()){
+
+                //add the collaborator malicious node if there is place in the array list
+                if(!source.isMalicious() && receiver.isMalicious() && node.isMalicious()){
+                    distance_map_colluders.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
+                }
+
+                //add to distance map if the node belongs to the target domain
+                if(node.getDomain().getDomainId() == target.getDomain().getDomainId()){
+                    distance_map_target_domain.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
+                }
+
+                distance_map.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
+            }
+        }
+
+        // this means that we should add malicious nodes to the head of the array
+        if(distance_map_colluders.size() > 0){
+            addMaliciousNeighbours(distance_map_colluders, result);
+        }
+
+        // this means that we should add nodes from the target domain to the array
+        if(distance_map_target_domain.size() > 0){
+            addHonestNeighbours(distance_map_target_domain, result, distance_map_colluders.size());
+        } else {
+            // fill the rest with the table with nodes that are closer to the target domain
+            addHonestNeighbours(distance_map, result, distance_map_colluders.size());
+
+        }
+
+        return result;
+    }
 
     /**
      * Return the closest neighbour to a key from the correct k-bucket.
      *
-     * @param target The ID we are looking up
+     * @param targetID The ID we are looking up
      * @param source The original requester of this lookup
      * @return The k closest neighbors to the search key
      */
-    public KadNode[] getKNeighbours(final KadNode target, final KadNode receiver, final KadNode source) {
+    public KadNode[] getKNeighbours(final BigInteger targetID, final KadNode receiver, final KadNode source) {
 
         KadNode[] result = new KadNode[KademliaCommonConfig.K];
 
@@ -95,12 +131,12 @@ public class RoutingTable implements Cloneable {
         TreeMap<BigInteger, KadNode> distance_map_colluders = new TreeMap<>();
 
         for(int i=0; i < KademliaCommonConfig.BITS; i++){
-            for(KadNode node : k_buckets.get(i).neighbours.keySet()){
+            for(KadNode node : routingTable.get(i).neighbours.keySet()){
                 //add the collaborator malicious node if there is place in the array list
                 if(!source.isMalicious() && receiver.isMalicious() && node.isMalicious()){
-                    distance_map_colluders.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
+                    distance_map_colluders.put(Util.distance((node.getNodeId()), targetID), node);
                 }
-                distance_map.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
+                distance_map.put(Util.distance((node.getNodeId()), targetID), node);
             }
         }
 
@@ -146,7 +182,7 @@ public class RoutingTable implements Cloneable {
     public Object clone() {
         RoutingTable dolly = new RoutingTable(this.owner);
         for (int i = 0; i < KademliaCommonConfig.BITS; i++) {
-            dolly.k_buckets.put(i, new KBucket());
+            dolly.routingTable.put(i, new KBucket());
         }
         return dolly;
     }
@@ -158,7 +194,7 @@ public class RoutingTable implements Cloneable {
      */
     public String toString() {
         String s = "";
-        for (Map.Entry<Integer, KBucket> entry : k_buckets.entrySet()) {
+        for (Map.Entry<Integer, KBucket> entry : routingTable.entrySet()) {
             KBucket kBucket = entry.getValue();
             String ith_k_bucket = kBucket.toString();
             s = s + "Nodes with common prefix " + entry.getKey() + " are : " + ith_k_bucket + "\n";
@@ -170,15 +206,15 @@ public class RoutingTable implements Cloneable {
     public String toString2(){
         StringBuilder str = new StringBuilder();
         str.append("I am node " + owner.getNodeId() + "\n");
-        for(int i = 0; i < k_buckets.size(); i++){
-            str.append("Number of nodes with longest common " + i + ": " + k_buckets.get(0).neighbours.size() + " \n");
+        for(int i = 0; i < routingTable.size(); i++){
+            str.append("Number of nodes with longest common " + i + ": " + routingTable.get(0).neighbours.size() + " \n");
         }
 
         return str.toString();
     }
 
     public KBucket getKBucket(int index){
-        return this.k_buckets.get(index);
+        return this.routingTable.get(index);
     }
 
 

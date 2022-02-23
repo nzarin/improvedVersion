@@ -24,6 +24,8 @@ public class FindOperation {
      */
     public KadNode destNode;
 
+    public KadNode sourceNode;
+
     private BridgeNode sourceBridgeNode;
 
     /**
@@ -54,6 +56,8 @@ public class FindOperation {
 
     public boolean alreadyFoundTarget;
 
+    public Scope scope;
+
     /**
      * This map contains the K closest nodes and corresponding boolean value that indicates if the nodes has been already queried
      * or not
@@ -65,7 +69,8 @@ public class FindOperation {
      *
      * @param destNode Id of the node to find
      */
-    public FindOperation(KadNode destNode, long timestamp) {
+    public FindOperation(KadNode sourceNode, KadNode destNode, long timestamp) {
+        this.sourceNode = sourceNode;
         this.destNode = destNode;
         this.timestamp = timestamp;
 

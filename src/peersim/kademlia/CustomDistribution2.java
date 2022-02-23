@@ -94,9 +94,27 @@ public class CustomDistribution2 implements peersim.core.Control {
     }
 
     private void createDomains() {
-        for (int i = 0; i < numberOfDomains; i++) {
+        int domainCounter = 0;
+        do {
             Domain dom = new Domain(urg.generateID());
-            domains.add(dom);
+            if(!domains.contains(dom)){
+                domains.add(dom);
+                domainCounter++;
+            }
+        } while (domainCounter < numberOfDomains);
+    }
+
+    private void acquaintDomains(){
+        //for every domain
+        for(int i = 0; i < domains.size(); i++){
+
+            //add every other domain
+            for(int j = 0; j < domains.size(); j++){
+
+                if (i != j){
+                    domains.get(i).addDomain(domains.get(j));
+                }
+            }
         }
     }
 
@@ -123,6 +141,9 @@ public class CustomDistribution2 implements peersim.core.Control {
 
         //create domains
         createDomains();
+
+        //acquaint domains
+        acquaintDomains();
 
         // create normal nodes
         generateKadNodes();

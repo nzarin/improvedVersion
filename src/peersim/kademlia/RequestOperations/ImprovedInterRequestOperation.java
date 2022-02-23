@@ -2,26 +2,14 @@ package peersim.kademlia.RequestOperations;
 
 import peersim.kademlia.*;
 
-/**
- * This class represents the find operation when the source and target are both KadNodes
- */
-public class KadToKadRequestOperation extends RequestOperation {
+public class ImprovedInterRequestOperation extends RequestOperation {
 
-
-    /**
-     * Constructs the FindOperation
-     * @param kid
-     * @param lookupMsg
-     * @param tid
-     */
-    public KadToKadRequestOperation(int kid, Message lookupMsg, int tid) {
+    public ImprovedInterRequestOperation(int kid, Message lookupMsg, int tid) {
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;
         messageSender = new MessageSender(kademliaid, tid);
     }
-
-
 
     @Override
     public void find() {
@@ -38,12 +26,27 @@ public class KadToKadRequestOperation extends RequestOperation {
 
         //add the findOp to my map of find operations anyway
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
+        KadNode[] neighbours =  lookupMessage.receiver.getRoutingTable().getKNeighbours2((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
-        // get the K-closest node to search key
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKNeighbours(lookupMessage.target.getNodeId(), (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+        KadNode[] result = new KadNode[KademliaCommonConfig.K];
+        int count = 0;
+
+        // select nodes in this neighbours list that are truly from the target domain
+        for(KadNode n : neighbours){
+            if(n.getDomain() == lookupMessage.target.getDomain()){
+                result[count] = n;
+                count++;
+            }
+        }
+
+        //if no nodes have been found that are from the target domain ->
+        if(count == 0){
+
+            result = neighbours;
+        }
 
         // update the list of closest nodes and re-initialize available requests
-        findOp.updateClosestSet(neighbours);
+        findOp.updateClosestSet(result);
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 
         //send ALPHA route messages

@@ -97,6 +97,9 @@ public class BridgeNode implements KademliaNode {
     }
 
     @Override
+    public Role getRole() {return this.role;}
+
+    @Override
     public BigInteger getNodeId() {
         return this.nodeId;
     }
