@@ -67,7 +67,6 @@ public class TrafficGenerator implements Control {
 
         if (intra) {
             //create intra domain lookup
-            System.err.println("we are going to create an intra domain lookup");
             do {
                 source = Network.get(CommonState.r.nextInt(Network.size()));
                 target = Network.get(CommonState.r.nextInt(Network.size()));

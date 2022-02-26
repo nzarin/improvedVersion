@@ -32,10 +32,15 @@ public class ImprovedHandleResponseOperation extends HandleResponseOperation {
 
             //Step 1: update the closest set by saving the received neighbours
             try{
-////                System.err.print("My old closest set is: ");
-//                System.err.println(findOp.beautifyClosestSet());
-//                System.err.println();
+//                if(findOp.scope.equals(Scope.INTRADOMAIN)){
+//                    System.err.println("HANDLERESPONSE: My shortlist before the update is in this intra-domain lookup is: ");
+//                    System.err.println(findOp.beautifyClosestSet());
+//                }
                 findOp.updateShortList((ArrayList<KadNode>) lookupMessage.body);
+//                if(findOp.scope.equals(Scope.INTRADOMAIN)){
+//                    System.err.println("HANDLERESPONSE: My shortlist after the update is in this intra-domain lookup is: ");
+//                    System.err.println(findOp.beautifyClosestSet());
+//                }
 ////                System.err.print("My new closest set is: ");
 //                System.err.println(findOp.beautifyClosestSet());
 //                System.err.println();

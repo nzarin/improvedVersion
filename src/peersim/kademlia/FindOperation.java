@@ -163,34 +163,46 @@ public class FindOperation {
             }
         }
 
+//        System.err.println("The size of the neighbours:" + neighbours.size());
+//        System.err.println("The size of the previous_nodes_in_target_domain:" + previous_nodes_in_target_domain.size());
+//        System.err.println("The size of the previous_nodes_in_other_domain:" + previous_nodes_in_other_domains.size());
+//        System.err.println("The size of the new_nodes_in_target_domain:" + new_nodes_in_target_domain.size());
+//        System.err.println("The size of the new_nodes_in_other_domain:" + new_nodes_in_other_domain.size());
+
+
         // Scenario 1: there are older nodes in the target domain and there are new nodes in the target domain
         if(!previous_nodes_in_target_domain.isEmpty() && !new_nodes_in_target_domain.isEmpty()){
             // if there are older node from other domains -> replace them with nodes from target domain
             if(!previous_nodes_in_other_domains.isEmpty()){
+//                System.err.println("Scenario 1a ");
                 replaceNodesFromOtherDomainForTargetDomain(previous_nodes_in_other_domains, new_nodes_in_target_domain);
+
             } else{ //replace farther node for closer node to target node
+//                System.err.println("Scenario 1b ");
                 replaceNodesFromTargetDomainForTargetDomain(previous_nodes_in_target_domain, new_nodes_in_target_domain);
             }
         }
 
         //Scenario 2: there are older nodes in the target domain but there are no new nodes in the target domain
-        if(!previous_nodes_in_target_domain.isEmpty() && new_nodes_in_target_domain.isEmpty()){
+        else if(!previous_nodes_in_target_domain.isEmpty() && new_nodes_in_target_domain.isEmpty()){
+//            System.err.println("Scenario 2");
             // if there are older nodes from other domains -> replace them with new nodes from other domain that are closer to target domainId
-            if(!previous_nodes_in_other_domains.isEmpty()){
                 replaceNodesFromOtherDomainForOtherDomain(previous_nodes_in_other_domains, new_nodes_in_other_domain);
-            }
         }
         //Scenario 3: there are no older nodes in the target domain and there are new nodes in the target domain
-        if(previous_nodes_in_target_domain.isEmpty() && !new_nodes_in_target_domain.isEmpty()){
+        else if(previous_nodes_in_target_domain.isEmpty() && !new_nodes_in_target_domain.isEmpty()){
+//            System.err.println("Scenario 3");
             // replace nodes from other domains for nodes from target domain
             replaceNodesFromOtherDomainForTargetDomain(previous_nodes_in_other_domains, new_nodes_in_target_domain);
         }
+
         //Scenario 4: there are no older nodes in the target domain and there are also no new nodes in the target domain
-        if(previous_nodes_in_target_domain.isEmpty() && new_nodes_in_target_domain.isEmpty()){
+        else if(previous_nodes_in_target_domain.isEmpty() && new_nodes_in_target_domain.isEmpty()){
+//            System.err.println("Scenario 4");
             // update nodes such that they are closest to target domainID
-            if(!new_nodes_in_other_domain.isEmpty()){
-                replaceNodesFromOtherDomainForOtherDomain(previous_nodes_in_other_domains, new_nodes_in_other_domain);
-            }
+            replaceNodesFromOtherDomainForOtherDomain(previous_nodes_in_other_domains, new_nodes_in_other_domain);
+        } else {
+            System.err.println("WHAT ARE WE MISSING???");
         }
     }
 
@@ -209,14 +221,14 @@ public class FindOperation {
                         for (KadNode i : oldNodes) {
                             BigInteger dist = Util.distance(i.getNodeId(), destNode.getDomain().getDomainId());
 
-                            if (dist.compareTo(maxdist) < 0) {
+                            if (dist.compareTo(maxdist) > 0) {
                                 maxdist = dist;
                                 nodeMaxDist = i;
                             }
                         }
 
                         //replace the node with larger distance with n if n is closer
-                        if (maxdist.compareTo(Util.distance(n.getNodeId(), destNode.getDomain().getDomainId())) != 0) {
+                        if (maxdist.compareTo(Util.distance(n.getNodeId(), destNode.getDomain().getDomainId())) > 0) {
                             closestSet.remove(nodeMaxDist);
                             closestSet.put(n, false);
                         }
@@ -227,11 +239,12 @@ public class FindOperation {
     }
 
     private void replaceNodesFromTargetDomainForTargetDomain(ArrayList<KadNode> oldNodes, ArrayList<KadNode> newNodes) {
-
+//        System.err.println("We are going to replace nodes from the target domain for nodes from target domain ");
         for(KadNode n : newNodes){
             if(n != null){
                 if(!closestSet.containsKey(n)){
                     if(closestSet.size() < KademliaCommonConfig.K){
+//                        System.err.println("Since there is room left in the closest set, we are just going to add node " + n.toString3() + " to it!" );
                         closestSet.put(n, false);
                     } else {
 
@@ -241,14 +254,17 @@ public class FindOperation {
                         for(KadNode i : oldNodes){
                             BigInteger dist = Util.distance(i.getNodeId(), destNode.getNodeId());
 
-                            if(dist.compareTo(maxdist) < 0){
+                            if(dist.compareTo(maxdist) > 0){
                                 maxdist = dist;
                                 nodeMaxDist = i;
                             }
                         }
 
+//                        System.err.println("The node with the largest distance to the target node is : " + nodeMaxDist.toString3() + " and the distance is " + maxdist);
+//                        System.err.println("The distance from new node " + n.toString3() + " to the target node " + destNode.toString3() + " is " + Util.distance(n.getNodeId(), destNode.getNodeId()));
                         //replace the node with larger distance with n if n is closer
-                        if(maxdist.compareTo(Util.distance(n.getNodeId(), destNode.getNodeId())) != 0){
+                        if(maxdist.compareTo(Util.distance(n.getNodeId(), destNode.getNodeId())) > 0){
+//                            System.err.println("Because the distance from the new node is smaller than distance from nodeMaxDist, we are going to replace nodeMaxDist for n");
                             closestSet.remove(nodeMaxDist);
                             closestSet.put(n, false);
                         }
@@ -259,15 +275,20 @@ public class FindOperation {
     }
 
     private void replaceNodesFromOtherDomainForTargetDomain(ArrayList<KadNode> oldNodes, ArrayList<KadNode> newNodes) {
-
+//        System.err.println("We are going to replace nodes from other domain for nodes from target domain ");
         // replace pairwise
-        for(int i =0; i < Math.min(oldNodes.size(), newNodes.size()); i++){
+        for(int i =0; i < newNodes.size(); i++){
             if(newNodes.get(i) != null){
                 if(!closestSet.containsKey(newNodes.get(i))){
                     if(closestSet.size() < KademliaCommonConfig.K){
+//                        System.err.println("Since there is room left in the closest set, we are just going to add node " + newNodes.get(i).toString3() + " to it!" );
                         closestSet.put(newNodes.get(i), false);
                     } else {
-                        closestSet.remove(oldNodes.get(i));
+                        if(oldNodes.get(i) != null ){
+//                            System.err.println("We are going to remove node " + oldNodes.get(i).toString3() + " from the closest set" );
+                            closestSet.remove(oldNodes.get(i));
+                        }
+//                        System.err.println("And are going to add node " + newNodes.get(i).toString3() + " to the closest set" );
                         closestSet.put(newNodes.get(i), false);
                     }
                 }

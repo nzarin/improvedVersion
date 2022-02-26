@@ -54,6 +54,13 @@ public class RoutingTable implements Cloneable {
         routingTable.get(prefix_len).addKadNode(neighbour);
     }
 
+    public void addNeighbourOtherDomain(KadNode neighbour){
+        // get the length of the longest common prefix (correspond to the correct k-bucket)
+        int prefix_len = Util.prefixLen(owner.getNodeId(), neighbour.getDomain().getDomainId());
+        // add the node to the corresponding k-bucket
+        routingTable.get(prefix_len).addKadNode(neighbour);
+    }
+
 
     /**
      * Remove a neighbour from the correct k-bucket.

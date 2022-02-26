@@ -20,7 +20,6 @@ public class ImprovedInterRequestOperation extends RequestOperation {
         FindOperation findOp = new FindOperation((KadNode) lookupMessage.src, (KadNode) lookupMessage.target, lookupMessage.timestamp);
         findOp.body = lookupMessage.body;
         if(lookupMessage.src.getDomain().getDomainId().equals(lookupMessage.target.getDomain().getDomainId())){
-            System.err.println("SCOPE IS INTRADOMAIN IN FIND()");
             findOp.scope = Scope.INTRADOMAIN;
         } else {
             findOp.scope = Scope.INTERDOMAIN;
@@ -29,8 +28,14 @@ public class ImprovedInterRequestOperation extends RequestOperation {
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
         ArrayList<KadNode> neighbours =  lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+
         // update the list of closest nodes and re-initialize available requests
         findOp.updateShortList(neighbours);
+//        if(findOp.scope.equals(Scope.INTRADOMAIN)){
+//            System.err.println("REQUEST: My shortlist after the update is in this intra-domain lookup is: ");
+//            System.err.println(findOp.beautifyClosestSet());
+//        }
+
 
         findOp.available_requests = KademliaCommonConfig.ALPHA;
 //        System.err.println("Do I have node from the target domain in my routing table? " + lookupMessage.receiver.getRoutingTable().containsNodeFromTargetDomain(lookupMessage.target.getDomain().getDomainId()));
