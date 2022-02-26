@@ -2,6 +2,8 @@ package peersim.kademlia.HandleResponseOperations;
 
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
+
 public class ImprovedHandleResponseOperation extends HandleResponseOperation {
 
     public ImprovedHandleResponseOperation(int kid, Message lookupMsg, int tid){
@@ -23,20 +25,20 @@ public class ImprovedHandleResponseOperation extends HandleResponseOperation {
 
         // get corresponding find operation (using the message field operationId)
         FindOperation findOp = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
-        //update statistics (we received a message from a sender)
-        findOp.nrMessages++;
 
         if(findOp != null){
+            //update statistics (we received a message from a sender)
+            findOp.nrMessages++;
 
             //Step 1: update the closest set by saving the received neighbours
             try{
-//                System.err.print("My old closest set is: ");
-                System.err.println(findOp.beautifyClosestSet());
-                System.err.println();
-                findOp.updateShortList((KadNode[]) lookupMessage.body);
-//                System.err.print("My new closest set is: ");
-                System.err.println(findOp.beautifyClosestSet());
-                System.err.println();
+////                System.err.print("My old closest set is: ");
+//                System.err.println(findOp.beautifyClosestSet());
+//                System.err.println();
+                findOp.updateShortList((ArrayList<KadNode>) lookupMessage.body);
+////                System.err.print("My new closest set is: ");
+//                System.err.println(findOp.beautifyClosestSet());
+//                System.err.println();
             } catch (Exception e){
                 findOp.available_requests++;
             }
@@ -74,7 +76,7 @@ public class ImprovedHandleResponseOperation extends HandleResponseOperation {
                     request.receiver = neighbour;
                     request.operationId = findOp.operationId;
                     request.newLookup = false;
-                    System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain().getDomainId() + ") of role " + request.receiver.getRole() + " with msgId is " + request.msgId);
+//                    System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain().getDomainId() + ") of role " + request.receiver.getRole() + " with msgId is " + request.msgId);
 
                     //send the ROUTE message
                     messageSender.sendMessage(request);

@@ -2,6 +2,8 @@ package peersim.kademlia.RequestOperations;
 
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
+
 /**
  * This class represents the find operation when the source and target are both KadNodes
  */
@@ -40,7 +42,7 @@ public class KadToKadRequestOperation extends RequestOperation {
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
         // get the K-closest node to search key
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+        ArrayList<KadNode> neighbours = lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);

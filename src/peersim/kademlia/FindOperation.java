@@ -90,7 +90,7 @@ public class FindOperation {
      *
      * @param neighbours
      */
-    public void updateClosestSet(KadNode[] neighbours) {
+    public void updateClosestSet(ArrayList<KadNode> neighbours) {
         // update response number because we can send another route message
         available_requests++;
 
@@ -131,7 +131,7 @@ public class FindOperation {
         }
     }
 
-    public void updateShortList(KadNode[] neighbours){
+    public void updateShortList(ArrayList<KadNode> neighbours){
         // update response number because we can send another route message
         available_requests++;
 
@@ -151,14 +151,14 @@ public class FindOperation {
         }
 
         //segment new nodes
-        for(KadNode i : neighbours) {
-            if (i.getDomain().getDomainId().equals(destNode.getDomain().getDomainId())) {
+        for(int i = 0; i < neighbours.size(); i++) {
+            if (neighbours.get(i).getDomain().getDomainId().equals(destNode.getDomain().getDomainId())) {
                 if (!previous_nodes_in_target_domain.contains(i)) {
-                    new_nodes_in_target_domain.add(i);
+                    new_nodes_in_target_domain.add(neighbours.get(i));
                 }
             } else {
                 if (!previous_nodes_in_other_domains.contains(i)) {
-                    new_nodes_in_other_domain.add(i);
+                    new_nodes_in_other_domain.add(neighbours.get(i));
                 }
             }
         }

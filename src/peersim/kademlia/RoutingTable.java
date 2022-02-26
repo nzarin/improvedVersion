@@ -1,6 +1,7 @@
 package peersim.kademlia;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -68,13 +69,13 @@ public class RoutingTable implements Cloneable {
         routingTable.get(prefix_len).removeNeighbour(node);
     }
 
-    public KadNode[] getNextHopCandidates(KadNode target, KadNode receiver, KadNode source){
+    public ArrayList<KadNode> getNextHopCandidates(KadNode target, KadNode receiver, KadNode source){
 
         //if I am in the same domain as the target node
         if(target.getDomain().getDomainId().equals(receiver.getDomain().getDomainId())){
-            return getKNeighbours(target, receiver, source);
+            return getTargetDomainNeighbours(target, receiver, source);
             //if am an octopus node, and I actually know nodes from the target domain
-        } else if(receiver.getRole().equals(Role.OCTOPUS) && containsNodeFromTargetDomain(target.getNodeId())){
+        } else if(containsNodeFromTargetDomain(target.getNodeId())){
             return getTargetDomainNeighbours(target, receiver, source);
         } else {
             return getTargetDomainIdNeighbours(target, receiver, source);
@@ -88,9 +89,9 @@ public class RoutingTable implements Cloneable {
      * @param source The original requester of this lookup
      * @return The k closest neighbors to the search key
      */
-    private KadNode[] getKNeighbours(final KadNode target, final KadNode receiver, final KadNode source) {
+    private ArrayList<KadNode> getKNeighbours(final KadNode target, final KadNode receiver, final KadNode source) {
 
-        KadNode[] result = new KadNode[KademliaCommonConfig.K];
+        ArrayList<KadNode> result = new ArrayList<>();
 
         // create a map (distance, node)
         TreeMap<BigInteger, KadNode> distance_map = new TreeMap<>();
@@ -119,9 +120,9 @@ public class RoutingTable implements Cloneable {
         return result;
     }
 
-    private KadNode[] getTargetDomainNeighbours(KadNode target, KadNode receiver, KadNode source){
+    private ArrayList<KadNode> getTargetDomainNeighbours(KadNode target, KadNode receiver, KadNode source){
 
-        KadNode[] result = new KadNode[KademliaCommonConfig.K];
+        ArrayList<KadNode> result = new ArrayList<>();
 
         // create a map (distance, node) for nodes from target domain
         TreeMap<BigInteger, KadNode> distance_map_colluders = new TreeMap<>();
@@ -150,17 +151,16 @@ public class RoutingTable implements Cloneable {
             addHonestNeighbours(distance_map_target_domain, result, distance_map_colluders.size());
         }
 
-
         return result;
     }
 
 
 
 
-    private KadNode[] getTargetDomainIdNeighbours(KadNode target, KadNode receiver, KadNode source){
-        KadNode[] result = new KadNode[KademliaCommonConfig.K];
+    private ArrayList<KadNode> getTargetDomainIdNeighbours(KadNode target, KadNode receiver, KadNode source){
+        ArrayList<KadNode> result = new ArrayList<>();
 
-        System.err.println(receiver.getRoutingTable().toString3());
+//        System.err.println(receiver.getRoutingTable().toString3());
 
         // create a map (distance, node) for nodes from target domain
         TreeMap<BigInteger, KadNode> distance_map_colluders = new TreeMap<>();
@@ -196,75 +196,15 @@ public class RoutingTable implements Cloneable {
     }
 
 
-    public KadNode[] getKNeighbours2(KadNode target, KadNode receiver, KadNode source){
-        KadNode[] result = new KadNode[KademliaCommonConfig.K];
-
-        System.err.println(receiver.getRoutingTable().toString3());
-
-        // create a map (distance, node) for nodes from target domain
-        TreeMap<BigInteger, KadNode> distance_map = new TreeMap<>();
-        TreeMap<BigInteger, KadNode> distance_map_colluders = new TreeMap<>();
-        TreeMap<BigInteger, KadNode> distance_map_target_domain = new TreeMap<>();
-
-        for(int i=0; i < KademliaCommonConfig.BITS; i++){
-            for(KadNode node : routingTable.get(i).neighbours.keySet()){
-
-                //add the collaborator malicious node if there is place in the array list
-                if(!source.isMalicious() && receiver.isMalicious() && node.isMalicious()){
-                    distance_map_colluders.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
-                }
-
-                //add to distance map if the node belongs to the target domain
-                if(node.getDomain().getDomainId().equals(target.getDomain().getDomainId())){
-                    System.err.println("We added node " + node.toString3() + " to the distance_map_target_domain set ");
-                    distance_map_target_domain.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
-                }
-                distance_map.put(Util.distance((node.getNodeId()), target.getNodeId()), node);
-            }
-        }
-
-        int resultCounter = 0;
-
-        // this means that we should add malicious nodes to the head of the array
-        if(distance_map_colluders.size() > 0){
-            System.err.println("We are behaving maliciously!");
-            addMaliciousNeighbours(distance_map_colluders, result);
-            resultCounter = Math.min(distance_map_colluders.size(), KademliaCommonConfig.K);
-            System.err.println("We have added " + resultCounter + " malicious colluders to the result set");
-        }
-
-        // this means that we should try to add nodes from the target domain to the array
-        if(resultCounter < KademliaCommonConfig.K){
-            System.err.println("Since we only have added " + resultCounter + " node, this means that there is still room left in the k-set. We are now trying to add nodes from the target domain" );
-            int temp = resultCounter;
-            addHonestNeighbours(distance_map_target_domain, result, resultCounter);
-            resultCounter = Math.min((resultCounter + distance_map_target_domain.size()), KademliaCommonConfig.K);
-            System.err.println("We have added " + Math.subtractExact(resultCounter,temp) + " nodes from the target domain");
-        }
-
-        // fill the rest with the table with nodes that are closer to the target domain
-        if(resultCounter < KademliaCommonConfig.K){
-            System.err.println("Since we only have added " + resultCounter + " node, this means that there is still room left in the k-set. We are now trying to add nodes from other domain" );
-            int temp = resultCounter;
-            addHonestNeighbours(distance_map, result, resultCounter);
-            resultCounter = Math.min((resultCounter + distance_map.size()), KademliaCommonConfig.K);
-            System.err.println("We have added " + Math.subtractExact(resultCounter,temp) + " nodes nodes from other domains");
-        }
-
-        return result;
-    }
-
-
-
     /**
      * Add honest neighbours to the list of closest neighbours to a target node
      * @param map
      * @param result
      * @param start_index
      */
-    private void addHonestNeighbours(TreeMap<BigInteger, KadNode> map, KadNode[] result, int start_index){
+    private void addHonestNeighbours(TreeMap<BigInteger, KadNode> map, ArrayList<KadNode> result, int start_index){
         for(int i = start_index; i < Math.min(KademliaCommonConfig.K, map.size()); i++){
-            result[i] = map.pollFirstEntry().getValue();
+            result.add(map.pollFirstEntry().getValue());
         }
     }
 
@@ -273,9 +213,9 @@ public class RoutingTable implements Cloneable {
      * @param map
      * @param result
      */
-    private  void addMaliciousNeighbours(TreeMap<BigInteger, KadNode> map, KadNode[] result){
+    private  void addMaliciousNeighbours(TreeMap<BigInteger, KadNode> map, ArrayList<KadNode> result){
         for(int i = 0; i < Math.min(KademliaCommonConfig.K, map.size()); i++){
-            result[i] = map.pollFirstEntry().getValue();
+            result.add(map.pollFirstEntry().getValue());
         }
     }
 

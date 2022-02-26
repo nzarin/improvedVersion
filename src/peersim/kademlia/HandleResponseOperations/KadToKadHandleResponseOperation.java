@@ -3,6 +3,8 @@ package peersim.kademlia.HandleResponseOperations;
 import peersim.core.CommonState;
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
+
 
 /**
  * This class represents how the response should be handled when source and target are both KadNodes
@@ -35,7 +37,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation {
 
             //Step 1: update the closest set by saving the received neighbour
             try {
-                findOp.updateClosestSet((KadNode[]) lookupMessage.body);
+                findOp.updateClosestSet((ArrayList<KadNode>) lookupMessage.body);
             } catch (Exception e) {
                 findOp.available_requests++;
             }

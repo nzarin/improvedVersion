@@ -2,6 +2,7 @@ package peersim.kademlia.RespondOperations;
 
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ImprovedRespondOperation extends RespondOperation{
@@ -25,10 +26,10 @@ public class ImprovedRespondOperation extends RespondOperation{
         }
 
         // get the k closest nodes to target node
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+        ArrayList<KadNode> neighbours = lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
         //get the BETA closest nodes from the neighbours
-        KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
+        ArrayList<KadNode> betaNeighbours = new ArrayList<>(neighbours.subList(0, KademliaCommonConfig.BETA+1));
 
 
         // create a response message containing the neighbours (with the same id as of the request)
@@ -41,12 +42,12 @@ public class ImprovedRespondOperation extends RespondOperation{
         response.newLookup = false;
         response.ackId = lookupMessage.msgId;
 //        System.err.println("Do I have node from the target domain in my routing table? " + lookupMessage.receiver.getRoutingTable().containsNodeFromTargetDomain(lookupMessage.target.getDomain().getDomainId()));
-        System.err.println(" I am sending a RESPONSE message to (" + response.receiver.getNodeId() + "," + response.receiver.getDomain().getDomainId() +  ") of role " + response.receiver.getRole() + " with msgId is " + response.msgId);
+//        System.err.println(" I am sending a RESPONSE message to (" + response.receiver.getNodeId() + "," + response.receiver.getDomain().getDomainId() +  ") of role " + response.receiver.getRole() + " with msgId is " + response.msgId);
 //        System.err.println(" The beta neighbours are : ");
 //        for (KadNode n : betaNeighbours){
 //            System.err.print("(" + n.getNodeId() + ", " + n.getDomain().getDomainId() + ")");
 //        }
-        System.err.println();
+//        System.err.println();
         messageSender.sendMessage(response);
     }
 }

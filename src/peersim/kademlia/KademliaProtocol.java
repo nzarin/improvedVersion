@@ -94,7 +94,7 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
      */
     public void processEvent(Node myNode, int myProtocolID, Object event) {
 
-        System.err.println(" ---------------------------------------- ");
+//        System.err.println(" ---------------------------------------- ");
         // Parse message content Activate the correct event manager for the particular event
         this.kademliaid = myProtocolID;
         SimpleEvent ev = (SimpleEvent) event;
@@ -113,17 +113,17 @@ public class KademliaProtocol implements Cloneable, EDProtocol {
             // Check what type of message and handle appropriately
             switch (m.getType()) {
                 case Message.MSG_FINDNODE:
-                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain().getDomainId() + ", " + m.receiver.getRole()  + ") gets a FIND message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain().getDomainId() + "," + m.sender.getRole() + ") to find node ("+ m.target.getNodeId() + "," + m.target.getDomain().getDomainId() +  "," + m.target.getRole() + ")");
+//                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain().getDomainId() + ", " + m.receiver.getRole()  + ") gets a FIND message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain().getDomainId() + "," + m.sender.getRole() + ") to find node ("+ m.target.getNodeId() + "," + m.target.getDomain().getDomainId() +  "," + m.target.getRole() + ")");
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performRequestOp();
                     break;
                 case Message.MSG_REQUEST:
-                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain().getDomainId() + ", " + m.receiver.getRole()  + ") gets a REQUEST message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain().getDomainId() + ", " + m.sender.getRole() + ")");
+//                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain().getDomainId() + ", " + m.receiver.getRole()  + ") gets a REQUEST message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain().getDomainId() + ", " + m.sender.getRole() + ")");
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performRespondOp();
                     break;
                 case Message.MSG_RESPONSE:
-                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain().getDomainId() + ", " + m.receiver.getRole()  + ") gets a RESPONSE message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain().getDomainId() + ", " + m.sender.getRole() + ")");
+//                    System.err.println("node (" + m.receiver.getNodeId() + "," + m.receiver.getDomain().getDomainId() + ", " + m.receiver.getRole()  + ") gets a RESPONSE message from (" + m.sender.getNodeId() + ","  + m.sender.getDomain().getDomainId() + ", " + m.sender.getRole() + ")");
                     this.currentLookup.prepare(kademliaid, m, tid);
                     currentLookup.performHandleResponseOp();
                     break;

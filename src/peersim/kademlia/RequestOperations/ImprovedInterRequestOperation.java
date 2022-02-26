@@ -2,6 +2,8 @@ package peersim.kademlia.RequestOperations;
 
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
+
 public class ImprovedInterRequestOperation extends RequestOperation {
 
     public ImprovedInterRequestOperation(int kid, Message lookupMsg, int tid) {
@@ -18,6 +20,7 @@ public class ImprovedInterRequestOperation extends RequestOperation {
         FindOperation findOp = new FindOperation((KadNode) lookupMessage.src, (KadNode) lookupMessage.target, lookupMessage.timestamp);
         findOp.body = lookupMessage.body;
         if(lookupMessage.src.getDomain().getDomainId().equals(lookupMessage.target.getDomain().getDomainId())){
+            System.err.println("SCOPE IS INTRADOMAIN IN FIND()");
             findOp.scope = Scope.INTRADOMAIN;
         } else {
             findOp.scope = Scope.INTERDOMAIN;
@@ -25,20 +28,13 @@ public class ImprovedInterRequestOperation extends RequestOperation {
 
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
-        KadNode[] neighbours =  lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
-        System.err.println("next hop candidates are : " + neighbours.length);
-        for(int i = 0; i < neighbours.length; i++){
-            System.err.println(neighbours[i].toString3());
-        }
+        ArrayList<KadNode> neighbours =  lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
         // update the list of closest nodes and re-initialize available requests
-        System.err.println("my old short list was: ");
-        System.err.println(findOp.beautifyClosestSet());
         findOp.updateShortList(neighbours);
-        System.err.println("my new short list is: ");
-        System.err.println(findOp.beautifyClosestSet());
 
         findOp.available_requests = KademliaCommonConfig.ALPHA;
-        System.err.println("Do I have node from the target domain in my routing table? " + lookupMessage.receiver.getRoutingTable().containsNodeFromTargetDomain(lookupMessage.target.getDomain().getDomainId()));
+//        System.err.println("Do I have node from the target domain in my routing table? " + lookupMessage.receiver.getRoutingTable().containsNodeFromTargetDomain(lookupMessage.target.getDomain().getDomainId()));
+
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
             KadNode nextNode = findOp.getNextHop((KadNode) lookupMessage.receiver);
@@ -57,7 +53,7 @@ public class ImprovedInterRequestOperation extends RequestOperation {
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
                 request.sender.getRoutingTable().addNeighbour(nextNode);
-                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain().getDomainId() + ") of role " + request.receiver.getRole() + " with msgId is " + request.msgId);
+//                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain().getDomainId() + ") of role " + request.receiver.getRole() + " with msgId is " + request.msgId);
                 messageSender.sendMessage(request);
             }
         }

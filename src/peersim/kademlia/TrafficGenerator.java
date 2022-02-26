@@ -67,6 +67,7 @@ public class TrafficGenerator implements Control {
 
         if (intra) {
             //create intra domain lookup
+            System.err.println("we are going to create an intra domain lookup");
             do {
                 source = Network.get(CommonState.r.nextInt(Network.size()));
                 target = Network.get(CommonState.r.nextInt(Network.size()));
@@ -74,7 +75,7 @@ public class TrafficGenerator implements Control {
                 KademliaProtocol kadProtocolTarget = (KademliaProtocol) target.getProtocol(pid);
                 sourceKadNode = kadProtocolSource.getCurrentNode();
                 targetKadNode = kadProtocolTarget.getCurrentNode();
-            } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode) || (sourceKadNode.getNodeId() == targetKadNode.getNodeId()) || sourceKadNode.getDomain() != targetKadNode.getDomain());
+            } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode) || (sourceKadNode.getNodeId() == targetKadNode.getNodeId()) || !sourceKadNode.getDomain().getDomainId().equals(targetKadNode.getDomain().getDomainId()));
         } else {
 
             //create inter-domain lookup
@@ -85,7 +86,7 @@ public class TrafficGenerator implements Control {
                 KademliaProtocol kadProtocolTarget = (KademliaProtocol) target.getProtocol(pid);
                 sourceKadNode = kadProtocolSource.getCurrentNode();
                 targetKadNode = kadProtocolTarget.getCurrentNode();
-            } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode) || (sourceKadNode.getNodeId() == targetKadNode.getNodeId()) || sourceKadNode.getDomain() == targetKadNode.getDomain());
+            } while ((source == null) || (target == null) || (!source.isUp()) || (!target.isUp()) || (sourceKadNode instanceof BridgeNode) || (targetKadNode instanceof BridgeNode) || (sourceKadNode.getNodeId() == targetKadNode.getNodeId()) || sourceKadNode.getDomain().getDomainId().equals(targetKadNode.getDomain().getDomainId()));
         }
 
 
