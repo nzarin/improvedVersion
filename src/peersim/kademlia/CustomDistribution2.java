@@ -49,21 +49,32 @@ public class CustomDistribution2 implements peersim.core.Control {
      */
     private void generateKadNodes() {
         //determine number of KadNodes in the network
-        int amountKadNodes = Network.size() - ((int) Math.round(Network.size() * fractionOctopusNodes));
+//        int amountKadNodes = Network.size() - ((int) Math.round(Network.size() * fractionOctopusNodes));
         int numberOfAdversarialNodes = (int) Math.round(Network.size() * fractionAdversarial);
 
         //create them
-        for (int i = 0; i < amountKadNodes; ++i) {
+        for (int i = 0; i < Network.size(); ++i) {
             BigInteger tmpID = urg.generateID();
             if (!mapNIDoPID.containsValue(tmpID)) {
                 KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
                 KademliaNode kadNode = new KadNode(tmpID, selectRandomDomain(), kademliaProtocol, selectRandomRole());
                 kademliaProtocol.setKadNode((KadNode) kadNode);
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
+
                 //determine whether this node has to be an adversarial
                 if (currentIndexNetworkNode < numberOfAdversarialNodes) {
                     ((KadNode) kadNode).makeMalicious();
                 }
+
+                //determine whether this node has to be an octopus
+                double dice = CommonState.r.nextDouble();
+                if(dice < fractionOctopusNodes){
+                    ((KadNode) kadNode).giveRole(Role.OCTOPUS);
+                } else {
+                    ((KadNode) kadNode).giveRole(Role.NORMAL);
+                }
+
+                //update index
                 currentIndexNetworkNode++;
             } else {
                 // set i back with 1 to retry
@@ -71,6 +82,7 @@ public class CustomDistribution2 implements peersim.core.Control {
             }
         }
     }
+
 
 
     /**
@@ -148,8 +160,8 @@ public class CustomDistribution2 implements peersim.core.Control {
         // create normal nodes
         generateKadNodes();
 
-        //create bridge nodes
-        generateBridgeNodes();
+//        //create bridge nodes
+//        generateBridgeNodes();
 
         System.err.println();
 

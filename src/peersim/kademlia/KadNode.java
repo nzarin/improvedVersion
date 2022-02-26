@@ -163,4 +163,8 @@ public class KadNode implements KademliaNode {
         return false;
     }
 
+    public void giveRole(Role role){
+        this.role = role;
+    }
+
 }
