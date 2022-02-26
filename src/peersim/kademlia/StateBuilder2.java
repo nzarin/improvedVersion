@@ -62,6 +62,11 @@ public class StateBuilder2 implements peersim.core.Control {
             if (iNode instanceof KadNode) {
 
 
+                //if it is an octopus -> add other-domain nodes to routing table
+                if((iNode).getRole() == Role.OCTOPUS){
+                    addRandomKadNodesToOctopusKadNode((KadNode) iNode);
+                }
+
                 // fill the routing table with random nodes
                 addSameDomainRandomKadNodesToKadNode((KadNode) iNode);
 
@@ -75,10 +80,7 @@ public class StateBuilder2 implements peersim.core.Control {
                 // add all the relevant bridge nodes to this kad node
                 addBridgeAndColludeNodesToKadNode((KadNode) iNode);
 
-                //if it is an octopus -> add other-domain nodes to routing table
-                if((iNode).getRole() == Role.OCTOPUS){
-                    addRandomKadNodesToOctopusKadNode((KadNode) iNode);
-                }
+
 
                 // i is a bridge node
             } else {
@@ -150,13 +152,10 @@ public class StateBuilder2 implements peersim.core.Control {
 
         // now add 50 nodes from other domains to routing table of iNode with a bias towards nodes from closer domains
         for (int i = 0; i < 50; i++){
-            System.err.println("otherDomain.size() : " + otherDomains.size());
             int domainIndex = chooseBiasedIndex(0, otherDomains.size()-1);
-            System.err.println("biased domainIndex: " + domainIndex);
-
             ArrayList<KadNode> nodes = nodes_other_domain.get(domainIndex);
-            System.err.println("nodes.size(): " + nodes.size());
-            //select random node from this arraylist
+
+            //select random node from the respective domain
             KadNode node = nodes.get(chooseRandomIndex(0, nodes.size()-1));
 
             //add to iNode routing table

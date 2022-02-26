@@ -129,16 +129,15 @@ public class KadNode implements KademliaNode {
 
 
     public String toString2() {
-        return "KadNode{" +
+        return "{" +
                 "nodeId=" + nodeId +
-                ", domain=" + domain +
-                ", has target in routing table= " + hasNodeInRoutingTable(this) +
+                ", domain=" + domain.getDomainId() +
                 '}';
     }
 
 
     public String toString3(){
-        return "nodeId=" + nodeId + ", ";
+        return "(" + nodeId + ", " + domain.getDomainId() + ", " + role + ")";
     }
 
     @Override

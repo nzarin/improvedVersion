@@ -15,43 +15,33 @@ public class ImprovedInterRequestOperation extends RequestOperation {
     public void find() {
 
         //check whether the findOp object already exists (inter-domain) or whether we have to create one (intra-domain)
-        FindOperation findOp;
-        if(lookupMessage.src.getDomain() == lookupMessage.target.getDomain()){
-            findOp = new FindOperation((KadNode) lookupMessage.src, (KadNode) lookupMessage.target, lookupMessage.timestamp);
+        FindOperation findOp = new FindOperation((KadNode) lookupMessage.src, (KadNode) lookupMessage.target, lookupMessage.timestamp);
+        findOp.body = lookupMessage.body;
+        if(lookupMessage.src.getDomain().getDomainId().equals(lookupMessage.target.getDomain().getDomainId())){
             findOp.scope = Scope.INTRADOMAIN;
-            findOp.body = lookupMessage.body;
-        } else{
-            findOp = (FindOperation) lookupMessage.body;
+        } else {
+            findOp.scope = Scope.INTERDOMAIN;
         }
 
-        //add the findOp to my map of find operations anyway
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
-        KadNode[] neighbours =  lookupMessage.receiver.getRoutingTable().getKNeighbours2((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
-        KadNode[] result = new KadNode[KademliaCommonConfig.K];
-        int count = 0;
-
-        // select nodes in this neighbours list that are truly from the target domain
-        for(KadNode n : neighbours){
-            if(n.getDomain() == lookupMessage.target.getDomain()){
-                result[count] = n;
-                count++;
-            }
+        KadNode[] neighbours =  lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+        System.err.println("next hop candidates are : " + neighbours.length);
+        for(int i = 0; i < neighbours.length; i++){
+            System.err.println(neighbours[i].toString3());
         }
-
-        //if no nodes have been found that are from the target domain ->
-        if(count == 0){
-
-            result = neighbours;
-        }
-
         // update the list of closest nodes and re-initialize available requests
-        findOp.updateClosestSet(result);
-        findOp.available_requests = KademliaCommonConfig.ALPHA;
+        System.err.println("my old short list was: ");
+        System.err.println(findOp.beautifyClosestSet());
+        findOp.updateShortList(neighbours);
+        System.err.println("my new short list is: ");
+        System.err.println(findOp.beautifyClosestSet());
 
+        findOp.available_requests = KademliaCommonConfig.ALPHA;
+        System.err.println("Do I have node from the target domain in my routing table? " + lookupMessage.receiver.getRoutingTable().containsNodeFromTargetDomain(lookupMessage.target.getDomain().getDomainId()));
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
-            KadNode nextNode = findOp.getNeighbour();
+            KadNode nextNode = findOp.getNextHop((KadNode) lookupMessage.receiver);
             if (nextNode != null) {
 
                 //update statistics of the find operation
@@ -67,7 +57,7 @@ public class ImprovedInterRequestOperation extends RequestOperation {
                 request.newLookup = lookupMessage.newLookup;
                 request.receiver = nextNode;
                 request.sender.getRoutingTable().addNeighbour(nextNode);
-//                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain() + ") of type " + request.receiver.getType() + "with msgId is " + request.msgId);
+                System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain().getDomainId() + ") of role " + request.receiver.getRole() + " with msgId is " + request.msgId);
                 messageSender.sendMessage(request);
             }
         }

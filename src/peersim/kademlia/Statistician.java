@@ -20,11 +20,14 @@ public class Statistician {
         if (fop.closestSet.containsKey(fop.destNode) && Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp()) {
 
             updateSuccessfulLookup(currentNode, fop);
-
+            System.err.println();
+            System.err.println("SUCCESFULL LOOKUP! ");
             // if I am still up -> FAILURE LOOKUP
         } else if (Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
 
             updateFailedLookup(currentNode, fop);
+            System.err.println();
+            System.err.println("FAILED LOOKUP! ");
 
         } else {
 

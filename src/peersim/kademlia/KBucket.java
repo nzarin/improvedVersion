@@ -29,8 +29,6 @@ public class KBucket implements Cloneable {
         // if the k-bucket isn't full, add neighbour to tail of the list.
         if (neighbours.size() < KademliaCommonConfig.K) { // k-bucket isn't full
             neighbours.put(node, time);
-        } else{
-            System.err.println("We tried to add kadNode to routing table, but its full");
         }
 
 //        long time = CommonState.getTime();

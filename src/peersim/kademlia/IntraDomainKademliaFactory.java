@@ -1,9 +1,12 @@
 package peersim.kademlia;
 
+import peersim.kademlia.HandleResponseOperations.ImprovedHandleResponseOperation;
+import peersim.kademlia.RequestOperations.ImprovedInterRequestOperation;
 import peersim.kademlia.RequestOperations.RequestOperation;
 import peersim.kademlia.RequestOperations.KadToKadRequestOperation;
 import peersim.kademlia.HandleResponseOperations.HandleResponseOperation;
 import peersim.kademlia.HandleResponseOperations.KadToKadHandleResponseOperation;
+import peersim.kademlia.RespondOperations.ImprovedRespondOperation;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
 import peersim.kademlia.RespondOperations.RespondOperation;
 
@@ -17,7 +20,11 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory {
      */
     @Override
     public RequestOperation createRequestOperation(Lookup lookup) {
-        return new KadToKadRequestOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        if (lookup.type.equals("naive")){
+            return new KadToKadRequestOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else{
+            return new ImprovedInterRequestOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        }
     }
 
     /**
@@ -25,7 +32,11 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory {
      */
     @Override
     public RespondOperation createRespondOperation(Lookup lookup) {
-        return new KadToKadRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        if(lookup.type.equals("naive")){
+            return new KadToKadRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else {
+            return new ImprovedRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        }
     }
 
     /**
@@ -33,7 +44,11 @@ public class IntraDomainKademliaFactory implements LookupIngredientFactory {
      */
     @Override
     public HandleResponseOperation createHandleResponseOperation(Lookup lookup) {
-        return new KadToKadHandleResponseOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        if(lookup.type.equals("naive")){
+            return new KadToKadHandleResponseOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else {
+            return new ImprovedHandleResponseOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        }
     }
 
 
