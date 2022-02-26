@@ -16,10 +16,21 @@ public class KadNode implements KademliaNode {
     private final RoutingTable routingTable;
     private final ArrayList<BridgeNode> bridgeNodes;
     private final ArrayList<KadNode> colluders;
-    private int domain;
+    private Domain domain;
     private final LinkedHashMap<Long, FindOperation> findOperationsMap;
     private final TreeMap<Long, Long> sentMsgTracker;
     private boolean malicious;
+    private Role role;
+
+    public KadNode(BigInteger id){
+        this.nodeId = id;
+        this.routingTable = new RoutingTable(this);
+        this.colluders = new ArrayList<>();
+        this.bridgeNodes = new ArrayList<>();
+        this.findOperationsMap = new LinkedHashMap<>();
+        this.sentMsgTracker = new TreeMap<>();
+        this.malicious = false;
+    }
 
     /**
      * Constructs the KadNode
@@ -27,7 +38,7 @@ public class KadNode implements KademliaNode {
      * @param id
      * @param domain
      */
-    public KadNode(BigInteger id, int domain) {
+    public KadNode(BigInteger id, Domain domain) {
         this.nodeId = id;
         this.domain = domain;
         this.routingTable = new RoutingTable(this);
@@ -45,7 +56,7 @@ public class KadNode implements KademliaNode {
      * @param domain
      * @param kademliaProtocol
      */
-    public KadNode(BigInteger id, int domain, KademliaProtocol kademliaProtocol) {
+    public KadNode(BigInteger id, Domain domain, KademliaProtocol kademliaProtocol, Role role) {
         this.kademliaProtocol = kademliaProtocol;
         this.nodeId = id;
         this.domain = domain;
@@ -55,21 +66,21 @@ public class KadNode implements KademliaNode {
         this.findOperationsMap = new LinkedHashMap<>();
         this.sentMsgTracker = new TreeMap<>();
         this.malicious = false;
+        this.role = role;
     }
 
     //SETTERS
 
-    public void setDomain(int domain) {
-        this.domain = domain;
-    }
+    public void setDomain(Domain domain) { this.domain = domain;}
 
     public void makeMalicious(){ this.malicious = true;}
 
+    public void setRole(Role role){this.role = role;}
+
     // GETTERS
 
-    public int getDomain() {
-        return this.domain;
-    }
+
+    public Domain getDomain() {return this.domain;}
 
     public RoutingTable getRoutingTable() {
         return this.routingTable;
@@ -118,17 +129,19 @@ public class KadNode implements KademliaNode {
 
 
     public String toString2() {
-        return "KadNode{" +
+        return "{" +
                 "nodeId=" + nodeId +
-                ", domain=" + domain +
-                ", has target in routing table= " + hasNodeInRoutingTable(this) +
+                ", domain=" + domain.getDomainId() +
                 '}';
     }
 
 
     public String toString3(){
-        return "nodeId=" + nodeId + ", ";
+        return "(" + nodeId + ", " + domain.getDomainId() + ", " + role + ")";
     }
+
+    @Override
+    public Role getRole() {return this.role;}
 
     @Override
     public BigInteger getNodeId() {
@@ -148,6 +161,10 @@ public class KadNode implements KademliaNode {
             return true;
         }
         return false;
+    }
+
+    public void giveRole(Role role){
+        this.role = role;
     }
 
 }

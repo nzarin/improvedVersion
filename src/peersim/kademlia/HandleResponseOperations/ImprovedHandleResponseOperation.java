@@ -1,15 +1,12 @@
-package peersim.kademlia.HandleResponseOperation;
+package peersim.kademlia.HandleResponseOperations;
 
-import peersim.core.CommonState;
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
 
-/**
- * This class represents how the response should be handled when source and target are both KadNodes
- */
-public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
+public class ImprovedHandleResponseOperation extends HandleResponseOperation {
 
-    public KadToKadHandleResponseOperation(int kid, Message lookupMsg, int tid) {
+    public ImprovedHandleResponseOperation(int kid, Message lookupMsg, int tid){
         kademliaid = kid;
         lookupMessage = lookupMsg;
         transportid = tid;
@@ -19,24 +16,35 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
     @Override
     public void handleResponse() {
-
-        // remove the timer for the deadline because we already received a response on time
         lookupMessage.receiver.getSentMsgTracker().remove(lookupMessage.ackId);
 
-        // add message sender to my routing table
-        if (lookupMessage.sender != null && lookupMessage.sender instanceof KadNode) {
+        // add message sender to my routing table if I am an octopus
+        if (lookupMessage.sender != null && lookupMessage.receiver.getRole().equals(Role.OCTOPUS)) {
             lookupMessage.receiver.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
         }
 
         // get corresponding find operation (using the message field operationId)
         FindOperation findOp = lookupMessage.receiver.getFindOperationsMap().get(lookupMessage.operationId);
 
-        if (findOp != null) {
+        if(findOp != null){
+            //update statistics (we received a message from a sender)
+            findOp.nrMessages++;
 
-            //Step 1: update the closest set by saving the received neighbour
-            try {
-                findOp.updateClosestSet((KadNode[]) lookupMessage.body);
-            } catch (Exception e) {
+            //Step 1: update the closest set by saving the received neighbours
+            try{
+//                if(findOp.scope.equals(Scope.INTRADOMAIN)){
+//                    System.err.println("HANDLERESPONSE: My shortlist before the update is in this intra-domain lookup is: ");
+//                    System.err.println(findOp.beautifyClosestSet());
+//                }
+                findOp.updateShortList((ArrayList<KadNode>) lookupMessage.body);
+//                if(findOp.scope.equals(Scope.INTRADOMAIN)){
+//                    System.err.println("HANDLERESPONSE: My shortlist after the update is in this intra-domain lookup is: ");
+//                    System.err.println(findOp.beautifyClosestSet());
+//                }
+////                System.err.print("My new closest set is: ");
+//                System.err.println(findOp.beautifyClosestSet());
+//                System.err.println();
+            } catch (Exception e){
                 findOp.available_requests++;
             }
 
@@ -55,9 +63,9 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                 }
             }
 
-            // Step 2: send the new requests if allowed
-            while (findOp.available_requests > 0) {
-                KadNode neighbour = findOp.getNeighbour();
+            //Step 2: send the new requests if allowed
+            while (findOp.available_requests>0){
+                KadNode neighbour = findOp.getNextHop((KadNode) lookupMessage.receiver);
 
                 //SCENARIO 1: there exists some neighbour we can visit.
                 if (neighbour != null) {
@@ -73,7 +81,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
                     request.receiver = neighbour;
                     request.operationId = findOp.operationId;
                     request.newLookup = false;
-//                    System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain() + ") of type " + request.receiver.getType() + " with msgId is " + request.msgId);
+//                    System.err.println("I am sending a REQUEST message to (" + request.receiver.getNodeId() + "," + request.receiver.getDomain().getDomainId() + ") of role " + request.receiver.getRole() + " with msgId is " + request.msgId);
 
                     //send the ROUTE message
                     messageSender.sendMessage(request);
@@ -88,32 +96,7 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 
                     // if the lookup operation was not for bootstrapping purposes
                     if (findOp.body.equals("Automatically Generated Traffic")) {
-
-                        // if the source of the lookup is the same as this receiver -> it was an intra-domain lookup
-                        if (lookupMessage.src == lookupMessage.receiver){
-                            Statistician.updateLookupStatistics((KadNode) lookupMessage.receiver, findOp, this.kademliaid);
-                        } else {
-
-                            // It is an inter-domain lookup. So first find the correct bridge node of the domain of the target node.
-                            BridgeNode randomBridgeNodeThisDomain;
-                            do{
-                                randomBridgeNodeThisDomain = lookupMessage.receiver.getBridgeNodes().get(CommonState.r.nextInt(lookupMessage.receiver.getBridgeNodes().size()));
-                            } while (randomBridgeNodeThisDomain == null);
-
-                            //update statistics of the find operation
-                            findOp.nrMessages++;
-
-                            //create RESPONSE message to send it to the bridge node of this domain we got the request from
-                            Message response = new Message(Message.MSG_RESPONSE);
-                            response.body = findOp;
-                            response.src = lookupMessage.src;
-                            response.target = lookupMessage.target;
-                            response.sender = lookupMessage.receiver;
-                            response.receiver = randomBridgeNodeThisDomain;
-                            response.operationId = lookupMessage.operationId;
-//                            System.err.println("I am sending a RESPONSE message to (" + response.receiver.getNodeId() + "," +  response.receiver.getDomain() + ") of type " + response.receiver.getType() + " with msgId is " + response.msgId);
-                            messageSender.sendMessage(response);
-                        }
+                        Statistician.updateLookupStatistics((KadNode) lookupMessage.receiver, findOp, this.kademliaid);
 
                     } else {
 //                        System.err.println("This is a bootstrap message. Let it be. ");
@@ -126,10 +109,13 @@ public class KadToKadHandleResponseOperation extends HandleResponseOperation2 {
 //                    System.err.println("SCENARIO 3: NO NEW NEIGHBOUR BUT THERE ARE SOME OUTSTANDING REQUESTS ");
                     return;
                 }
+
             }
-        } else {
-            System.err.println("There has been some error in the protocol");
+
+
+
         }
+
 
 
     }

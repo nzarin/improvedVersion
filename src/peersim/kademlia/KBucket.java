@@ -23,12 +23,7 @@ public class KBucket implements Cloneable {
     }
 
 
-    /**
-     * Add a neighbour to this k-bucket.
-     *
-     * @param node The to-be added neighbour.
-     */
-    public void fillKBucket(KadNode node) {
+    public void addKadNode(KadNode node){
         long time = CommonState.getTime();
 
         // if the k-bucket isn't full, add neighbour to tail of the list.
@@ -36,23 +31,19 @@ public class KBucket implements Cloneable {
             neighbours.put(node, time);
         }
 
-    }
-
-
-    public void addKadNode(KadNode node){
-        long time = CommonState.getTime();
-
-        if(neighbours.size() < KademliaCommonConfig.K){
-            neighbours.put(node, time);
-        } else {
-            //determine whether there is a node that is offline
-            for(KadNode neighbour : neighbours.keySet()){
-                if(!neighbour.isAlive()){
-                    neighbours.remove(neighbour);
-                    neighbours.put(node,time);
-                }
-            }
-        }
+//        long time = CommonState.getTime();
+//
+//        if(neighbours.size() < KademliaCommonConfig.K){
+//            neighbours.put(node, time);
+//        } else {
+//            //determine whether there is a node that is offline
+//            for(KadNode neighbour : neighbours.keySet()){
+//                if(!neighbour.isAlive()){
+//                    neighbours.remove(neighbour);
+//                    neighbours.put(node,time);
+//                }
+//            }
+//        }
     }
 
 

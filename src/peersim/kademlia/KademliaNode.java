@@ -6,9 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 public interface KademliaNode {
+    Role getRole();
     BigInteger getNodeId();
     RoutingTable getRoutingTable();
-    int getDomain();
+    Domain getDomain();
     ArrayList<BridgeNode> getBridgeNodes();
     ArrayList<KadNode> getKadNodes();
     LinkedHashMap<Long, FindOperation> getFindOperationsMap();

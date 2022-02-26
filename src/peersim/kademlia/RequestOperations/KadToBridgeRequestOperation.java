@@ -1,4 +1,4 @@
-package peersim.kademlia.FindOperations;
+package peersim.kademlia.RequestOperations;
 
 import peersim.core.CommonState;
 import peersim.kademlia.*;
@@ -16,7 +16,8 @@ public class KadToBridgeRequestOperation extends RequestOperation {
     public void find() {
 
         //create a findOp object
-        FindOperation findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
+        FindOperation findOp = new FindOperation((KadNode) lookupMessage.src, (KadNode) lookupMessage.target, lookupMessage.timestamp);
+        findOp.scope = Scope.INTERDOMAIN;
         findOp.body = lookupMessage.body;
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 

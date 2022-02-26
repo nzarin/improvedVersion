@@ -1,4 +1,4 @@
-package peersim.kademlia.FindOperations;
+package peersim.kademlia.RequestOperations;
 
 import peersim.kademlia.*;
 

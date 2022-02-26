@@ -4,9 +4,9 @@ package peersim.kademlia;
  * This class specifies the naive variant of the Kademlia protocol for cross-DHT lookups.
  */
 public class NaiveKademliaLookup extends Lookup {
-    LookupIngredientFactory2 lif2;
+    LookupIngredientFactory lif2;
 
-    public NaiveKademliaLookup(LookupIngredientFactory2 lif) {
+    public NaiveKademliaLookup(LookupIngredientFactory lif) {
         this.lif2 = lif;
     }
 
@@ -30,7 +30,7 @@ public class NaiveKademliaLookup extends Lookup {
      */
     @Override
     public void performRequestOp() {
-        findOp = lif2.createRequestOperation(kademliaid, lookupMessage, transportid);
+        findOp = lif2.createRequestOperation(this);
         findOp.find();
     }
 
@@ -39,7 +39,7 @@ public class NaiveKademliaLookup extends Lookup {
      */
     @Override
     public void performRespondOp() {
-        resOp = lif2.createRespondOperation(kademliaid, lookupMessage, transportid);
+        resOp = lif2.createRespondOperation(this);
         resOp.respond();
 
     }
@@ -49,7 +49,7 @@ public class NaiveKademliaLookup extends Lookup {
      */
     @Override
     public void performHandleResponseOp() {
-        handleResOp = lif2.createHandleResponseOperation(kademliaid, lookupMessage, transportid);
+        handleResOp = lif2.createHandleResponseOperation(this);
         handleResOp.handleResponse();
 
     }

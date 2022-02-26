@@ -1,8 +1,8 @@
-package peersim.kademlia.HandleResponseOperation;
+package peersim.kademlia.HandleResponseOperations;
 
 import peersim.kademlia.*;
 
-public class BridgeToKadHandleResponseOperation extends HandleResponseOperation2 {
+public class BridgeToKadHandleResponseOperation extends HandleResponseOperation {
 
     public BridgeToKadHandleResponseOperation(int kid, Message lookupMsg, int tid){
         kademliaid = kid;

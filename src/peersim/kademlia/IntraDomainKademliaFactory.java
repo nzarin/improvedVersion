@@ -1,51 +1,55 @@
 package peersim.kademlia;
 
-import peersim.kademlia.FindOperations.RequestOperation;
-import peersim.kademlia.FindOperations.KadToKadRequestOperation;
-import peersim.kademlia.HandleResponseOperation.HandleResponseOperation2;
-import peersim.kademlia.HandleResponseOperation.KadToKadHandleResponseOperation;
+import peersim.kademlia.HandleResponseOperations.ImprovedHandleResponseOperation;
+import peersim.kademlia.RequestOperations.ImprovedInterRequestOperation;
+import peersim.kademlia.RequestOperations.RequestOperation;
+import peersim.kademlia.RequestOperations.KadToKadRequestOperation;
+import peersim.kademlia.HandleResponseOperations.HandleResponseOperation;
+import peersim.kademlia.HandleResponseOperations.KadToKadHandleResponseOperation;
+import peersim.kademlia.RespondOperations.ImprovedRespondOperation;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
-import peersim.kademlia.RespondOperations.RespondOperation2;
+import peersim.kademlia.RespondOperations.RespondOperation;
 
 /**
  * This class represents a factory that creates the correct operations for an intra-domain lookup.
  */
-public class IntraDomainKademliaFactory implements LookupIngredientFactory2 {
+public class IntraDomainKademliaFactory implements LookupIngredientFactory {
 
     /**
      * Create the find operation for an intra-domain lookup.
-     * @param kademliaid
-     * @param lookupMessage
-     * @param tid
-     * @return
      */
     @Override
-    public RequestOperation createRequestOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
+    public RequestOperation createRequestOperation(Lookup lookup) {
+        if (lookup.type.equals("naive")){
+            return new KadToKadRequestOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else{
+            return new ImprovedInterRequestOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        }
     }
 
     /**
      * Create the respond operation for an intra-domain lookup.
-     * @param kademliaid
-     * @param lookupMessage
-     * @param tid
-     * @return
      */
     @Override
-    public RespondOperation2 createRespondOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadRespondOperation(kademliaid, lookupMessage, tid);
+    public RespondOperation createRespondOperation(Lookup lookup) {
+        if(lookup.type.equals("naive")){
+            return new KadToKadRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else {
+            return new ImprovedRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        }
     }
 
     /**
      * Create a handle response operation for an intra-domain lookup.
-     * @param kademliaid
-     * @param lookupMessage
-     * @param tid
-     * @return
      */
     @Override
-    public HandleResponseOperation2 createHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
-        return new KadToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
+    public HandleResponseOperation createHandleResponseOperation(Lookup lookup) {
+        if(lookup.type.equals("naive")){
+            return new KadToKadHandleResponseOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else {
+            return new ImprovedHandleResponseOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        }
     }
+
 
 }

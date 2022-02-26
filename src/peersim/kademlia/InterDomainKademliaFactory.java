@@ -1,64 +1,77 @@
 package peersim.kademlia;
 
-import peersim.kademlia.FindOperations.*;
-import peersim.kademlia.HandleResponseOperation.*;
+import peersim.kademlia.HandleResponseOperations.*;
+import peersim.kademlia.RequestOperations.*;
+import peersim.kademlia.RespondOperations.ImprovedRespondOperation;
 import peersim.kademlia.RespondOperations.KadToKadRespondOperation;
-import peersim.kademlia.RespondOperations.RespondOperation2;
+import peersim.kademlia.RespondOperations.RespondOperation;
 
 
-public class InterDomainKademliaFactory implements LookupIngredientFactory2 {
+public class InterDomainKademliaFactory implements LookupIngredientFactory {
+
 
     @Override
-    public RequestOperation createRequestOperation(int kademliaid, Message lookupMessage, int tid) {
+    public RequestOperation createRequestOperation(Lookup lookup) {
+        int kademliaid = lookup.kademliaid;
+        Message lookupMessage = lookup.lookupMessage;
+        int tid = lookup.transportid;
 
-        RequestOperation fop = null;
 
-        //for the first message its always the case that the receiver is the source -> so we have a kad to bridge find operation
-        if (lookupMessage.receiver == lookupMessage.src) {
-//            System.err.println("We have a new lookup request ");
-            fop = new KadToBridgeRequestOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof KadNode) {
-//            System.err.println("it is a bridge to bridge find operation ");
-            fop = new BridgeToBridgeRequestOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof BridgeNode) {
-//            System.err.println("it is a bridge to kad find operation ");
-            fop = new BridgeToKadRequestOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof BridgeNode) {
-//            System.err.println("it is a kad to kad find operation ");
-            fop = new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof KadNode) {
-//            System.err.println("it is a kad to bridge find operation ");
-            fop = new KadToBridgeRequestOperation(kademliaid, lookupMessage, tid);
+        RequestOperation requestOperation = null;
+
+        if(lookup.type.equals("naive")){
+            //for the first message its always the case that the receiver is the source -> so we have a kad to bridge find operation
+            if (lookupMessage.receiver == lookupMessage.src) {
+                requestOperation = new KadToBridgeRequestOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof KadNode) {
+                requestOperation = new BridgeToBridgeRequestOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof BridgeNode) {
+                requestOperation = new BridgeToKadRequestOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof BridgeNode) {
+                requestOperation = new KadToKadRequestOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof KadNode) {
+                requestOperation = new KadToBridgeRequestOperation(kademliaid, lookupMessage, tid);
+            }
+        } else {
+            requestOperation = new ImprovedInterRequestOperation(kademliaid, lookupMessage, tid);
         }
 
-        return fop;
+        return requestOperation;
+
     }
 
     @Override
-    public RespondOperation2 createRespondOperation(int kademliaid, Message lookupMessage, int tid) {
-        //because the lookup operation will eventually always be
-//        System.err.println("it is a kad to kad respond operation ");
-        return new KadToKadRespondOperation(kademliaid, lookupMessage, tid);
-    }
-
-    @Override
-    public HandleResponseOperation2 createHandleResponseOperation(int kademliaid, Message lookupMessage, int tid) {
-        HandleResponseOperation2 handleResponseOperation2 = null;
-
-        if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof KadNode) {
-//            System.err.println("it is a kad to bridge handleresponse operation ");
-            handleResponseOperation2 = new KadToBridgeHandleRespondOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof BridgeNode) {
-//            System.err.println("it is a bridge to bridge handleresponse operation ");
-            handleResponseOperation2 = new BridgeToBridgeHandleResponseOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof BridgeNode) {
-//            System.err.println("it is a bridge to kad handleresponse operation ");
-            handleResponseOperation2 = new BridgeToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
-        } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof KadNode) {
-//            System.err.println("it is a kad to kad handleresponse operation ");
-            handleResponseOperation2 = new KadToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
+    public RespondOperation createRespondOperation(Lookup lookup) {
+        if(lookup.type.equals("naive")){
+            return new KadToKadRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
+        } else {
+            return new ImprovedRespondOperation(lookup.kademliaid, lookup.lookupMessage, lookup.transportid);
         }
-        return handleResponseOperation2;
     }
+
+    @Override
+    public HandleResponseOperation createHandleResponseOperation(Lookup lookup) {
+        int kademliaid = lookup.kademliaid;
+        Message lookupMessage = lookup.lookupMessage;
+        int tid = lookup.transportid;
+
+        HandleResponseOperation handleResponseOperation = null;
+        if(lookup.type.equals("Naive")){
+            if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof KadNode) {
+                handleResponseOperation = new KadToBridgeHandleRespondOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof BridgeNode && lookupMessage.sender instanceof BridgeNode) {
+                handleResponseOperation = new BridgeToBridgeHandleResponseOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof BridgeNode) {
+                handleResponseOperation = new BridgeToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
+            } else if (lookupMessage.receiver instanceof KadNode && lookupMessage.sender instanceof KadNode) {
+                handleResponseOperation = new KadToKadHandleResponseOperation(kademliaid, lookupMessage, tid);
+            }
+        } else{
+            handleResponseOperation = new ImprovedHandleResponseOperation(kademliaid, lookupMessage, tid);
+        }
+
+        return handleResponseOperation;
+    }
+
 
 }

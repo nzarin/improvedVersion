@@ -3,8 +3,10 @@ package peersim.kademlia;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Network;
+import peersim.core.Node;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 /**
@@ -23,6 +25,8 @@ public class CustomDistribution implements peersim.core.Control {
     private final int numberOfBridgeNodesPerDomain;
     private final double fractionAdversarial;
     private int currentIndexNetworkNode;
+    public ArrayList<Domain> domains;
+
 
     /**
      * Constructor that links the Controller and Protocol IDs and creates a uniform random generator.
@@ -37,7 +41,7 @@ public class CustomDistribution implements peersim.core.Control {
         this.numberOfDomains = KademliaCommonConfig.NUMBER_OF_DOMAINS;
         this.numberOfBridgeNodesPerDomain = KademliaCommonConfig.NUMBER_OF_BRIDGES_PER_DOMAIN;
         this.currentIndexNetworkNode = 0;
-
+        this.domains = new ArrayList<>();
     }
 
     /**
@@ -52,10 +56,9 @@ public class CustomDistribution implements peersim.core.Control {
         //create them
         for (int i = 0; i < amountKadNodes; ++i) {
             BigInteger tmpID = urg.generateID();
-            int tmpDomain = urg.selectDomain();
             if (!mapNIDoPID.containsValue(tmpID)) {
                 KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
-                KademliaNode kadNode = new KadNode(tmpID, tmpDomain, kademliaProtocol);
+                KademliaNode kadNode = new KadNode(tmpID, selectRandomDomain(), kademliaProtocol, Role.NORMAL);
                 kademliaProtocol.setKadNode((KadNode) kadNode);
                 mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpID);
                 //determine whether this node has to be an adversarial
@@ -76,13 +79,13 @@ public class CustomDistribution implements peersim.core.Control {
     private void generateBridgeNodes() {
 
         //for every domain
-        for (int i = 0; i < numberOfDomains; ++i) {
+        for (int i = 0; i < domains.size(); ++i) {
             //generate the necessary amount of bridge nodes
             for (int j = 0; j < numberOfBridgeNodesPerDomain; j++) {
                 BigInteger tmpId = urg.generateID();
                 if (!mapNIDoPID.containsValue(tmpId)) {
                     KademliaProtocol kademliaProtocol = (KademliaProtocol) Network.get(currentIndexNetworkNode).getProtocol(protocolID);
-                    KademliaNode bridgeNode = new BridgeNode(tmpId, i, kademliaProtocol);
+                    KademliaNode bridgeNode = new BridgeNode(tmpId, domains.get(i), kademliaProtocol);
                     kademliaProtocol.setBridgeNode((BridgeNode) bridgeNode);
                     mapNIDoPID.put(Network.get(currentIndexNetworkNode).getID(), tmpId);
                     currentIndexNetworkNode++;
@@ -91,6 +94,17 @@ public class CustomDistribution implements peersim.core.Control {
                 }
             }
         }
+    }
+
+    private void createDomains() {
+        for(int i = 0; i < numberOfDomains; i++){
+            Domain dom = new Domain(urg.generateID());
+            domains.add(dom);
+        }
+    }
+
+    public Domain selectRandomDomain(){
+        return domains.get(CommonState.r.nextInt(domains.size()));
     }
 
 
@@ -104,6 +118,9 @@ public class CustomDistribution implements peersim.core.Control {
         System.err.println();
         System.err.println("Assigning kademlia node identifiers to nodes in the network:");
 
+        //create domains
+        createDomains();
+
         // create normal nodes
         generateKadNodes();
 
@@ -114,6 +131,8 @@ public class CustomDistribution implements peersim.core.Control {
 
         return false;
     }
+
+
 
 
 }

@@ -20,11 +20,14 @@ public class Statistician {
         if (fop.closestSet.containsKey(fop.destNode) && Util.nodeIdtoNode(fop.destNode.getNodeId(), kademliaid).isUp()) {
 
             updateSuccessfulLookup(currentNode, fop);
-
+//            System.err.println();
+//            System.err.println("SUCCESFULL LOOKUP! ");
             // if I am still up -> FAILURE LOOKUP
         } else if (Util.nodeIdtoNode(currentNode.getNodeId(), kademliaid).isUp()) {
 
             updateFailedLookup(currentNode, fop);
+//            System.err.println();
+//            System.err.println("FAILED LOOKUP! ");
 
         } else {
 
@@ -81,7 +84,7 @@ public class Statistician {
 
         long duration = (CommonState.getTime() - (findOp.timestamp));
 
-        if (currentNode.getDomain() == findOp.destNode.getDomain()) {
+        if (findOp.scope.equals(Scope.INTRADOMAIN)) {
             updateIntraDomainLookupStatistics(findOp, duration, true);
             KademliaObserver.shortestAmountHops_INTRA_SUCCESS.add(findOp.shortestNrHops);
             KademliaObserver.timeStore_INTRA_SUCCESS.add(duration);
@@ -102,7 +105,7 @@ public class Statistician {
         long duration = (CommonState.getTime() - (findOp.timestamp));
 
         //update the correct inter or intra domain statistics
-        if (currentNode.getDomain() == findOp.destNode.getDomain()) {
+        if (findOp.scope.equals(Scope.INTRADOMAIN)) {
             updateIntraDomainLookupStatistics(findOp, duration, false);
             KademliaObserver.timeStore_INTRA_FAILURE.add(duration);
             KademliaObserver.messageStore_INTRA_FAILURE.add(findOp.nrMessages);

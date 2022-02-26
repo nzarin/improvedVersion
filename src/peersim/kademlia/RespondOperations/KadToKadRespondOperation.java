@@ -2,12 +2,13 @@ package peersim.kademlia.RespondOperations;
 
 import peersim.kademlia.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  *  This class represents the respond operation when the source and target are both KadNodes
  */
-public class KadToKadRespondOperation extends RespondOperation2 {
+public class KadToKadRespondOperation extends RespondOperation {
 
     public KadToKadRespondOperation(int kademliaid, Message lookupMessage, int tid){
         this.kademliaid = kademliaid;
@@ -24,12 +25,11 @@ public class KadToKadRespondOperation extends RespondOperation2 {
             lookupMessage.receiver.getRoutingTable().addNeighbour((KadNode) lookupMessage.sender);
         }
 
-
         // get the k closest nodes to target node -> I AM RECEIVER OF THE MESSAGE
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+        ArrayList<KadNode> neighbours = lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
         //get the BETA closest nodes from the neighbours
-        KadNode[] betaNeighbours = Arrays.copyOfRange(neighbours, 0, KademliaCommonConfig.BETA);
+        ArrayList<KadNode> betaNeighbours = new ArrayList<>(neighbours.subList(0, KademliaCommonConfig.BETA+1));
 
         //update statistics
         FindOperation findOp = lookupMessage.sender.getFindOperationsMap().get(lookupMessage.operationId);

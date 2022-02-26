@@ -1,6 +1,8 @@
-package peersim.kademlia.FindOperations;
+package peersim.kademlia.RequestOperations;
 
 import peersim.kademlia.*;
+
+import java.util.ArrayList;
 
 /**
  * This class represents the find operation when the source and target are both KadNodes
@@ -29,17 +31,18 @@ public class KadToKadRequestOperation extends RequestOperation {
         //check whether the findOp object already exists (inter-domain) or whether we have to create one (intra-domain)
         FindOperation findOp;
         if(lookupMessage.src.getDomain() == lookupMessage.target.getDomain()){
-            findOp = new FindOperation((KadNode) lookupMessage.target, lookupMessage.timestamp);
+            findOp = new FindOperation((KadNode) lookupMessage.src, (KadNode) lookupMessage.target, lookupMessage.timestamp);
+            findOp.scope = Scope.INTRADOMAIN;
             findOp.body = lookupMessage.body;
         } else{
             findOp = (FindOperation) lookupMessage.body;
         }
 
-        //add the findOp to my map of find operations any way
+        //add the findOp to my map of find operations anyway
         lookupMessage.receiver.getFindOperationsMap().put(findOp.operationId, findOp);
 
-        // get the K closest node to search key
-        KadNode[] neighbours = lookupMessage.receiver.getRoutingTable().getKNeighbours((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
+        // get the K-closest node to search key
+        ArrayList<KadNode> neighbours = lookupMessage.receiver.getRoutingTable().getNextHopCandidates((KadNode) lookupMessage.target, (KadNode) lookupMessage.receiver, (KadNode) lookupMessage.src);
 
         // update the list of closest nodes and re-initialize available requests
         findOp.updateClosestSet(neighbours);
@@ -47,7 +50,7 @@ public class KadToKadRequestOperation extends RequestOperation {
 
         //send ALPHA route messages
         for (int i = 0; i < KademliaCommonConfig.ALPHA; i++) {
-            KadNode nextNode = findOp.getNeighbour();
+            KadNode nextNode = findOp.getNeighbourThisDomain();
             if (nextNode != null) {
 
                 //update statistics of the find operation

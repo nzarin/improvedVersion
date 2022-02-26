@@ -5,9 +5,9 @@ package peersim.kademlia;
  */
 public class ImprovedKademliaProtocol extends Lookup {
 
-    LookupIngredientFactory2 lif2;
+    LookupIngredientFactory lif2;
 
-    public ImprovedKademliaProtocol(LookupIngredientFactory2 lookupFactory2) {
+    public ImprovedKademliaProtocol(LookupIngredientFactory lookupFactory2) {
         this.lif2 = lookupFactory2;
     }
 
@@ -23,7 +23,7 @@ public class ImprovedKademliaProtocol extends Lookup {
      */
     @Override
     public void performRequestOp() {
-        this.findOp = lif2.createRequestOperation(kademliaid, lookupMessage, transportid);
+        this.findOp = lif2.createRequestOperation(this);
         findOp.find();
 
     }
@@ -33,7 +33,7 @@ public class ImprovedKademliaProtocol extends Lookup {
      */
     @Override
     public void performRespondOp() {
-        this.resOp = lif2.createRespondOperation(kademliaid, lookupMessage, transportid);
+        this.resOp = lif2.createRespondOperation(this);
         resOp.respond();
     }
 
@@ -42,7 +42,7 @@ public class ImprovedKademliaProtocol extends Lookup {
      */
     @Override
     public void performHandleResponseOp() {
-        this.handleResOp = lif2.createHandleResponseOperation(kademliaid, lookupMessage, transportid);
+        this.handleResOp = lif2.createHandleResponseOperation(this);
         handleResOp.handleResponse();
     }
 
